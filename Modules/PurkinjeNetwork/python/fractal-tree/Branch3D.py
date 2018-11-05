@@ -3,6 +3,7 @@
 This module contains the Branch class (one branch of the tree)  and the Nodes class
 """
 
+import logging
 import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 from operator import itemgetter
@@ -47,6 +48,8 @@ class Branch:
 #        self.normal=np.array([0.0,0.0,0.0])
         self.queue=[]
         self.growing=True
+        self._logger = logging.getLogger('fractal-tree')
+        #
         shared_node=-1
         init_normal=mesh.normals[init_tri]
         nodes.update_collision_tree(brother_nodes)
@@ -66,13 +69,13 @@ class Branch:
             intriangle=self.add_node_to_queue(mesh,self.queue[i-1],dir*l/Nsegments)
             #print 'intriangle',intriangle
             if not intriangle:
-                print 'Point not in triangle',i
-#                print self.queue[i-1]+dir*l/50.
+                self._logger.debug('Point not in triangle %d' % i)
+#               print self.queue[i-1]+dir*l/50.
                 self.growing=False
                 break
             collision=nodes.collision(self.queue[i])
             if collision[1]<l/5.:
-                print "Collision",i, collision
+                self._logger.debug("Collision %d %s" % (i, str(collision)))
                 self.growing=False
                 self.queue.pop()
                 self.triangles.pop()
@@ -146,7 +149,7 @@ class Nodes:
         self.vtk_tree.BuildLocatorFromPoints(points)
 
         self.tree=cKDTree(self.nodes)
-
+        self._logger = logging.getLogger('fractal-tree')
  
     def add_nodes(self,queue):
         """This function stores a list of nodes of a branch and returns the node indices. It also updates the tree to compute distances.
@@ -191,10 +194,10 @@ class Nodes:
         # [davep]
         d,node=self.tree.query(point)
 
-        print("[distance_from_point] ----------------")
-        print("[distance_from_point] point %s " % (str(point)))
-        print("[distance_from_point] vtk d %f  node %d" % (vtk_d, vtk_node))
-        print("[distance_from_point] sci d %f  node %d" % (d, node))
+        self._logger.debug(" ----------------")
+        self._logger.debug("point %s " % (str(point)))
+        self._logger.debug("vtk d %f  node %d" % (vtk_d, vtk_node))
+        self._logger.debug("sci d %f  node %d" % (d, node))
 
         d = vtk_d
         node = vtk_node
@@ -233,7 +236,7 @@ class Nodes:
         if len(nodes_to_consider)==0:
             nodes_to_consider=[np.array([-100000000000.0,-100000000000.0,-100000000000.0])]
             self.nodes_to_consider_keys=[100000000]
-            print "no nodes to consider"
+            self._logger.debug("No nodes to consider")
 
         points = vtk.vtkPoints()
         for node in nodes_to_consider: 
@@ -261,10 +264,10 @@ class Nodes:
         # [davep]
         d,node=self.collision_tree.query(point)
 
-        print("[collision] ----------------")
-        print("[collision] point %s " % (str(point)))
-        print("[collision] vtk d %f  node %d" % (vtk_d, vtk_node))
-        print("[collision] sci d %f  node %d" % (d, node))
+        self._logger.debug("----------------")
+        self._logger.debug("point %s " % (str(point)))
+        self._logger.debug("vtk d %f  node %d" % (vtk_d, vtk_node))
+        self._logger.debug("sci d %f  node %d" % (d, node))
 
         d = vtk_d
         node = vtk_node
