@@ -29,7 +29,7 @@ class Parameters():
         
     """
     def __init__(self):
-        self.meshfile='sphere.obj'
+        self.meshfile='sphere.vtu'
         self.filename='sphere-line'
         self.init_node=np.array([-1.0 ,0., 0.])
         self.second_node=np.array([-0.964,  0.00,  0.266      ])

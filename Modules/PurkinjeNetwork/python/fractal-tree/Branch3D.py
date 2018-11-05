@@ -7,6 +7,8 @@ import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 from operator import itemgetter
 from scipy.spatial import cKDTree
+import vtk 
+from math import sqrt 
 
 pool = ThreadPool(16) 
 
@@ -136,7 +138,16 @@ class Nodes:
         self.nodes.append(init_node)
         self.last_node=0
         self.end_nodes=[]
+
+        points = vtk.vtkPoints()
+        for node in self.nodes: 
+            points.InsertNextPoint( node[0], node[1], node[2] )
+        self.vtk_tree=vtk.vtkKdTree()
+        self.vtk_tree.BuildLocatorFromPoints(points)
+
         self.tree=cKDTree(self.nodes)
+
+ 
     def add_nodes(self,queue):
         """This function stores a list of nodes of a branch and returns the node indices. It also updates the tree to compute distances.
         
@@ -151,8 +162,16 @@ class Nodes:
             self.nodes.append(point)
             self.last_node+=1
             nodes_id.append(self.last_node)
+
+        points = vtk.vtkPoints()
+        for node in self.nodes: 
+            points.InsertNextPoint( node[0], node[1], node[2] )
+        self.vtk_tree=vtk.vtkKdTree()
+        self.vtk_tree.BuildLocatorFromPoints(points)
+
         self.tree=cKDTree(self.nodes)
         return nodes_id
+
     def distance_from_point(self,point):
         """This function returns the distance from any point to the closest node in the tree.
         
@@ -162,12 +181,32 @@ class Nodes:
         Returns:
             d (float): the distance between point and the closest node in the tree.
         """
+
+        dist = 0.0
+        vtk_d = vtk.reference(dist)
+        vtk_node = self.vtk_tree.FindClosestPoint( point, vtk_d )
+        vtk_d = sqrt(vtk_d)
+        #if vtk_d == 0.0: vtk_d = 1.73205080756e+11
+
+        # [davep]
         d,node=self.tree.query(point)
+
+        print("[distance_from_point] ----------------")
+        print("[distance_from_point] point %s " % (str(point)))
+        print("[distance_from_point] vtk d %f  node %d" % (vtk_d, vtk_node))
+        print("[distance_from_point] sci d %f  node %d" % (d, node))
+
+        d = vtk_d
+        node = vtk_node
+
   #      distance=pool.map(lambda a: np.linalg.norm(a-point),self.nodes.values())
         return d
+
     def distance_from_node(self,node):
         """This function returns the distance from any node to the closest node in the tree.
         
+          [DaveP] Does not seem to be used.
+
         Args:
             node (int): the index of the node to calculate the distance from.
             
@@ -177,6 +216,7 @@ class Nodes:
         d, node = self.tree.query(self.nodes[node])
    #     distance=pool.map(lambda a: np.linalg.norm(a-self.nodes[node]),self.nodes.values())
         return d
+
     def update_collision_tree(self,nodes_to_exclude):
         """This function updates the collision_tree excluding a list of nodes from all the nodes in the tree. If all the existing nodes are excluded, one distant node is added.
         
@@ -194,7 +234,15 @@ class Nodes:
             nodes_to_consider=[np.array([-100000000000.0,-100000000000.0,-100000000000.0])]
             self.nodes_to_consider_keys=[100000000]
             print "no nodes to consider"
+
+        points = vtk.vtkPoints()
+        for node in nodes_to_consider: 
+            points.InsertNextPoint( node[0], node[1], node[2] )
+        self.vtk_collision_tree=vtk.vtkKdTree()
+        self.vtk_collision_tree.BuildLocatorFromPoints(points)
+
         self.collision_tree=cKDTree(nodes_to_consider)
+
     def collision(self,point):
         """This function returns the distance between one point and the closest node in the tree and the index of the closest node using the collision_tree.
         
@@ -204,8 +252,25 @@ class Nodes:
         Returns:
             collision (tuple): (distance to the closest node, index of the closest node)
         """
+        dist = 0.0
+        vtk_d = vtk.reference(dist)
+        vtk_node = self.vtk_collision_tree.FindClosestPoint( point, vtk_d )
+        vtk_d = sqrt(vtk_d)
+        if vtk_d == 0.0: vtk_d = float("inf") 
+
+        # [davep]
         d,node=self.collision_tree.query(point)
+
+        print("[collision] ----------------")
+        print("[collision] point %s " % (str(point)))
+        print("[collision] vtk d %f  node %d" % (vtk_d, vtk_node))
+        print("[collision] sci d %f  node %d" % (d, node))
+
+        d = vtk_d
+        node = vtk_node
+
         collision=(self.nodes_to_consider_keys[node],d)
+
         return collision
     def gradient(self,point):
         """This function returns the gradient of the distance from the existing points of the tree from any point. It uses a central finite difference approximation.
