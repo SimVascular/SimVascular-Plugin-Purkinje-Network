@@ -29,24 +29,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef sv4guiPurkinjeNetworkEdit_H
-#define sv4guiPurkinjeNetworkEdit_H
+#ifndef SV4GUI_PURKINJENETWORKEDIT_H
+#define SV4GUI_PURKINJENETWORKEDIT_H
 
-#include <string>
-#include <QString>
-#include <QDir>
-#include <sv4gui_QmitkFunctionality.h>
+//[dp] #include "sv4gui_MitkMesh.h"
+#include "sv4gui_Model.h"
 
+#include "sv4gui_ModelDataInteractor.h"
 #include "sv4gui_DataNodeOperationInterface.h"
-#include "sv4gui_DataNodeOperation.h"
+#include "sv4gui_LocalTableDelegate.h"
+#include "sv4gui_QmitkFunctionality.h"
 #include "sv4gui_ProjectManager.h"
 
-#include "sv4gui_PurkinjeNetworkUtils.h"
-#include <sv4gui_PurkinjeSeedContainer.h>
-#include <sv4gui_PurkinjeSeedInteractor.h>
-#include <sv4gui_PurkinjeSeedMapper.h>
+#include <vtkSphereWidget.h>
 
-#include <mitkImage.h>
+#include <QWidget>
+#include <QStandardItemModel>
+#include <QItemDelegate>
 
 namespace Ui {
 class sv4guiPurkinjeNetworkEdit;
@@ -58,111 +57,177 @@ class sv4guiPurkinjeNetworkEdit : public sv4guiQmitkFunctionality
 
 public:
 
+    static const QString EXTENSION_ID;
+
     sv4guiPurkinjeNetworkEdit();
 
     virtual ~sv4guiPurkinjeNetworkEdit();
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
-
-    static const QString EXTENSION_ID;
-
-    void UpdateImageList();
-
-    std::string getImageName(int imageIndex);
-
-    mitk::Image::Pointer getImage(std::string image_name);
-
-    virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
-
-    sv4guiPurkinjeNetworkUtils::itkImPoint getItkImage(int index);
-
-    void addNode(mitk::DataNode::Pointer child_node, mitk::DataNode::Pointer parent_node);
-
-    void storeImage(sv4guiPurkinjeNetworkUtils::itkImPoint image);
-
-    void storePolyData(vtkSmartPointer<vtkPolyData> vtkPd);
-
 public slots:
 
-    //display
-    void seedSize();
-    void displayGuide(bool state);
-    void displaySeeds(bool state);
+    void RunMesher();
 
-    //displaay buttons
-    void imageEditingTabSelected();
-    void filteringTabSelected();
-    void segmentationTabSelected();
-    void pipelinesTabSelected();
+    void RunHistory();
 
-    //run buttons
-    void runFullCollidingFronts();
+    void ClearAll();
 
-    void runThreshold();
+    void AddObservers();
 
-    void runBinaryThreshold();
+    void RemoveObservers();
 
-    void runCollidingFronts();
+    void UpdateGUI();
 
-    void runGradientMagnitude();
+    void SetEstimatedEdgeSize();
 
-    void runEditImage();
+    void TableFaceListSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
 
-    void runCropImage();
+    void SetLocal( bool checked = false );
 
-    void runResampleImage();
+    void ClearLocal( bool checked = false );
 
-    void runZeroLevel();
+    void TableViewLocalContextMenuRequested( const QPoint & pos );
 
-    void runSmoothing();
+    void TableRegionListSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
 
-    void runAnisotropic();
+    void TableDomainsListSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
 
-    void runIsovalue();
+    void DeleteSelectedDomains( bool checked = false );
 
-    void runGeodesicLevelSet();
+    void SetSubDomainSize( bool checked = false );
+
+    void SetRegion( bool checked = false );
+
+    void DeleteSelectedRegions( bool checked = false );
+
+    void TableViewRegionContextMenuRequested( const QPoint & pos );
+
+    void TableViewDomainsContextMenuRequested( const QPoint & pos );
+
+    void UpdateFaceListSelection();
+
+    void UpdateTetGenGUI();
+
+    void UpdateMeshSimGUI();
+
+    void UpdateAdaptGUI(int selected);
+
+    void AddSphere();
+
+    void AddHole();
+
+    void AddSubDomain();
+
+    void ShowSphereInteractor(bool checked);
+
+    void DisplayMeshInfo();
+
+    void SetResultFile();
+
+    void Adapt();
+
+    void ShowModel(bool checked = false);
 
 public:
 
+    int GetTimeStep();
+
+    void SetupGUI(QWidget *parent );
+
+    void RunCommands(bool fromGUI = true);
+
+    double EstimateEdgeSize();
+
+    std::vector<std::string> CreateCmdsT();
+
+    std::vector<std::string> CreateCmdsM();
+
+//    static void UpdateSphereData( vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* vtkNotUsed(clientData), void* vtkNotUsed(callData) );
+
+    void UpdateSphereData();
+
+//    std::vector<int> GetSelectedFaceIDs();
+
+    virtual void CreateQtPartControl(QWidget *parent) override;
+
+    virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+
+    virtual void NodeChanged(const mitk::DataNode* node) override;
+
+    virtual void NodeAdded(const mitk::DataNode* node) override;
+
+    virtual void NodeRemoved(const mitk::DataNode* node) override;
+
+//    virtual void Activated() override;
+
+//    virtual void Deactivated() override;
+
+    virtual void Visible() override;
+
+    virtual void Hidden() override;
+
+    bool IsDouble(QString value);
+
+    bool IsInt(QString value);
+
+    QString GetMeshFolderPath();
+
 protected:
 
-  Ui::sv4guiPurkinjeNetworkEdit *ui;
-  QWidget *m_parent;
-  QmitkStdMultiWidget* m_DisplayWidget;
+    QWidget* m_Parent;
 
-  mitk::DataNode::Pointer m_ProjectFolderNode;
-  mitk::DataStorage::Pointer m_DataStorage;
-  mitk::DataNode::Pointer m_SelecteNode;
-  int m_TimeStep;
-  QString m_StoreDir;
+    Ui::sv4guiPurkinjeNetworkEdit *ui;
 
-  sv4guiDataNodeOperationInterface* m_Interface;
+    //[dp] sv4guiMitkMesh* m_MitkMesh;
 
-  std::string m_selectedAlgorithm;
+    sv4guiModel* m_Model;
 
+    std::string m_MeshType;
 
-  sv4guiPurkinjeSeedContainer::Pointer m_SeedContainer;
+    mitk::DataNode::Pointer m_MeshNode;
 
-  bool m_init = true;
+    mitk::DataNode::Pointer m_ModelNode;
 
-  sv4guiPurkinjeSeedInteractor::Pointer m_SeedInteractor;
+    sv4guiModelDataInteractor::Pointer m_DataInteractor;
 
-  sv4guiPurkinjeSeedMapper::Pointer m_SeedMapper;
+    long m_ModelSelectFaceObserverTag;
+//    long m_SphereObserverTag;
 
-  sv4guiPurkinjeNetworkUtils::itkImPoint CombinedCollidingFronts(
-    sv4guiPurkinjeNetworkUtils::itkImPoint, double lower, double upper);
+    QmitkStdMultiWidget* m_DisplayWidget;
 
-  mitk::DataNode::Pointer m_SeedNode;
+    QMenu* m_TableMenuLocal;
+    QStandardItemModel* m_TableModelLocal;
+
+    QMenu* m_TableMenuRegion;
+    QStandardItemModel* m_TableModelRegion;
+
+    QMenu* m_TableMenuDomains;
+    QStandardItemModel* m_TableModelDomains;
+
+    int m_SelectedRegionIndex;
+    int m_SelectedDomainsIndex;
+
+    vtkSmartPointer<vtkSphereWidget> m_SphereWidget;
+
+    bool m_UndoAble;
+
+    sv4guiDataNodeOperationInterface* m_Interface;
+
+    sv4guiLocalTableDelegate* m_CustomDelegate;
+
+    QItemDelegate* m_DefaultDelegate;
+
+    mitk::DataNode::Pointer m_ProjectFolderNode;
+    mitk::DataStorage::Pointer m_DataStorage;
+    QString m_StoreDir;
 
 private:
 
-  void Initialize();
-  void makeDir();
-  QDir getDir();
-  mitk::DataNode::Pointer getProjectNode();
-  void createDataFolder();
-  sv4guiProjectManager svProj;
+    void Initialize();
+    mitk::DataNode::Pointer getProjectNode();
+    sv4guiProjectManager svProj;
+
+
 
 };
 
-#endif // sv4guiPurkinjeNetworkEdit_H
+#endif // SV4GUI_PURKINJENETWORKEDIT_H

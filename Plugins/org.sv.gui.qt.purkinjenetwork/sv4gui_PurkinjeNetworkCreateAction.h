@@ -29,42 +29,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "sv4gui_PurkinjeNetworkPluginActivator.h"
-#include "sv4gui_PurkinjeNetworkCreateAction.h"
-#include "sv4gui_PurkinjeNetworkLegacySaveAction.h"
-#include "sv4gui_PurkinjeNetworkLoadSurfaceAction.h"
-#include "sv4gui_PurkinjeNetworkLoadVolumeAction.h"
-#include "sv4gui_PurkinjeNetworkEdit.h"
+#ifndef SV4GUI_PURKINJENETWORKCREATEACTION_H
+#define SV4GUI_PURKINJENETWORKCREATEACTION_H
 
-//sv4guiPurkinjeNetworkPluginActivator* sv4guiPurkinjeNetworkPluginActivator::m_Instance = nullptr;
-//ctkPluginContext* sv4guiPurkinjeNetworkPluginActivator::m_Context = nullptr;
+#include <org_sv_gui_qt_purkinjenetwork_Export.h>
 
-void sv4guiPurkinjeNetworkPluginActivator::start(ctkPluginContext* context)
+#include "sv4gui_PurkinjeNetworkCreate.h"
+
+#include <sv4gui_mitkIContextMenuAction.h>
+#include <mitkDataNode.h>
+
+#include <QObject>
+
+class SV_QT_PURKINJENETWORK sv4guiPurkinjeNetworkCreateAction : public QObject, public svmitk::IContextMenuAction
 {
-//    m_Instance = this;
-//    m_Context = context;
+  Q_OBJECT
+  Q_INTERFACES(svmitk::IContextMenuAction)
 
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkCreateAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLegacySaveAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLoadSurfaceAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLoadVolumeAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkEdit, context)
-}
+public:
+  sv4guiPurkinjeNetworkCreateAction();
+  ~sv4guiPurkinjeNetworkCreateAction();
 
-void sv4guiPurkinjeNetworkPluginActivator::stop(ctkPluginContext* context)
-{
-//    Q_UNUSED(context)
+  // IContextMenuAction
+  void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;
+  void SetDataStorage(mitk::DataStorage *dataStorage) override;
+  void SetSmoothed(bool smoothed) override {}
+  void SetDecimated(bool decimated) override {}
+  void SetFunctionality(berry::QtViewPart *functionality) override;
 
-//    m_Context = nullptr;
-//    m_Instance = nullptr;
-}
+private:
+  sv4guiPurkinjeNetworkCreateAction(const sv4guiPurkinjeNetworkCreateAction &);
+  sv4guiPurkinjeNetworkCreateAction & operator=(const sv4guiPurkinjeNetworkCreateAction &);
 
-//ctkPluginContext* sv4guiPurkinjeNetworkPluginActivator::GetContext()
-//{
-//  return m_Context;
-//}
+  mitk::DataStorage::Pointer m_DataStorage;
+  berry::QtViewPart *m_Functionality;
 
-//sv4guiPurkinjeNetworkPluginActivator* sv4guiPurkinjeNetworkPluginActivator::GetInstance()
-//{
-//    return m_Instance;
-//}
+  sv4guiPurkinjeNetworkCreate* m_MeshCreateWidget;
+};
+
+#endif

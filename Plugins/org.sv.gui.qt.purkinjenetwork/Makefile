@@ -39,41 +39,51 @@ CXXFLAGS = $(GLOBAL_CXXFLAGS) \
 	   $(VTK_INCDIRS) \
 	   $(TCLTK_INCDIR) \
            $(PYTHON_INCDIR) \
-           $(MESHSIM_INCDIR) \
-           $(PARASOLID_INCDIR) \
+           $(ZLIB_INCDIR) \
+           $(TETGEN_INCDIR) \
            $(QT_INCDIRS) $(QT_DEFS) \
 	   $(ITK_INCDIRS) \
            $(MITK_INCDIRS) $(MITK_DEFS) \
-           -Dorg_sv_gui_qt_imageprocessing_EXPORTS \
-           -DUS_MODULE_NAME=sv4guiModuleImageProcessing
+           $(MESHSIM_INCDIR) \
+           $(PARASOLID_INCDIR) \
+           -Dorg_sv_gui_qt_meshing_EXPORTS \
+           -DUS_MODULE_NAME=sv4guiModuleMeshing
 
 ifeq ($(SV_USE_OPENCASCADE_QT_GUI),1)
     CXXFLAGS += $(OPENCASCADE_INCDIR)
 endif
 
 HDRS	= \
-    sv4gui_ImageProcessing.h \
-    sv4gui_ImageSeedContainer.h \
-    sv4gui_ImageSeedMapper.h \
-    sv4gui_ImageSeedInteractor.h \
-    sv4gui_ImageProcessingPluginActivator.h
+    sv4gui_MeshCreate.h \
+    sv4gui_MeshCreateAction.h \
+    sv4gui_MeshEdit.h \
+    sv4gui_LocalTableDelegate.h \
+    sv4gui_MeshLegacySaveAction.h \
+    sv4gui_MeshLoadSurfaceAction.h \
+    sv4gui_MeshLoadVolumeAction.h \
+    sv4gui_MeshingPluginActivator.h
 
 CXXSRCS	= \
-    sv4gui_ImageProcessing.cxx \
-    sv4gui_ImageSeedContainer.cxx \
-    sv4gui_ImageSeedMapper.cxx \
-    sv4gui_ImageSeedInteractor.cxx \
-    sv4gui_ImageProcessingPluginActivator.cxx
+    sv4gui_MeshCreate.cxx \
+    sv4gui_MeshCreateAction.cxx \
+    sv4gui_MeshEdit.cxx \
+    sv4gui_VtkMeshSphereWidget.cxx \
+    sv4gui_LocalTableDelegate.cxx \
+    sv4gui_MeshLegacySaveAction.cxx \
+    sv4gui_MeshLoadSurfaceAction.cxx \
+    sv4gui_MeshLoadVolumeAction.cxx \
+    sv4gui_MeshingPluginActivator.cxx
 
 UIFILES = \
-    sv4gui_ImageProcessing.ui
+    sv4gui_MeshCreate.ui \
+    sv4gui_MeshEdit.ui
 
-QRCFILES = org_sv_gui_qt_imageprocessing_manifest.qrc \
-           org_sv_gui_qt_imageprocessing_cached.qrc
+QRCFILES = org_sv_gui_qt_meshing_manifest.qrc \
+           org_sv_gui_qt_meshing_cached.qrc
 
 RCFILES = \
   plugin.xml \
-  resources/image_processing.png
+  resources/mesh.png
 
 CXXSRCS += $(addprefix moc_,$(notdir $(HDRS:.h=.cxx)))
 CXXSRCS += $(addprefix qrc_,$(notdir $(QRCFILES:.qrc=.cxx)))
@@ -87,8 +97,8 @@ DLLLIBS += $(PYTHON_LIB) $(VTK_LIBS) $(ITK_LIBS) $(QT_LIBS) $(MITK_LIBS)
 DLLLIBS +=  \
           $(SVLIBFLAG)$(SV_PLUGIN_DATAMANAGER_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_COMMON_NAME)$(LIBLINKEXT) \
-          $(SVLIBFLAG)$(SV_LIB_MODULE_IMAGEPROCESSING_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_SEGMENTATION_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_MESH_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_MODEL_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_PATH_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_PROJECTMANAGEMENT_NAME)$(LIBLINKEXT) \
@@ -99,14 +109,33 @@ DLLLIBS +=  \
           $(SVLIBFLAG)$(SV_LIB_UTILS_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_GLOBALS_NAME)$(LIBLINKEXT)
 
+ifeq ($(SV_USE_MESHSIM_DISCRETE_MODEL_QT_GUI),1)
+    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_MESHSIM_DISCRETE_SOLID_NAME)$(LIBLINKEXT)
+endif
+ifeq ($(SV_USE_MESHSIM_SOLID_MODEL_QT_GUI),1)
+    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_MESHSIM_SOLID_NAME)$(LIBLINKEXT)
+endif
+ifeq ($(SV_USE_PARASOLID_QT_GUI),1)
+    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_PARASOLID_SOLID_NAME)$(LIBLINKEXT)
+endif
+ifeq ($(SV_USE_OPENCASCADE_QT_GUI),1)
+    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_OpenCASCADE_SOLID_NAME)$(LIBLINKEXT)
+endif
+
+DLLLIBS += $(PARASOLID_LIBS) $(MESHSIM_LIBS)
+
+ifeq ($(SV_USE_OPENCASCADE_QT_GUI),1)
+    DLLLIBS += $(OPENCASCADE_LIBS)
+endif
+
 EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I../org.sv.gui.qt.datamanager
 
-TARGET_LIB_NAME = $(SV_PLUGIN_IMAGEPROCESSING_NAME)
+TARGET_LIB_NAME = $(SV_PLUGIN_MESHING_NAME)
 
-PLUGIN_SYMBOLIC_NAME = org_sv_gui_qt_imageprocessing
-PLUGIN_EXPORTS_NAME = org_sv_gui_qt_imageprocessing
+PLUGIN_SYMBOLIC_NAME = org_sv_gui_qt_meshing
+PLUGIN_EXPORTS_NAME = org_sv_gui_qt_meshing
 PLUGIN_EXPORTS_PREFIX = SV_QT_
-PLUGIN_NAME = IMAGEPROCESSING
+PLUGIN_NAME = MESHING
 
 SV_COPY_DLL_TO_BIN_PLUGINS = 1
 

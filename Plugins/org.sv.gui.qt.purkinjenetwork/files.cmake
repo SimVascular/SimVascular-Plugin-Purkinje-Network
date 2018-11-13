@@ -28,29 +28,31 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set(SRC_CPP_FILES
-
-)
-
-set(INTERNAL_CPP_FILES
+set(CPP_FILES
+    sv4gui_PurkinjeNetworkCreate.cxx
+    sv4gui_PurkinjeNetworkCreateAction.cxx
     sv4gui_PurkinjeNetworkEdit.cxx
-    sv4gui_PurkinjeSeedContainer.cxx
-    sv4gui_PurkinjeSeedMapper.cxx
-    sv4gui_PurkinjeSeedInteractor.cxx
+    sv4gui_VtkPurkinjeNetworkSphereWidget.cxx
+    sv4gui_LocalTableDelegate.cxx
+    sv4gui_PurkinjeNetworkLegacySaveAction.cxx
+    sv4gui_PurkinjeNetworkLoadSurfaceAction.cxx
+    sv4gui_PurkinjeNetworkLoadVolumeAction.cxx
     sv4gui_PurkinjeNetworkPluginActivator.cxx
-    sv4gui_PurkinjeNetworkLoadAction.cxx
 )
 
 set(MOC_H_FILES
+    sv4gui_PurkinjeNetworkCreate.h
+    sv4gui_PurkinjeNetworkCreateAction.h
     sv4gui_PurkinjeNetworkEdit.h
-    sv4gui_PurkinjeSeedContainer.h
-    sv4gui_PurkinjeSeedMapper.h
-    sv4gui_PurkinjeSeedInteractor.h
+    sv4gui_LocalTableDelegate.h
+    sv4gui_PurkinjeNetworkLegacySaveAction.h
+    sv4gui_PurkinjeNetworkLoadSurfaceAction.h
+    sv4gui_PurkinjeNetworkLoadVolumeAction.h
     sv4gui_PurkinjeNetworkPluginActivator.h
-    sv4gui_PurkinjeNetworkLoadAction.h
 )
 
 set(UI_FILES
+    sv4gui_PurkinjeNetworkCreate.ui
     sv4gui_PurkinjeNetworkEdit.ui
 )
 
@@ -60,15 +62,4 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-
 )
-
-set(CPP_FILES )
-
-foreach(file ${SRC_CPP_FILES})
-  set(CPP_FILES ${CPP_FILES} ${file})
-endforeach(file ${SRC_CPP_FILES})
-
-foreach(file ${INTERNAL_CPP_FILES})
-  set(CPP_FILES ${CPP_FILES} ${file})
-endforeach(file ${INTERNAL_CPP_FILES})

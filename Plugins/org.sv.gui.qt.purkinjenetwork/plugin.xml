@@ -8,9 +8,11 @@
           icon="resources/purkinje_network.png" />
   </extension>
 
- <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
-     <contextMenuAction nodeDescriptorName="sv4guiPurkinjeNetworkFolder" label="Import Network" icon="" class="sv4guiPurkinjeNetworkLoadAction" />
- 
+  <extension point="org.sv.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="sv4guiPurkinjeNetworkFolder" label="Create PurkinjeNetwork" icon="" class="sv4guiPurkinjeNetworkCreateAction" />
+    <contextMenuAction nodeDescriptorName="sv4guiMitkPurkinjeNetwork" label="Export PurkinjeNetwork-Complete" icon="" class="sv4guiPurkinjeNetworkLegacySaveAction" />
+    <contextMenuAction nodeDescriptorName="sv4guiMitkPurkinjeNetwork" label="Load/Unload Surface PurkinjeNetwork" icon="" class="sv4guiPurkinjeNetworkLoadSurfaceAction" />
+    <contextMenuAction nodeDescriptorName="sv4guiMitkPurkinjeNetwork" label="Load/Unload Volume PurkinjeNetwork" icon="" class="sv4guiPurkinjeNetworkLoadVolumeAction" />
   </extension>
 
 </plugin>

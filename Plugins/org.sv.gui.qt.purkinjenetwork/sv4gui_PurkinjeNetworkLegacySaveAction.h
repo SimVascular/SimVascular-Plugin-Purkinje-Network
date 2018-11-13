@@ -29,36 +29,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef sv4guiPurkinjeSEEDINTERACTOR_H
-#define sv4guiPurkinjeSEEDINTERACTOR_H
+#ifndef SV4GUI_PURKINJENETWORKLEGACYSAVEACTION_H
+#define SV4GUI_PURKINJENETWORKLEGACYSAVEACTION_H
 
-#include <mitkDataInteractor.h>
-class sv4guiPurkinjeSeedInteractor : public mitk::DataInteractor
+#include <org_sv_gui_qt_purkinjenetwork_Export.h>
+
+#include <sv4gui_mitkIContextMenuAction.h>
+#include <mitkDataNode.h>
+
+#include <QObject>
+
+class SV_QT_PURKINJENETWORK sv4guiPurkinjeNetworkLegacySaveAction : public QObject, public svmitk::IContextMenuAction
 {
+  Q_OBJECT
+  Q_INTERFACES(svmitk::IContextMenuAction)
+
 public:
-  mitkClassMacro(sv4guiPurkinjeSeedInteractor, mitk::DataInteractor)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-  double m_seedRadius = 0.5;
+  sv4guiPurkinjeNetworkLegacySaveAction();
+  ~sv4guiPurkinjeNetworkLegacySaveAction();
 
-protected:
-  sv4guiPurkinjeSeedInteractor();
-  ~sv4guiPurkinjeSeedInteractor();
-
-  virtual void ConnectActionsAndFunctions() override;
-
-  bool IsOverSeed( const mitk::InteractionEvent* interactionEvent );
-
-  void AddSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
-
-  void AddEndSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
-
-  void DeleteSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent );
+  // IContextMenuAction
+  void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;
+  void SetDataStorage(mitk::DataStorage *dataStorage) override;
+  void SetSmoothed(bool smoothed) override {}
+  void SetDecimated(bool decimated) override {}
+  void SetFunctionality(berry::QtViewPart *functionality) override {}
 
 private:
-  std::vector<int> m_selectedSeed;
-  mitk::Point3D m_currentPickedPoint;
-  int m_currentStartSeed = -1;
+  sv4guiPurkinjeNetworkLegacySaveAction(const sv4guiPurkinjeNetworkLegacySaveAction &);
+  sv4guiPurkinjeNetworkLegacySaveAction & operator=(const sv4guiPurkinjeNetworkLegacySaveAction &);
+
+  mitk::DataStorage::Pointer m_DataStorage;
+
 };
 
-#endif // sv4guiPurkinjeSEEDINTERACTOR_H
+#endif

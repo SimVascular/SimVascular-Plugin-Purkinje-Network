@@ -29,12 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef sv4gui_PurkinjeNETWORKPLUGINACTIVATOR_H
-#define sv4gui_PurkinjeNETWORKPLUGINACTIVATOR_H
+#ifndef SV4GUI_PURKINJENETWORKPLUGINACTIVATOR_H
+#define SV4GUI_PURKINJENETWORKPLUGINACTIVATOR_H
 
 #include <ctkPluginActivator.h>
 
-class sv4guiPurkinjeNetworkPluginActivator : public QObject, public ctkPluginActivator
+class sv4guiPurkinjeNetworkPluginActivator :
+        public QObject, public ctkPluginActivator
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org_sv_gui_qt_purkinjenetwork")
@@ -43,13 +44,15 @@ class sv4guiPurkinjeNetworkPluginActivator : public QObject, public ctkPluginAct
 public:
 
 //    static ctkPluginContext* GetContext();
-//    static svPathPlanningPluginActivator* GetInstance();
+//    static sv4guiPurkinjeNetworkPluginActivator* GetInstance();
 
     void start(ctkPluginContext* context) override;
     void stop(ctkPluginContext* context) override;
 
 private:
+//    static sv4guiPurkinjeNetworkPluginActivator* m_Instance;
+//    static ctkPluginContext* m_Context;
 
 };
 
-#endif // sv4guiPurkinjeNETWORKPLUGINACTIVATOR_H
+#endif // SV4GUI_PURKINJENETWORKPLUGINACTIVATOR_H

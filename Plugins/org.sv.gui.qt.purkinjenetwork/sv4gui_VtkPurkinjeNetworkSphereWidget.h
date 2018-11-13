@@ -29,74 +29,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef sv4guiPurkinjeSEEDMAPPER_H
-#define sv4guiPurkinjeSEEDMAPPER_H
+#ifndef SV4GUI_VTKPURKINJENETWORKSPHEREWIDGET_H
+#define SV4GUI_VTKPURKINJENETWORKSPHEREWIDGET_H
 
-#include "mitkVtkMapper.h"
-#include "mitkBaseRenderer.h"
-#include "mitkLocalStorageHandler.h"
+#include "sv4gui_PurkinjeNetworkEdit.h"
 
-#include <vtkAssembly.h>
-#include <vtkPropAssembly.h>
-#if VTK_MAJOR_VERSION == 6
-    #include <vtkPainterPolyDataMapper.h>
-#else
-    #include <vtkOpenGLPolyDataMapper.h>
-#endif
-#include <vtkActor.h>
-#include <vtkSmartPointer.h>
-#include <vtkActor.h>
-#include <string>
-class sv4guiPurkinjeSeedMapper : public mitk::VtkMapper
+#include <vtkSphereWidget.h>
+
+class sv4guiVtkPurkinjeNetworkSphereWidget : public vtkSphereWidget
 {
 public:
+    static sv4guiVtkPurkinjeNetworkSphereWidget* New();
+    vtkTypeMacro(sv4guiVtkPurkinjeNetworkSphereWidget, vtkSphereWidget);
 
-    mitkClassMacro(sv4guiPurkinjeSeedMapper, mitk::VtkMapper);
+    static void SetMeshEdit(sv4guiPurkinjeNetworkEdit* meshEdit);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    void AddMyObserver();
+    void RemoveMyObserver();
 
-    class LocalStorage : public mitk::Mapper::BaseLocalStorage
-    {
-    public:
-
-        vtkSmartPointer<vtkAssembly> m_PropAssembly;
-
-        LocalStorage()
-        {
-            m_PropAssembly = vtkSmartPointer<vtkAssembly>::New();
-        }
-
-        ~LocalStorage()
-        {
-        }
-    };
-
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-
-    mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
-    std::string mode;
-
-    bool m_needsUpdate = true;
-
-    bool m_box = false;
-
-    double m_seedRadius = 0.5;
+    // Handles the events
+    static void ProcessEvents(vtkObject* object,
+                              unsigned long event,
+                              void* clientdata,
+                              void* calldata);
 
 protected:
-    sv4guiPurkinjeSeedMapper();
+    sv4guiVtkPurkinjeNetworkSphereWidget();
 
-    virtual ~sv4guiPurkinjeSeedMapper();
+    long m_EventObserverTag;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    static sv4guiPurkinjeNetworkEdit* m_MeshEdit;
 
-    virtual void ResetMapper( mitk::BaseRenderer* renderer ) override;
-
-    vtkSmartPointer<vtkActor> createSeedActor(int x, int y, int z, int color);
-
-    vtkSmartPointer<vtkActor> createCubeActor(int x1, int y1, int z1,
-    int x2, int y2, int z2 );
 };
 
-#endif /* sv4guiPurkinjeSEEDMAPPER_H */
+#endif

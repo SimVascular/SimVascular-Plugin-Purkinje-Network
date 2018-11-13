@@ -29,42 +29,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "sv4gui_PurkinjeNetworkPluginActivator.h"
-#include "sv4gui_PurkinjeNetworkCreateAction.h"
-#include "sv4gui_PurkinjeNetworkLegacySaveAction.h"
-#include "sv4gui_PurkinjeNetworkLoadSurfaceAction.h"
-#include "sv4gui_PurkinjeNetworkLoadVolumeAction.h"
-#include "sv4gui_PurkinjeNetworkEdit.h"
+#include "sv4gui_VtkPurkinjeNetworkSphereWidget.h"
 
-//sv4guiPurkinjeNetworkPluginActivator* sv4guiPurkinjeNetworkPluginActivator::m_Instance = nullptr;
-//ctkPluginContext* sv4guiPurkinjeNetworkPluginActivator::m_Context = nullptr;
+#include <vtkSmartPointer.h>
+#include <vtkObjectFactory.h>
+#include <vtkCallbackCommand.h>
 
-void sv4guiPurkinjeNetworkPluginActivator::start(ctkPluginContext* context)
+sv4guiPurkinjeNetworkEdit* sv4guiVtkPurkinjeNetworkSphereWidget::m_MeshEdit=NULL;
+
+vtkStandardNewMacro(sv4guiVtkPurkinjeNetworkSphereWidget);
+
+sv4guiVtkPurkinjeNetworkSphereWidget::sv4guiVtkPurkinjeNetworkSphereWidget()
 {
-//    m_Instance = this;
-//    m_Context = context;
-
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkCreateAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLegacySaveAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLoadSurfaceAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLoadVolumeAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkEdit, context)
+    m_EventObserverTag=0;
 }
 
-void sv4guiPurkinjeNetworkPluginActivator::stop(ctkPluginContext* context)
+void sv4guiVtkPurkinjeNetworkSphereWidget::SetMeshEdit(sv4guiPurkinjeNetworkEdit* meshEdit)
 {
-//    Q_UNUSED(context)
-
-//    m_Context = nullptr;
-//    m_Instance = nullptr;
+    m_MeshEdit=meshEdit;
 }
 
-//ctkPluginContext* sv4guiPurkinjeNetworkPluginActivator::GetContext()
-//{
-//  return m_Context;
-//}
+void sv4guiVtkPurkinjeNetworkSphereWidget::AddMyObserver()
+{
+    if(m_EventObserverTag==0)
+    {
+        vtkSmartPointer<vtkCallbackCommand> sphereChangedCommand = vtkSmartPointer<vtkCallbackCommand>::New();
+        sphereChangedCommand->SetCallback(sv4guiVtkPurkinjeNetworkSphereWidget::ProcessEvents);
+        m_EventObserverTag = AddObserver(vtkCommand::InteractionEvent, sphereChangedCommand);
+    }
+}
 
-//sv4guiPurkinjeNetworkPluginActivator* sv4guiPurkinjeNetworkPluginActivator::GetInstance()
-//{
-//    return m_Instance;
-//}
+void sv4guiVtkPurkinjeNetworkSphereWidget::RemoveMyObserver()
+{
+    if(m_EventObserverTag)
+    {
+        RemoveObserver(m_EventObserverTag);
+        m_EventObserverTag=0;
+    }
+}
+
+void sv4guiVtkPurkinjeNetworkSphereWidget::ProcessEvents( vtkObject *vtkNotUsed(object),
+                                           unsigned long event,
+                                           void *vtkNotUsed(clientdata),
+                                           void *vtkNotUsed(calldata) )
+{
+    m_MeshEdit->UpdateSphereData();
+}

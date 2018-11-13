@@ -29,38 +29,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SV4GUI_PURKINJENETWORKLOADACTION_H
-#define SV4GUI_PURKINJENETWORKLOADACTION_H
+#ifndef SV4GUI_LOCALTABLEDELEGATE_H
+#define SV4GUI_LOCALTABLEDELEGATE_H
 
-#include <org_sv_gui_qt_purkinjenetwork_Export.h>
-
-#include <sv4gui_mitkIContextMenuAction.h>
-#include <mitkDataNode.h>
-
+#include <QItemDelegate>
+#include <QModelIndex>
 #include <QObject>
+#include <QSize>
+#include <QComboBox>
 
-class SV_QT_PURKINJENETWORK sv4guiPurkinjeNetworkLoadAction : public QObject, public svmitk::IContextMenuAction
+class sv4guiLocalTableDelegate : public QItemDelegate
 {
-  Q_OBJECT
-  Q_INTERFACES(svmitk::IContextMenuAction)
-
+    Q_OBJECT
 public:
-  sv4guiPurkinjeNetworkLoadAction();
-  ~sv4guiPurkinjeNetworkLoadAction();
+    explicit sv4guiLocalTableDelegate(QObject *parent = 0);
 
-  // IContextMenuAction
-  void Run(const QList<mitk::DataNode::Pointer> &selectedNodes) override;
-  void SetDataStorage(mitk::DataStorage *dataStorage) override;
-  void SetSmoothed(bool smoothed) override {}
-  void SetDecimated(bool decimated) override {}
-  void SetFunctionality(berry::QtViewPart *functionality) override {}
+    QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-private:
-  sv4guiPurkinjeNetworkLoadAction(const sv4guiPurkinjeNetworkLoadAction &);
-  sv4guiPurkinjeNetworkLoadAction & operator=(const sv4guiPurkinjeNetworkLoadAction &);
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
 
-  mitk::DataStorage::Pointer m_DataStorage;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+signals:
+
+public slots:
 
 };
 
-#endif
+#endif // SV4GUI_LOCALTABLEDELEGATE_H

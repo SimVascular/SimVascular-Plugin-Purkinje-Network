@@ -29,42 +29,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "sv4gui_PurkinjeNetworkPluginActivator.h"
-#include "sv4gui_PurkinjeNetworkCreateAction.h"
-#include "sv4gui_PurkinjeNetworkLegacySaveAction.h"
-#include "sv4gui_PurkinjeNetworkLoadSurfaceAction.h"
-#include "sv4gui_PurkinjeNetworkLoadVolumeAction.h"
-#include "sv4gui_PurkinjeNetworkEdit.h"
+#ifndef SV4GUI_PURKINJENETWORKCREATE_H
+#define SV4GUI_PURKINJENETWORKCREATE_H
 
-//sv4guiPurkinjeNetworkPluginActivator* sv4guiPurkinjeNetworkPluginActivator::m_Instance = nullptr;
-//ctkPluginContext* sv4guiPurkinjeNetworkPluginActivator::m_Context = nullptr;
+#include "sv4gui_DataNodeOperationInterface.h"
+#include <mitkDataStorage.h>
+#include <QWidget>
 
-void sv4guiPurkinjeNetworkPluginActivator::start(ctkPluginContext* context)
-{
-//    m_Instance = this;
-//    m_Context = context;
-
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkCreateAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLegacySaveAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLoadSurfaceAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkLoadVolumeAction, context)
-    BERRY_REGISTER_EXTENSION_CLASS(sv4guiPurkinjeNetworkEdit, context)
+namespace Ui {
+class sv4guiPurkinjeNetworkCreate;
 }
 
-void sv4guiPurkinjeNetworkPluginActivator::stop(ctkPluginContext* context)
+class sv4guiPurkinjeNetworkCreate : public QWidget
 {
-//    Q_UNUSED(context)
+    Q_OBJECT
 
-//    m_Context = nullptr;
-//    m_Instance = nullptr;
-}
+public:
 
-//ctkPluginContext* sv4guiPurkinjeNetworkPluginActivator::GetContext()
-//{
-//  return m_Context;
-//}
+    sv4guiPurkinjeNetworkCreate(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer selectedNode, int timeStep);
 
-//sv4guiPurkinjeNetworkPluginActivator* sv4guiPurkinjeNetworkPluginActivator::GetInstance()
-//{
-//    return m_Instance;
-//}
+    virtual ~sv4guiPurkinjeNetworkCreate();
+
+public slots:
+
+    void CreateMesh();
+
+    void Cancel();
+
+    void SetFocus();
+
+    void Activated();
+
+    void SetupMeshType(int idx);
+
+protected:
+
+    Ui::sv4guiPurkinjeNetworkCreate *ui;
+
+    QWidget* m_Parent;
+
+    mitk::DataNode::Pointer m_MeshFolderNode;
+
+    mitk::DataNode::Pointer m_ModelFolderNode;
+
+    mitk::DataStorage::Pointer m_DataStorage;
+
+    mitk::DataNode::Pointer m_SelecteNode;
+
+    int m_TimeStep;
+
+    sv4guiDataNodeOperationInterface* m_Interface;
+};
+
+#endif // SV4GUI_PURKINJENETWORKCREATE_H
