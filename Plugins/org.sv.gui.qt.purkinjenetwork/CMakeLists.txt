@@ -53,7 +53,7 @@ if(SV_INSTALL_LIBS)
 endif()
 
 foreach(so ${SimVascular_LIBRARIES})
-   message(WARNING ${so})
+   message(STATUS ${so})
    target_link_libraries(${lib} PRIVATE ${so})
- endforeach()
+endforeach()
 

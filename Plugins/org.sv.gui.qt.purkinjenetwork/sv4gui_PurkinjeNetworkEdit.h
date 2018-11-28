@@ -35,11 +35,16 @@
 //[dp] #include "sv4gui_MitkMesh.h"
 #include "sv4gui_Model.h"
 
-#include "sv4gui_ModelDataInteractor.h"
 #include "sv4gui_DataNodeOperationInterface.h"
 #include "sv4gui_LocalTableDelegate.h"
-#include "sv4gui_QmitkFunctionality.h"
+#include "sv4gui_Mesh.h"
+#include "sv4gui_ModelDataInteractor.h"
 #include "sv4gui_ProjectManager.h"
+#include "sv4gui_PurkinjeNetworkMeshContainer.h"
+#include "sv4gui_PurkinjeNetworkMeshMapper.h"
+#include "sv4gui_PurkinjeNetworkInteractor.h"
+
+#include "sv4gui_QmitkFunctionality.h"
 
 #include <vtkSphereWidget.h>
 
@@ -58,118 +63,29 @@ class sv4guiPurkinjeNetworkEdit : public sv4guiQmitkFunctionality
 public:
 
     static const QString EXTENSION_ID;
-
     sv4guiPurkinjeNetworkEdit();
-
     virtual ~sv4guiPurkinjeNetworkEdit();
 
 public slots:
 
-    void RunMesher();
+    void displayMesh(bool state);
+    void LoadMesh();
 
-    void RunHistory();
-
-    void ClearAll();
-
-    void AddObservers();
-
-    void RemoveObservers();
-
-    void UpdateGUI();
-
-    void SetEstimatedEdgeSize();
-
-    void TableFaceListSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
-
-    void SetLocal( bool checked = false );
-
-    void ClearLocal( bool checked = false );
-
-    void TableViewLocalContextMenuRequested( const QPoint & pos );
-
-    void TableRegionListSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
-
-    void TableDomainsListSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
-
-    void DeleteSelectedDomains( bool checked = false );
-
-    void SetSubDomainSize( bool checked = false );
-
-    void SetRegion( bool checked = false );
-
-    void DeleteSelectedRegions( bool checked = false );
-
-    void TableViewRegionContextMenuRequested( const QPoint & pos );
-
-    void TableViewDomainsContextMenuRequested( const QPoint & pos );
-
-    void UpdateFaceListSelection();
-
-    void UpdateTetGenGUI();
-
-    void UpdateMeshSimGUI();
-
-    void UpdateAdaptGUI(int selected);
-
-    void AddSphere();
-
-    void AddHole();
-
-    void AddSubDomain();
-
-    void ShowSphereInteractor(bool checked);
-
-    void DisplayMeshInfo();
-
-    void SetResultFile();
-
-    void Adapt();
-
-    void ShowModel(bool checked = false);
+    //void ShowModel(bool checked = false);
 
 public:
-
-    int GetTimeStep();
-
-    void SetupGUI(QWidget *parent );
-
-    void RunCommands(bool fromGUI = true);
-
-    double EstimateEdgeSize();
-
-    std::vector<std::string> CreateCmdsT();
-
-    std::vector<std::string> CreateCmdsM();
-
-//    static void UpdateSphereData( vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* vtkNotUsed(clientData), void* vtkNotUsed(callData) );
-
-    void UpdateSphereData();
-
-//    std::vector<int> GetSelectedFaceIDs();
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
     virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
-
     virtual void NodeChanged(const mitk::DataNode* node) override;
-
     virtual void NodeAdded(const mitk::DataNode* node) override;
-
     virtual void NodeRemoved(const mitk::DataNode* node) override;
 
-//    virtual void Activated() override;
-
-//    virtual void Deactivated() override;
+    void UpdateSphereData();
 
     virtual void Visible() override;
-
     virtual void Hidden() override;
-
-    bool IsDouble(QString value);
-
-    bool IsInt(QString value);
-
-    QString GetMeshFolderPath();
 
 protected:
 
@@ -177,34 +93,11 @@ protected:
 
     Ui::sv4guiPurkinjeNetworkEdit *ui;
 
-    //[dp] sv4guiMitkMesh* m_MitkMesh;
-
-    sv4guiModel* m_Model;
-
-    std::string m_MeshType;
-
-    mitk::DataNode::Pointer m_MeshNode;
-
-    mitk::DataNode::Pointer m_ModelNode;
-
     sv4guiModelDataInteractor::Pointer m_DataInteractor;
 
     long m_ModelSelectFaceObserverTag;
-//    long m_SphereObserverTag;
 
     QmitkStdMultiWidget* m_DisplayWidget;
-
-    QMenu* m_TableMenuLocal;
-    QStandardItemModel* m_TableModelLocal;
-
-    QMenu* m_TableMenuRegion;
-    QStandardItemModel* m_TableModelRegion;
-
-    QMenu* m_TableMenuDomains;
-    QStandardItemModel* m_TableModelDomains;
-
-    int m_SelectedRegionIndex;
-    int m_SelectedDomainsIndex;
 
     vtkSmartPointer<vtkSphereWidget> m_SphereWidget;
 
@@ -212,20 +105,28 @@ protected:
 
     sv4guiDataNodeOperationInterface* m_Interface;
 
-    sv4guiLocalTableDelegate* m_CustomDelegate;
-
-    QItemDelegate* m_DefaultDelegate;
-
     mitk::DataNode::Pointer m_ProjectFolderNode;
     mitk::DataStorage::Pointer m_DataStorage;
     QString m_StoreDir;
 
+    sv4guiPurkinjeNetworkMeshContainer::Pointer m_MeshContainer;
+    sv4guiPurkinjeNetworkMeshMapper::Pointer m_MeshMapper;
+
+    mitk::DataNode::Pointer m_MeshNode;
+
 private:
 
-    void Initialize();
-    mitk::DataNode::Pointer getProjectNode();
+    QString m_MeshFileName;
+    sv4guiMesh* m_SurfacMesh;
+
     sv4guiProjectManager svProj;
 
+    sv4guiPurkinjeNetworkInteractor::Pointer m_MeshInteractor;
+
+    bool m_init = true;
+
+    mitk::DataNode::Pointer getProjectNode();
+    void Initialize();
 
 
 };

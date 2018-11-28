@@ -38,6 +38,9 @@ set(CPP_FILES
     sv4gui_PurkinjeNetworkLoadSurfaceAction.cxx
     sv4gui_PurkinjeNetworkLoadVolumeAction.cxx
     sv4gui_PurkinjeNetworkPluginActivator.cxx
+    sv4gui_PurkinjeNetworkMeshContainer.cxx
+    sv4gui_PurkinjeNetworkMeshMapper.cxx
+    sv4gui_PurkinjeNetworkInteractor.cxx
 )
 
 set(MOC_H_FILES
@@ -49,6 +52,9 @@ set(MOC_H_FILES
     sv4gui_PurkinjeNetworkLoadSurfaceAction.h
     sv4gui_PurkinjeNetworkLoadVolumeAction.h
     sv4gui_PurkinjeNetworkPluginActivator.h
+    sv4gui_PurkinjeNetworkMeshContainer.h
+    sv4gui_PurkinjeNetworkMeshMapper.h
+    sv4gui_PurkinjeNetworkInteractor.h
 )
 
 set(UI_FILES
