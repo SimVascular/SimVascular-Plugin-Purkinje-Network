@@ -23,7 +23,9 @@ class Mesh:
         
     """
     def __init__(self,filename):
-        vtu_filename = "sphere.vtu"
+        vtu_filename = filename
+        print("Input file name %s" % filename)
+        #vtu_filename = "sphere.vtu"
         verts, connectivity, points = self.loadVtu(vtu_filename)
         #verts, connectivity = self.loadOBJ(filename)
 
@@ -76,7 +78,9 @@ class Mesh:
         cells = grid.GetCells()
         num_cells = cells.GetNumberOfCells()
         conn = cells.GetData()
-        for i in xrange(0, num_cells):
+        ## [DaveP] fix for Python 3.5.
+        for i in range(0, num_cells):
+        #for i in xrange(0, num_cells):
             connectivity.append([conn.GetValue(4*i+j) for j in range(1,4)])
 
         return verts, connectivity, points

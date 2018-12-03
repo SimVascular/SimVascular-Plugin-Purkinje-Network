@@ -7,7 +7,7 @@ import logging
 import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 from operator import itemgetter
-from scipy.spatial import cKDTree
+#from scipy.spatial import cKDTree
 import vtk 
 from math import sqrt 
 
@@ -148,7 +148,7 @@ class Nodes:
         self.vtk_tree=vtk.vtkKdTree()
         self.vtk_tree.BuildLocatorFromPoints(points)
 
-        self.tree=cKDTree(self.nodes)
+        #self.tree=cKDTree(self.nodes)
         self._logger = logging.getLogger('fractal-tree')
  
     def add_nodes(self,queue):
@@ -172,7 +172,7 @@ class Nodes:
         self.vtk_tree=vtk.vtkKdTree()
         self.vtk_tree.BuildLocatorFromPoints(points)
 
-        self.tree=cKDTree(self.nodes)
+        #self.tree=cKDTree(self.nodes)
         return nodes_id
 
     def distance_from_point(self,point):
@@ -192,12 +192,12 @@ class Nodes:
         #if vtk_d == 0.0: vtk_d = 1.73205080756e+11
 
         # [davep]
-        d,node=self.tree.query(point)
+        #d,node=self.tree.query(point)
 
         self._logger.debug(" ----------------")
         self._logger.debug("point %s " % (str(point)))
         self._logger.debug("vtk d %f  node %d" % (vtk_d, vtk_node))
-        self._logger.debug("sci d %f  node %d" % (d, node))
+        #self._logger.debug("sci d %f  node %d" % (d, node))
 
         d = vtk_d
         node = vtk_node
@@ -244,7 +244,7 @@ class Nodes:
         self.vtk_collision_tree=vtk.vtkKdTree()
         self.vtk_collision_tree.BuildLocatorFromPoints(points)
 
-        self.collision_tree=cKDTree(nodes_to_consider)
+        #self.collision_tree=cKDTree(nodes_to_consider)
 
     def collision(self,point):
         """This function returns the distance between one point and the closest node in the tree and the index of the closest node using the collision_tree.
@@ -262,12 +262,12 @@ class Nodes:
         if vtk_d == 0.0: vtk_d = float("inf") 
 
         # [davep]
-        d,node=self.collision_tree.query(point)
+        #d,node=self.collision_tree.query(point)
 
         self._logger.debug("----------------")
         self._logger.debug("point %s " % (str(point)))
         self._logger.debug("vtk d %f  node %d" % (vtk_d, vtk_node))
-        self._logger.debug("sci d %f  node %d" % (d, node))
+        #self._logger.debug("sci d %f  node %d" % (d, node))
 
         d = vtk_d
         node = vtk_node

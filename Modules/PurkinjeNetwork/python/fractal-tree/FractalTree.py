@@ -68,8 +68,11 @@ def Fractal_Tree_3D(param):
         branches_to_grow=range(1,len(param.fascicles_angles)+1)
 
         
+    ## [DaveP] Fix xrange for python 3.5.
     for i in range(param.N_it):
-        shuffle(branches_to_grow)
+        ## [DaveP] Fix for python 3.5.
+        shuffle(list(branches_to_grow))
+        #shuffle(branches_to_grow)  
         new_branches_to_grow=[]
         for g in branches_to_grow:
             angle=-param.branch_angle*np.random.choice([-1,1])
