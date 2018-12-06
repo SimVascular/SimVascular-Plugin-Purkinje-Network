@@ -29,16 +29,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "sv4gui_PurkinjeNetworkMeshContainer.h"
+#include "sv4gui_PurkinjeNetwork1DContainer.h"
 #include "math.h"
 
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
 #include <berryPlatform.h>
 
-sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer()
+sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer()
 {
-  MITK_INFO << "[sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer] ";
+  MITK_INFO << "[sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer] ";
   m_startSeeds = std::vector<std::vector<double>>();
   m_endSeeds = std::vector<std::vector<std::vector<double>>>();
   hoverPoint.push_back(0.0);
@@ -46,7 +46,7 @@ sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer()
   hoverPoint.push_back(0.0);
 }
 
-sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer(const sv4guiPurkinjeNetworkMeshContainer& other)
+sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer(const sv4guiPurkinjeNetwork1DContainer& other)
   :BaseData(other)
 {
   int numStartSeeds = other.getNumStartSeeds();
@@ -63,31 +63,31 @@ sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer(const sv4
   }
 };
 
-sv4guiPurkinjeNetworkMeshContainer::~sv4guiPurkinjeNetworkMeshContainer(){
+sv4guiPurkinjeNetwork1DContainer::~sv4guiPurkinjeNetwork1DContainer(){
 
 };
 
-void sv4guiPurkinjeNetworkMeshContainer::SetSurfaceMesh(sv4guiMesh* surfaceMesh)
+void sv4guiPurkinjeNetwork1DContainer::SetSurfaceMesh(sv4guiMesh* surfaceMesh)
 {
   m_SurfaceMesh = surfaceMesh;
 }
 
-sv4guiMesh* sv4guiPurkinjeNetworkMeshContainer::GetSurfaceMesh()
+sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceMesh()
 {
   return m_SurfaceMesh;
 }
 
-void sv4guiPurkinjeNetworkMeshContainer::SetSurfaceNetwork(sv4guiMesh* surfaceNetwork)
+void sv4guiPurkinjeNetwork1DContainer::SetSurfaceNetwork(sv4guiMesh* surfaceNetwork)
 {
   m_SurfaceNetwork = surfaceNetwork;
 }
 
-sv4guiMesh* sv4guiPurkinjeNetworkMeshContainer::GetSurfaceNetwork()
+sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceNetwork()
 {
   return m_SurfaceNetwork;
 }
 
-void sv4guiPurkinjeNetworkMeshContainer::addStartSeed(double x, double y, double z)
+void sv4guiPurkinjeNetwork1DContainer::addStartSeed(double x, double y, double z)
 {
   auto v = std::vector<double>();
   v.push_back(x);
@@ -99,7 +99,7 @@ void sv4guiPurkinjeNetworkMeshContainer::addStartSeed(double x, double y, double
   m_endSeeds.push_back(v2);
 };
 
-void sv4guiPurkinjeNetworkMeshContainer::addEndSeed(double x, double y, double z, int seedIndex)
+void sv4guiPurkinjeNetwork1DContainer::addEndSeed(double x, double y, double z, int seedIndex)
 {
   auto v = std::vector<double>();
   v.push_back(x);
@@ -110,23 +110,23 @@ void sv4guiPurkinjeNetworkMeshContainer::addEndSeed(double x, double y, double z
 
 };
 
-int sv4guiPurkinjeNetworkMeshContainer::getNumStartSeeds() const {
+int sv4guiPurkinjeNetwork1DContainer::getNumStartSeeds() const {
   return m_startSeeds.size();
 }
 
-int sv4guiPurkinjeNetworkMeshContainer::getNumEndSeeds(int startSeedIndex) const {
+int sv4guiPurkinjeNetwork1DContainer::getNumEndSeeds(int startSeedIndex) const {
   return m_endSeeds[startSeedIndex].size();
 }
 
-std::vector<double> sv4guiPurkinjeNetworkMeshContainer::getStartSeed(int seedIndex) const {
+std::vector<double> sv4guiPurkinjeNetwork1DContainer::getStartSeed(int seedIndex) const {
   return m_startSeeds[seedIndex];
 }
 
-std::vector<double> sv4guiPurkinjeNetworkMeshContainer::getEndSeed(int startSeedIndex, int endSeedIndex) const{
+std::vector<double> sv4guiPurkinjeNetwork1DContainer::getEndSeed(int startSeedIndex, int endSeedIndex) const{
   return m_endSeeds[startSeedIndex][endSeedIndex];
 }
 
-std::vector<int> sv4guiPurkinjeNetworkMeshContainer::findNearestSeed(double x, double y, double z, double tol){
+std::vector<int> sv4guiPurkinjeNetwork1DContainer::findNearestSeed(double x, double y, double z, double tol){
 
   bool done = false;
 
@@ -163,7 +163,7 @@ std::vector<int> sv4guiPurkinjeNetworkMeshContainer::findNearestSeed(double x, d
   return v;
 }
 
-void sv4guiPurkinjeNetworkMeshContainer::deleteSeed(int startIndex, int endIndex){
+void sv4guiPurkinjeNetwork1DContainer::deleteSeed(int startIndex, int endIndex){
   std::cout << "Deleting " << startIndex << " " << endIndex << "\n";
   std::cout << "startSeeds size " << m_startSeeds.size() << "\n";
 
@@ -183,7 +183,7 @@ void sv4guiPurkinjeNetworkMeshContainer::deleteSeed(int startIndex, int endIndex
   return;
 }
 
-double sv4guiPurkinjeNetworkMeshContainer::distance(double x1, double y1, double z1, double x2,
+double sv4guiPurkinjeNetwork1DContainer::distance(double x1, double y1, double z1, double x2,
   double y2, double z2) const{
 
     auto d1 = (x1-x2)*(x1-x2);

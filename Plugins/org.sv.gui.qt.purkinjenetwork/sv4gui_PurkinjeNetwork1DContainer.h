@@ -29,19 +29,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SV4GUI_PURKINJENETWORK_MESH_CONTAINER_H
-#define SV4GUI_PURKINJENETWORK_MESH_CONTAINER_H
+#ifndef SV4GUI_PURKINJENETWORK_1D_CONTAINER_H
+#define SV4GUI_PURKINJENETWORK_1D_CONTAINER_H
 
 #include <iostream>
 #include <vector>
 #include "mitkBaseData.h"
 #include "sv4gui_Mesh.h"
 
-class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
+class sv4guiPurkinjeNetwork1DContainer : public mitk::BaseData {
 
   public:
 
-    mitkClassMacro(sv4guiPurkinjeNetworkMeshContainer, mitk::BaseData);
+    mitkClassMacro(sv4guiPurkinjeNetwork1DContainer, mitk::BaseData);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -72,15 +72,12 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetSurfaceNetwork(sv4guiMesh* surfaceNetwork);
     sv4guiMesh* GetSurfaceNetwork();
 
-    mitk::Point3D getPickedPoint() { return m_currentPickedPoint; }
-    void setPickedPoint(mitk::Point3D& point) { m_currentPickedPoint = point; }
-
 protected:
 
   mitkCloneMacro(Self);
-  sv4guiPurkinjeNetworkMeshContainer();
-  sv4guiPurkinjeNetworkMeshContainer(const sv4guiPurkinjeNetworkMeshContainer& other);
-  virtual ~sv4guiPurkinjeNetworkMeshContainer();
+  sv4guiPurkinjeNetwork1DContainer();
+  sv4guiPurkinjeNetwork1DContainer(const sv4guiPurkinjeNetwork1DContainer& other);
+  virtual ~sv4guiPurkinjeNetwork1DContainer();
 
 private:
 
@@ -88,8 +85,7 @@ private:
   std::vector< std::vector< std::vector<double> > > m_endSeeds;
   sv4guiMesh* m_SurfaceMesh;
   sv4guiMesh* m_SurfaceNetwork;
-  mitk::Point3D m_currentPickedPoint;
 
 };
 
-#endif //SV4GUI_PURKINJENETWORK_MESH_CONTAINER_H
+#endif //SV4GUI_PURKINJENETWORK_1D_CONTAINER_H

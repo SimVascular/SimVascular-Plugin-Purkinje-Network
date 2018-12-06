@@ -22,38 +22,35 @@ def init_logging():
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-def main():
+def run(infile=None, outfile=None):
     init_logging()
     logger = logging.getLogger('fractal-tree')
-    error_flag = False
 
     # Create a Parameters object to store parameters.
     param = Parameters()
 
-    ## Set parameters from command-line arguments.
+    ## Set parameters.
     #
-    args, print_help = parse_args()
-
-    if args.infile == None:
+    if infile == None:
         logger.error("No input file name given.")
-        error_flag = True
+        return 
     else:
-        logger.info("Input file name %s" % args.infile)
-        param.input_file_name = args.infile
+        logger.info("Input file name %s" % infile)
+        param.input_file_name = infile
 
-    if args.outfile == None:
+    if outfile == None:
         logger.error("No output file name given.")
-        error_flag = True
+        return 
     else:
-        logger.info("Output file name %s" % args.outfile)
-        param.output_file_name = args.outfile
+        logger.info("Output file name %s" % outfile)
+        param.output_file_name = outfile
 
     ## Calculate the fractal tree.
     #
     branches, nodes = Fractal_Tree_3D(param)
 
-
 if __name__ == '__main__':
-    main()
+    args, print_help = parse_args()
+    run(infile=args.infile, outfile=args.outfile)
 
 

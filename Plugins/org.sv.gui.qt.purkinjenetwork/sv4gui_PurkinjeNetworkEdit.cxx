@@ -29,6 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <Python.h>
+
 #include "sv4gui_PurkinjeNetworkEdit.h"
 #include "ui_sv4gui_PurkinjeNetworkEdit.h"
 #include "sv4gui_PurkinjeNetworkFolder.h"
@@ -107,38 +109,53 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
     Initialize();
 
     // Define widget event handlers.
+    connect(ui->buttonCreateNetwork, SIGNAL(clicked()), this, SLOT(CreateNetwork()));
     connect(ui->buttonLoadMesh, SIGNAL(clicked()), this, SLOT(LoadMesh()));
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(displayMesh(bool)));
+    connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(displayNetwork(bool)));
 
     m_Interface= new sv4guiDataNodeOperationInterface();
 
     if (m_init){
         MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Making network node";
 
+        // Create mesh container, node and mapper.
+        //
         m_MeshContainer = sv4guiPurkinjeNetworkMeshContainer::New();
-
         auto meshNode = mitk::DataNode::New();
         meshNode->SetData(m_MeshContainer);
         meshNode->SetVisibility(true);
         meshNode->SetName("mesh");
         m_MeshNode = meshNode;
-        /*
-        meshNode->SetVisibility(false);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        meshNode->SetVisibility(true);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        */
 
         m_MeshMapper = sv4guiPurkinjeNetworkMeshMapper::New();
         m_MeshMapper->SetDataNode(meshNode);
         m_MeshMapper->m_box = false;
+        meshNode->SetMapper(mitk::BaseRenderer::Standard3D, m_MeshMapper);
 
+        // Create network container, node and mapper.
+        //
+        m_1DContainer = sv4guiPurkinjeNetwork1DContainer::New();
+        auto node = mitk::DataNode::New();
+        node->SetData(m_1DContainer);
+        node->SetVisibility(true);
+        node->SetName("1D network");
+        m_1DNode = node;
+
+        m_1DMapper = sv4guiPurkinjeNetwork1DMapper::New();
+        m_1DMapper->SetDataNode(node);
+        m_1DMapper->m_box = false;
+        m_1DNode->SetMapper(mitk::BaseRenderer::Standard3D, m_1DMapper);
+
+        // Create interactor to select mesh point.
         m_MeshInteractor = sv4guiPurkinjeNetworkInteractor::New();
         m_MeshInteractor->LoadStateMachine("seedInteraction.xml",
           us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
         m_MeshInteractor->SetEventConfig("seedConfig.xml",
           us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
         m_MeshInteractor->SetDataNode(meshNode);
+        /*
+        */
 
         // Set visibility of data node for Model.
         mitk::DataNode::Pointer model_folder_node = GetDataStorage()->GetNamedNode("Models");
@@ -160,18 +177,7 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
         m_init = false;
     }
 
-/* [dp]
-    if(m_SphereWidget==NULL) {
-        m_SphereWidget = vtkSmartPointer<sv4guiVtkPurkinjeNetworkSphereWidget>::New();
-        m_SphereWidget->SetInteractor(m_DisplayWidget->GetRenderWindow4()->GetVtkRenderWindow()->GetInteractor());
-    //    m_SphereWidget->SetRepresentationToSurface();
-        sv4guiVtkPurkinjeNetworkSphereWidget* sphereWidget=dynamic_cast<sv4guiVtkPurkinjeNetworkSphereWidget*>(m_SphereWidget.GetPointer());
-        sphereWidget->SetMeshEdit(this);
-    }
-*/
-
     // connect(ui->btnMeshInfo, SIGNAL(clicked()), this, SLOT(DisplayMeshInfo()) );
-    //connect(ui->checkBoxShowModel, SIGNAL(clicked(bool)), this, SLOT(ShowModel(bool)) );
 }
 
 void sv4guiPurkinjeNetworkEdit::displayMesh(bool state)
@@ -182,10 +188,28 @@ void sv4guiPurkinjeNetworkEdit::displayMesh(bool state)
       GetDataStorage()->Remove(m_MeshNode);
   } else {
       auto image_folder_node = GetDataStorage()->GetNamedNode("Purkinje-Network");
+      //auto image_folder_node = GetDataStorage()->GetNamedNode("Images");
       // Add m_MeshNode to parent image_folder_node?
       if(image_folder_node) {
           MITK_INFO << "[sv4guiPurkinjeNetworkEdit::displayMesh] Add m_MeshNode to image_folder_node";
           GetDataStorage()->Add(m_MeshNode, image_folder_node);
+      }
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void sv4guiPurkinjeNetworkEdit::displayNetwork(bool state)
+{
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::displayNetwork] state " << state;
+
+  if (!state) {
+      GetDataStorage()->Remove(m_1DNode);
+  } else {
+      auto image_folder_node = GetDataStorage()->GetNamedNode("Purkinje-Network");
+      if(image_folder_node) {
+          MITK_INFO << "[sv4guiPurkinjeNetworkEdit::displayMesh] Add m_MeshNode to image_folder_node";
+          GetDataStorage()->Add(m_1DNode, image_folder_node);
       }
   }
 
@@ -248,6 +272,54 @@ mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::getProjectNode()
   return projFolderNode;
 }
 
+// Create a Purkinje Network. 
+//
+void sv4guiPurkinjeNetworkEdit::CreateNetwork()
+{
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] ";
+
+  // Get the project data node. 
+  mitk::DataNode::Pointer projFolderNode = getProjectNode();
+  std::string projPath = "";
+  projFolderNode->GetStringProperty("project path", projPath);
+  QString QprojPath = QString(projPath.c_str());
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] projPath " << projPath;
+
+  // Set the input and output files.
+  std::string dir = "/Users/parkerda/software/SimVascular/SimVascular-fork/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/";
+  std::string infile = dir + "sphere.vtu";
+  std::string outfile = projPath + "/" + m_StoreDir.toStdString() + "/sphere-network";
+
+  //  Execute python script to compute fractal tree network. 
+  std::string cmd;
+  cmd += "import fractal_tree\n";
+  cmd += "fractal_tree.run(";
+  cmd += "infile='" + infile + "',";
+  cmd += "outfile='" + outfile + "')\n";
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] cmd " << cmd;
+  //PyRun_SimpleString(cmd.c_str());
+
+  // Load VTK file containing network elements.
+  std::string networkFileName = projPath + "/" + m_StoreDir.toStdString() + "/sphere-network.vtu";
+  LoadNetwork(networkFileName);
+}
+
+// Read a Purkinje network file.
+//
+// The network is represented as an unstructured mesh of 1D elements.
+// The elements are stored in a VTK .vtu format file.
+//
+sv4guiMesh* sv4guiPurkinjeNetworkEdit::LoadNetwork(std::string fileName)
+{
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadNetwork] ";
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadNetwork] Read surface network " << fileName;
+
+  m_SurfaceNetwork = new sv4guiMesh();
+  //m_SurfaceNetwork->ReadSurfaceFile(fileName);
+  m_SurfaceNetwork->ReadVolumeFile(fileName);
+  m_1DContainer->SetSurfaceNetwork(m_SurfaceNetwork);
+}
+
 // Load a surface mesh in VTK vtp format.
 //
 void sv4guiPurkinjeNetworkEdit::LoadMesh()
@@ -297,12 +369,14 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
       auto numPolys = polygons->GetNumberOfCells();
       MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadMesh] Number of triangles " << numPolys; 
 
+      m_MeshContainer->SetSurfaceMesh(m_SurfacMesh);
+
 
       //polyMesh->Print(std::cout);
   }
 
   catch(...) {
-      MITK_ERROR << "Loading Error!";
+      MITK_ERROR << "Error loading Purkinje surface mesh.!";
   }
 
 

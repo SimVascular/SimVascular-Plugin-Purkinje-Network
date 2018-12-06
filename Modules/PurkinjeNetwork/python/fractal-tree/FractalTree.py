@@ -9,6 +9,7 @@ import numpy as np
 from Branch3D import *
 from random import shuffle
 from Mesh import Mesh
+import logging
 
 def Fractal_Tree_3D(param):
     """ This fuction creates the fractal tree.
@@ -115,5 +116,4 @@ def Fractal_Tree_3D(param):
         np.savetxt(param.output_file_name +'_endnodes.txt',nodes.end_nodes,fmt='%d')
 
     return branches,nodes
-
 

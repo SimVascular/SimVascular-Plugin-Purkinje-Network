@@ -47,13 +47,10 @@ protected:
 
   virtual void ConnectActionsAndFunctions() override;
 
-  bool IsOverSeed( const mitk::InteractionEvent* interactionEvent );
+  void AddStart(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
 
-  void AddSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
+  virtual void SelectPoint(mitk::StateMachineAction*, mitk::InteractionEvent*);
 
-  void AddEndSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
-
-  void DeleteSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent );
 
 private:
   std::vector<int> m_selectedSeed;

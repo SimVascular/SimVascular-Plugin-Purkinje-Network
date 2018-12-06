@@ -41,6 +41,8 @@ set(CPP_FILES
     sv4gui_PurkinjeNetworkMeshContainer.cxx
     sv4gui_PurkinjeNetworkMeshMapper.cxx
     sv4gui_PurkinjeNetworkInteractor.cxx
+    sv4gui_PurkinjeNetwork1DMapper.cxx
+    sv4gui_PurkinjeNetwork1DContainer.cxx
 )
 
 set(MOC_H_FILES
@@ -55,6 +57,8 @@ set(MOC_H_FILES
     sv4gui_PurkinjeNetworkMeshContainer.h
     sv4gui_PurkinjeNetworkMeshMapper.h
     sv4gui_PurkinjeNetworkInteractor.h
+    sv4gui_PurkinjeNetwork1DMapper.h
+    sv4gui_PurkinjeNetwork1DContainer.h
 )
 
 set(UI_FILES

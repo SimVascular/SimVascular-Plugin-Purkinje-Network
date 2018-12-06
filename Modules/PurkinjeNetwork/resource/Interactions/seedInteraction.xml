@@ -2,35 +2,16 @@
 
   <state name="Start" startstate="true">
 
-    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="OverSeed">
-      <condition name="is_over_seed" />
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Start">
+      <action    name="select_point"/>
     </transition>
 
     <transition event_class="InteractionKeyEvent" event_variant="KeyPressed_S" target="Start">
-      <action name="add_seed" />
+      <action name="add_start" />
     </transition>
 
-    <transition event_class="InteractionKeyEvent" event_variant="KeyPressed_E" target="Start">
-      <action name="add_end_seed" />
-    </transition>
-
-    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="Start">
-      <condition name="is_over_seed"/>
-      <action    name="delete_seed"/>
-    </transition>
 
   </state>
 
-  <state name="OverSeed">
-
-    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Start" >
-      <condition name="is_over_seed" inverted="true" />
-    </transition>
-
-    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="Start" >
-      <action name="delete_seed" />
-    </transition>
-
-  </state>
 
 </statemachine>

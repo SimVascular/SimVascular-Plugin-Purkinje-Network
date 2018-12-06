@@ -29,14 +29,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SV4GUIPURKINJENETWORKMAPPER_H
-#define SV4GUIPURKINJENETWORKMAPPER_H
+#ifndef SV4GUIPURKINJENETWORK_1D_MAPPER_H
+#define SV4GUIPURKINJENETWORK_1D_MAPPER_H
 
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
-
-#include "sv4gui_PurkinjeNetworkMeshContainer.h"
 
 #include <vtkAssembly.h>
 #include <vtkPropAssembly.h>
@@ -50,11 +48,11 @@
 #include <vtkActor.h>
 #include <string>
 
-class sv4guiPurkinjeNetworkMeshMapper : public mitk::VtkMapper
+class sv4guiPurkinjeNetwork1DMapper : public mitk::VtkMapper
 {
 public:
 
-    mitkClassMacro(sv4guiPurkinjeNetworkMeshMapper, mitk::VtkMapper);
+    mitkClassMacro(sv4guiPurkinjeNetwork1DMapper, mitk::VtkMapper);
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -80,19 +78,12 @@ public:
     double m_seedRadius = 0.5;
 
 protected:
-    sv4guiPurkinjeNetworkMeshMapper();
 
-    virtual ~sv4guiPurkinjeNetworkMeshMapper();
+    sv4guiPurkinjeNetwork1DMapper();
 
+    virtual ~sv4guiPurkinjeNetwork1DMapper();
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
-
     virtual void ResetMapper( mitk::BaseRenderer* renderer ) override;
-
-    vtkSmartPointer<vtkActor> createCubeActor(mitk::Point3D& point);
-    void findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, mitk::Point3D& point);
-
-
-
 };
 
-#endif /* SV4GUIPURKINJENETWORKMAPPER_H */
+#endif /* SV4GUIPURKINJENETWORK_NETWORK_MAPPER_H */

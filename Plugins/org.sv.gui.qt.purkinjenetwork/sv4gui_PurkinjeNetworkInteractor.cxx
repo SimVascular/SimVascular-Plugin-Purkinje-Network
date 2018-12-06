@@ -54,104 +54,71 @@ sv4guiPurkinjeNetworkInteractor::~sv4guiPurkinjeNetworkInteractor(){
 void sv4guiPurkinjeNetworkInteractor::ConnectActionsAndFunctions()
 {
   MITK_INFO << "connect actions and functions\n";
+  /*
   CONNECT_CONDITION("is_over_seed", IsOverSeed);
-
-  CONNECT_FUNCTION( "add_seed"    , AddSeed);
   CONNECT_FUNCTION( "add_end_seed", AddEndSeed);
   CONNECT_FUNCTION( "delete_seed" , DeleteSeed);
+  */
+  CONNECT_FUNCTION( "add_start"    , AddStart);
+  CONNECT_FUNCTION("select_point", SelectPoint);
 }
 
-bool sv4guiPurkinjeNetworkInteractor::IsOverSeed(const mitk::InteractionEvent * interactionEvent)
+void sv4guiPurkinjeNetworkInteractor::SelectPoint(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
+  MITK_INFO << "[sv4guiPurkinjeNetworkInteractor::SelectPoint] ";
+
   const mitk::InteractionPositionEvent* positionEvent = 
     dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
 
   if ( positionEvent == NULL ) {
-      return false;
+      MITK_INFO << "[sv4guiPurkinjeNetworkInteractor::SelectPoint]  positionEvent is null ";
+      return;
   }
 
-  sv4guiPurkinjeNetworkMeshContainer* seeds  =
+  sv4guiPurkinjeNetworkMeshContainer* mesh =
         static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
 
-  if(seeds==NULL) {
-      return false;
+  if (mesh == NULL) {
+      MITK_INFO << "[sv4guiPurkinjeNetworkInteractor::SelectPoint]  mesh is null ";
+      return;
   }
 
   mitk::Point3D point3d = positionEvent->GetPositionInWorld();
   m_currentPickedPoint = point3d;
+  MITK_INFO << "[sv4guiPurkinjeNetworkInteractor::SelectPoint] Point " << point3d[0] << " " <<
+    point3d[1] << "  " << point3d[2]; 
 
-  seeds->hoverPoint[0] = (double)point3d[0];
-  seeds->hoverPoint[1] = (double)point3d[1];
-  seeds->hoverPoint[2] = (double)point3d[2];
-  MITK_INFO << "[sv4guiPurkinjeNetworkInteractor::IsOverSeed] Point " << seeds->hoverPoint[0] << " " <<
-    seeds->hoverPoint[1] << "  " << seeds->hoverPoint[2]; 
+  mesh->setPickedPoint(point3d);
 
+  /*
   m_selectedSeed = seeds->findNearestSeed((double)point3d[0], (double)point3d[1], (double)point3d[2], 
     3*m_seedRadius);
   MITK_INFO << "[sv4guiPurkinjeNetworkInteractor::IsOverSeed] Selected seed " << m_selectedSeed[0] << 
     ", " << m_selectedSeed[1] << "\n";
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-
-  if (m_selectedSeed[0] == -1) {
-    return false;
-  } else {
-    return true;
-  }
-  return false;
+  */
+  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }
 
-void sv4guiPurkinjeNetworkInteractor::AddSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent){
-  IsOverSeed(interactionEvent);
-  std::cout << "Start seed added\n";
-  sv4guiPurkinjeNetworkMeshContainer* seeds  =
+void sv4guiPurkinjeNetworkInteractor::AddStart(mitk::StateMachineAction*, 
+    mitk::InteractionEvent* interactionEvent)
+{
+  //IsOverSeed(interactionEvent);
+  sv4guiPurkinjeNetworkMeshContainer* mesh =
         static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
 
-  if(seeds==NULL)
+  if (mesh == NULL) {
       return;
+  }
 
+/*
   seeds->addStartSeed((double)m_currentPickedPoint[0],
     (double)m_currentPickedPoint[1],
   (double)m_currentPickedPoint[2]);
 
   m_currentStartSeed += 1;
   std::cout << m_currentStartSeed << "\n";
+*/
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }
 
-void sv4guiPurkinjeNetworkInteractor::AddEndSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent){
-  IsOverSeed(interactionEvent);
-  std::cout << "end seed added\n";
-  sv4guiPurkinjeNetworkMeshContainer* seeds  =
-        static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
-
-  if(seeds==NULL || m_currentStartSeed < 0)
-      return;
-
-  seeds->addEndSeed((double)m_currentPickedPoint[0],
-    (double)m_currentPickedPoint[1],
-  (double)m_currentPickedPoint[2],
-  m_currentStartSeed);
-
-  std::cout << m_currentStartSeed << "\n";
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-}
-
-void sv4guiPurkinjeNetworkInteractor::DeleteSeed(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent ){
-  IsOverSeed(interactionEvent);
-
-  std::cout << "seed deleted\n";
-  if (m_selectedSeed[0] == -1) return;
-
-  sv4guiPurkinjeNetworkMeshContainer* seeds  =
-        static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
-
-  if(seeds==NULL)
-      return;
-
-  seeds->deleteSeed(m_selectedSeed[0], m_selectedSeed[1]);
-  if (m_selectedSeed[1] == -1){
-    m_currentStartSeed -= 1;
-  }
-  std::cout << "deleted seed, current start seed " << m_currentStartSeed << "\n";
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-}

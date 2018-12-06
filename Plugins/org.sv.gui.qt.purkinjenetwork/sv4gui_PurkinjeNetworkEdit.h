@@ -42,6 +42,9 @@
 #include "sv4gui_ProjectManager.h"
 #include "sv4gui_PurkinjeNetworkMeshContainer.h"
 #include "sv4gui_PurkinjeNetworkMeshMapper.h"
+#include "sv4gui_PurkinjeNetwork1DContainer.h"
+#include "sv4gui_PurkinjeNetwork1DMapper.h"
+#include "sv4gui_PurkinjeNetworkInteractor.h"
 #include "sv4gui_PurkinjeNetworkInteractor.h"
 
 #include "sv4gui_QmitkFunctionality.h"
@@ -69,7 +72,9 @@ public:
 public slots:
 
     void displayMesh(bool state);
+    void displayNetwork(bool state);
     void LoadMesh();
+    void CreateNetwork();
 
     //void ShowModel(bool checked = false);
 
@@ -111,13 +116,20 @@ protected:
 
     sv4guiPurkinjeNetworkMeshContainer::Pointer m_MeshContainer;
     sv4guiPurkinjeNetworkMeshMapper::Pointer m_MeshMapper;
-
     mitk::DataNode::Pointer m_MeshNode;
+
+    sv4guiPurkinjeNetwork1DContainer::Pointer m_1DContainer;
+    sv4guiPurkinjeNetwork1DMapper::Pointer m_1DMapper;
+    mitk::DataNode::Pointer m_1DNode;
+
+    sv4guiMesh* LoadNetwork(std::string fileName);
 
 private:
 
     QString m_MeshFileName;
     sv4guiMesh* m_SurfacMesh;
+
+    sv4guiMesh* m_SurfaceNetwork;
 
     sv4guiProjectManager svProj;
 
