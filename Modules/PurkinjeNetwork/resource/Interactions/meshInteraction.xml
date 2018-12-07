@@ -1,4 +1,4 @@
-<statemachine NAME="svMitkSeg3DInteractor">
+<statemachine>
 
   <state name="Start" startstate="true">
 
