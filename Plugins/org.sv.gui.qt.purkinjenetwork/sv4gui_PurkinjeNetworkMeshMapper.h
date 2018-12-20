@@ -78,6 +78,14 @@ public:
     bool m_needsUpdate = true;
     bool m_box = false;
     double m_seedRadius = 0.5;
+    double m_pickRadius = 0.5;
+
+    bool m_newMesh = true;
+
+    double m_point1[3];
+    double m_point2[3];
+
+    vtkSmartPointer<vtkActor> m_sphereActor;
 
 protected:
     sv4guiPurkinjeNetworkMeshMapper();
@@ -88,7 +96,7 @@ protected:
 
     virtual void ResetMapper( mitk::BaseRenderer* renderer ) override;
 
-    vtkSmartPointer<vtkActor> createCubeActor(mitk::Point3D& point);
+    vtkSmartPointer<vtkActor> createSphereActor(mitk::Point3D& point);
     void findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, mitk::Point3D& point);
 
 

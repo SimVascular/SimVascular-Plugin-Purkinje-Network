@@ -127,6 +127,7 @@ protected:
 private:
 
     QString m_MeshFileName;
+    QString m_MeshOutputFileName;
     sv4guiMesh* m_SurfacMesh;
 
     sv4guiMesh* m_SurfaceNetwork;

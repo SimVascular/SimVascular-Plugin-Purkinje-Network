@@ -23,10 +23,11 @@ class Mesh:
         
     """
     def __init__(self,filename):
-        vtu_filename = filename
+        vtp_filename = filename
         print("Input file name %s" % filename)
         #vtu_filename = "sphere.vtu"
-        verts, connectivity, points = self.loadVtu(vtu_filename)
+        verts, connectivity, points = self.loadVtp(vtp_filename)
+        #verts, connectivity, points = self.loadVtu(vtu_filename)
         #verts, connectivity = self.loadOBJ(filename)
 
         self.verts=np.array(verts)
@@ -80,6 +81,45 @@ class Mesh:
         conn = cells.GetData()
         ## [DaveP] fix for Python 3.5.
         for i in range(0, num_cells):
+        #for i in xrange(0, num_cells):
+            connectivity.append([conn.GetValue(4*i+j) for j in range(1,4)])
+
+        return verts, connectivity, points
+
+    def loadVtp(self,filename):
+        """This function reads a VTK .vtp mesh file
+        
+        Args:
+            filename (str): the path and filename of the VTP file.
+            
+        Returns:
+             verts (array): a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).
+             connectivity (array): a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.
+
+        """
+        numVerts = 0  
+        verts = []  
+        norms = []   
+        connectivity=[]
+
+        reader = vtk.vtkXMLPolyDataReader()
+        reader.SetFileName(filename)
+        reader.Update()
+        poly_data = reader.GetOutput()
+
+        # Set coordinates.
+        points = poly_data.GetPoints()
+        num_points = points.GetNumberOfPoints()
+        for i in range(0, num_points):
+            x, y, z = points.GetPoint(i)
+            verts.append([x, y, z])
+
+        # Set connectivity.
+        polygons = poly_data.GetPolys()
+        num_polys = polygons.GetNumberOfCells()
+        conn = polygons.GetData()
+        ## [DaveP] fix for Python 3.5.
+        for i in range(0, num_polys):
         #for i in xrange(0, num_cells):
             connectivity.append([conn.GetValue(4*i+j) for j in range(1,4)])
 

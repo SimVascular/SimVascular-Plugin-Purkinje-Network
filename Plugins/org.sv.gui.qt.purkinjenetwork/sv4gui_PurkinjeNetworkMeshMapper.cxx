@@ -49,7 +49,7 @@ sv4guiPurkinjeNetworkMeshMapper::~sv4guiPurkinjeNetworkMeshMapper()
 //
 void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] ";
+  //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] ";
 
   //make ls propassembly
   mitk::DataNode* node = GetDataNode();
@@ -82,7 +82,7 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   }
 
   // [DaveP] Do we need to remove?
-  local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
+  // local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
 
   //local_storage->m_PropAssembly->VisibilityOn();
 
@@ -90,7 +90,7 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   //
   auto surfaceMesh = mesh->GetSurfaceMesh();
 
-  if (surfaceMesh != NULL) {
+  if (surfaceMesh != NULL && m_newMesh) {
     //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] Have surface mesh data ";
     auto polyMesh = surfaceMesh->GetSurfaceMesh();
     vtkSmartPointer<vtkPolyDataMapper> meshMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -100,16 +100,30 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     polyMeshActor->GetProperty()->SetEdgeColor(0, 0, 0);
     polyMeshActor->GetProperty()->EdgeVisibilityOn();
     local_storage->m_PropAssembly->AddPart(polyMeshActor);
+
+    double bounds[6];
+    polyMesh->GetBounds(bounds);
+    double xmin = bounds[0]; double xmax = bounds[1]; double ymin = bounds[2];
+    double ymax = bounds[3]; double zmin = bounds[4]; double zmax = bounds[5];
+    double dx = xmax - xmin; double dy = ymax - ymin; double dz = zmax - zmin;
+    MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] dx "<< dx 
+        << "  dy "<<dy<< "  dz "<< dz;
+
+    m_pickRadius = (dx > dy) ? dx : dy;
+    m_pickRadius = (m_pickRadius > dz) ? m_pickRadius : dz;
+    m_newMesh = false;
+
   } else {
       //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] No surface mesh data ";
   }
 
   // Show picked point.
+  local_storage->m_PropAssembly->GetParts()->RemoveItem(m_sphereActor);
   auto point = mesh->getPickedPoint();
-  auto pointActor = createCubeActor(point);
+  auto pointActor = createSphereActor(point);
   local_storage->m_PropAssembly->AddPart(pointActor);
 
-  // Find cloest face.
+  // Find closest face.
   this->findClosestFace(mesh, point);
 
   local_storage->m_PropAssembly->VisibilityOn();
@@ -120,12 +134,13 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
 void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, 
     mitk::Point3D& point)
 {
-  MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::findClosestFace] ";
+  //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::findClosestFace] ";
   auto surfaceMesh = mesh->GetSurfaceMesh();
   if (surfaceMesh == NULL) {
     return;
   }
 
+  //MITK_INFO << "Query point: " << point[0] << " " << point[1] << " " << point[2];
   auto polyMesh = surfaceMesh->GetSurfaceMesh();
 
   // Build the cell locator.
@@ -141,11 +156,32 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
   int subId; 
   cellLocator->FindClosestPoint(testPoint, closestPoint, cellId, subId, closestPointDist2);
   
+  /*
   MITK_INFO << "Coordinates of closest point: " << closestPoint[0] << " " << closestPoint[1] << " " << closestPoint[2];
   MITK_INFO << "Squared distance to closest point: " << closestPointDist2;
   MITK_INFO << "CellId: " << cellId;
+  */
+
+  vtkCell* cell = polyMesh->GetCell(cellId);
+  vtkTriangle* triangle = dynamic_cast<vtkTriangle*>(cell);
+  double p0[3];
+  double p1[3];
+  double p2[3];
+  triangle->GetPoints()->GetPoint(0, p0);
+  //std::cout << "p0: " << p0[0] << " " << p0[1] << " " << p0[2] << std::endl;
+  triangle->GetPoints()->GetPoint(1, p1);
+  //std::cout << "p1: " << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
+  triangle->GetPoints()->GetPoint(2, p2);
+  //std::cout << "p2: " << p2[0] << " " << p2[1] << " " << p2[2] << std::endl;
+
+  for (int i = 0; i < 3; i++) {
+    m_point1[i] = point[i];
+    m_point2[i] = (p0[i] + p1[i]) / 2.0;
+  }
+
  
   // Find neighbor cells.
+/*
   vtkSmartPointer<vtkIdList> cellPointIds = vtkSmartPointer<vtkIdList>::New();
   polyMesh->GetCellPoints(cellId, cellPointIds);
   std::set<vtkIdType> neighbors;
@@ -165,6 +201,7 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
   for(std::set<vtkIdType>::iterator it1 = neighbors.begin(); it1 != neighbors.end(); it1++) {
     MITK_INFO << " " << *it1;
   }
+*/
 
 }
 
@@ -183,22 +220,24 @@ vtkProp* sv4guiPurkinjeNetworkMeshMapper::GetVtkProp(mitk::BaseRenderer* rendere
   return ls->m_PropAssembly;
 }
 
-vtkSmartPointer<vtkActor> sv4guiPurkinjeNetworkMeshMapper::createCubeActor(mitk::Point3D& point)
+vtkSmartPointer<vtkActor> sv4guiPurkinjeNetworkMeshMapper::createSphereActor(mitk::Point3D& point)
 {
-  vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
+  if (true) { 
+  //if (!m_sphereActor) { 
+    vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+    double r = m_pickRadius / 100.0;
+    sphere->SetRadius(r);
+    sphere->SetCenter(point[0], point[1], point[2]);
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(sphere->GetOutputPort());
 
-  double r = 0.1;
-  cube->SetCenter(point[0], point[1], point[2]); 
-  cube->SetBounds(point[0]-r, point[0]+r, point[1]-r, point[1]+r, point[2]-r, point[2]+r);
+    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+    actor->GetProperty()->SetColor(1,0,0);
+    //actor->GetProperty()->SetRepresentationToWireframe();
+    m_sphereActor = actor;
+  }
 
-  vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  mapper->SetInputConnection(cube->GetOutputPort());
-
-  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-  actor->SetMapper(mapper);
-  actor->GetProperty()->SetColor(1,0,0);
-  actor->GetProperty()->SetRepresentationToWireframe();
-
-  return actor;
+  return m_sphereActor;
 }
 

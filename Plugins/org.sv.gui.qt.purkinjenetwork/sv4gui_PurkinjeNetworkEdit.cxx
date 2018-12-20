@@ -222,7 +222,7 @@ void sv4guiPurkinjeNetworkEdit::Initialize()
   m_DataStorage = GetDataStorage();
 
   mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
-  mitk::DataNode::Pointer m_ProjFolderNode = m_DataStorage->GetNode (isProjFolder);
+  mitk::DataNode::Pointer m_ProjFolderNode = m_DataStorage->GetNode(isProjFolder);
 
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Initialize] Making directory\n";
   mitk::DataNode::Pointer projFolderNode = getProjectNode();
@@ -277,6 +277,9 @@ mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::getProjectNode()
 void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 {
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] ";
+  double* point1 = m_MeshMapper->m_point1;
+  double* point2 = m_MeshMapper->m_point2;
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] point1 " << point1[0] << " " << point1[1] << "  " << point1[2];
 
   // Get the project data node. 
   mitk::DataNode::Pointer projFolderNode = getProjectNode();
@@ -287,20 +290,24 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 
   // Set the input and output files.
   std::string dir = "/Users/parkerda/software/SimVascular/SimVascular-fork/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/";
-  std::string infile = dir + "sphere.vtu";
-  std::string outfile = projPath + "/" + m_StoreDir.toStdString() + "/sphere-network";
+  std::string infile = m_MeshOutputFileName.toStdString();
+  std::string outfile = projPath + "/" + m_StoreDir.toStdString() + "/network";
 
   //  Execute python script to compute fractal tree network. 
   std::string cmd;
   cmd += "import fractal_tree\n";
   cmd += "fractal_tree.run(";
   cmd += "infile='" + infile + "',";
-  cmd += "outfile='" + outfile + "')\n";
+  cmd += "outfile='" + outfile + "',";
+  cmd += "init_node='[" + std::to_string(point1[0]) + "," + std::to_string(point1[1]) + 
+      "," + std::to_string(point1[2]) + "]',";
+  cmd += "second_node='[" + std::to_string(point2[0]) + "," + std::to_string(point2[1]) + 
+      "," + std::to_string(point2[2]) + "]')\n";
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] cmd " << cmd;
-  //PyRun_SimpleString(cmd.c_str());
+  PyRun_SimpleString(cmd.c_str());
 
   // Load VTK file containing network elements.
-  std::string networkFileName = projPath + "/" + m_StoreDir.toStdString() + "/sphere-network.vtu";
+  std::string networkFileName = projPath + "/" + m_StoreDir.toStdString() + "/network.vtu";
   LoadNetwork(networkFileName);
 }
 
@@ -371,8 +378,16 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
 
       m_MeshContainer->SetSurfaceMesh(m_SurfacMesh);
 
-
-      //polyMesh->Print(std::cout);
+      // Write mesh to project.
+      QFileInfo fileInfo(m_MeshFileName);
+      QString outFileName(fileInfo.fileName());
+      mitk::DataNode::Pointer projFolderNode = getProjectNode();
+      std::string projPath = "";
+      projFolderNode->GetStringProperty("project path", projPath);
+      QString QprojPath = QString(projPath.c_str());
+      m_MeshOutputFileName = QprojPath + "/" + m_StoreDir + "/" + outFileName;
+      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadMesh] m_MeshOutputFileName " <<m_MeshOutputFileName.toStdString();
+      m_SurfacMesh->WriteSurfaceFile(m_MeshOutputFileName.toStdString());
   }
 
   catch(...) {
