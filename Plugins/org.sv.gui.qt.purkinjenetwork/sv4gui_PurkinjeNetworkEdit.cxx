@@ -66,6 +66,8 @@
 #include <vtkProperty.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
+#include "sv4gui_PurkinjeNetworkIO.h"
+
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
@@ -82,6 +84,15 @@ sv4guiPurkinjeNetworkEdit::sv4guiPurkinjeNetworkEdit() : ui(new Ui::sv4guiPurkin
     m_DataInteractor = NULL;
     m_ModelSelectFaceObserverTag = -1;
     m_SphereWidget = NULL;
+
+    // [DaveP] The plugin does not currently references any module code so the module's shared 
+    // library won't be loaded on Ubuntu (works ok on MacOS). This causes mitk to not find the 
+    // state machine xml files which are stored in the module shared library. Force loading the 
+    // module shared library be using a module class here. 
+    //
+    // This will not be a problem when I rewrite this code and place most of it under the module.
+    //
+    auto nio = new sv4guiPurkinjeNetworkIO();
 }
 
 sv4guiPurkinjeNetworkEdit::~sv4guiPurkinjeNetworkEdit()
@@ -149,10 +160,8 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
 
         // Create interactor to select mesh point.
         m_MeshInteractor = sv4guiPurkinjeNetworkInteractor::New();
-        m_MeshInteractor->LoadStateMachine("seedInteraction.xml",
-          us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
-        m_MeshInteractor->SetEventConfig("seedConfig.xml",
-          us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
+        m_MeshInteractor->LoadStateMachine("meshInteraction.xml", us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
+        m_MeshInteractor->SetEventConfig("meshConfig.xml", us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
         m_MeshInteractor->SetDataNode(meshNode);
         /*
         */
