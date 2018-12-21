@@ -120,8 +120,9 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
     Initialize();
 
     // Define widget event handlers.
-    connect(ui->buttonCreateNetwork, SIGNAL(clicked()), this, SLOT(CreateNetwork()));
     connect(ui->buttonLoadMesh, SIGNAL(clicked()), this, SLOT(LoadMesh()));
+    connect(ui->selectMeshComboBox, SIGNAL(clicked()), this, SLOT(SelectMesh()));
+    connect(ui->buttonCreateNetwork, SIGNAL(clicked()), this, SLOT(CreateNetwork()));
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(displayMesh(bool)));
     connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(displayNetwork(bool)));
 
@@ -271,6 +272,91 @@ void sv4guiPurkinjeNetworkEdit::Initialize()
           node = svProj.CreateDataFolder<PurkinjeNetworkFolder>(m_DataStorage, folderName, projFolderNode);
       }
   }
+
+  SetModelAndMesh();
+}
+
+
+// -----------------
+//  SetModelAndMesh
+// -----------------
+
+void sv4guiPurkinjeNetworkEdit::SetModelAndMesh()
+{
+    //ui->comboBox->clear();
+
+    m_ModelNode = NULL;
+    m_MeshNode = NULL;
+
+    //if(m_SelecteNode.IsNull())
+    //    return;
+
+    /*
+    mitk::DataNode::Pointer selectedNode = m_SelecteNode;
+    mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSources(selectedNode, isProjFolder, false);
+    */
+
+    mitk::DataStorage::SetOfObjects::ConstPointer rs;
+    mitk::DataNode::Pointer projFolderNode = getProjectNode();
+
+    mitk::NodePredicateDataType::Pointer isMeshFolder = mitk::NodePredicateDataType::New("sv4guiMeshFolder");
+    mitk::NodePredicateDataType::Pointer isMesh = mitk::NodePredicateDataType::New("sv4guiMitkMesh");
+    rs = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiMeshFolder"));
+
+    if (rs->size() > 0) {
+      m_MeshNode = rs->GetElement(0);
+      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] Found mesh.";
+    } else {
+      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] **** No mesh!";
+    }
+
+    /*
+    if (isMeshFolder->CheckNode(selectedNode)) {
+      m_MeshNode = selectedNode;
+    } else if (isMesh->CheckNode(selectedNode)) {
+      mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSources(selectedNode);
+      if (rs->size() > 0) {
+        m_MeshNode = rs->GetElement(0);
+      }
+    }
+    */
+
+    rs = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiModelFolder"));
+
+    if (rs->size() > 0) {
+      m_ModelNode = rs->GetElement(0);
+      rs = m_DataStorage->GetDerivations(m_ModelNode,mitk::NodePredicateDataType::New("sv4guiModel"));
+      //for (int i=0; i < rs->size(); i++) {
+        //ui->comboBox->addItem(QString::fromStdString(rs->GetElement(i)->GetName()));
+      //}
+
+      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] Found model.";
+    } else {
+      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] **** No model!";
+    }
+
+    mitk::DataNode::Pointer modelNode = NULL;
+    mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSources(meshNode,isProjFolder,false);
+
+    if(rs->size()>0) {
+        mitk::DataNode::Pointer projFolderNode=rs->GetElement(0);
+
+        rs=GetDataStorage()->GetDerivations(projFolderNode,mitk::NodePredicateDataType::New("sv4guiModelFolder"));
+        if (rs->size()>0) {
+            mitk::DataNode::Pointer modelFolderNode=rs->GetElement(0);
+            modelNode=GetDataStorage()->GetNamedDerivedNode(modelName.c_str(),modelFolderNode);
+        }
+    }
+
+    sv4guiModel* model=NULL;
+    if(modelNode.IsNotNull()) {
+        model=dynamic_cast<sv4guiModel*>(modelNode->GetData());
+    }
+
+
+
 }
 
 mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::getProjectNode()
@@ -334,6 +420,11 @@ sv4guiMesh* sv4guiPurkinjeNetworkEdit::LoadNetwork(std::string fileName)
   //m_SurfaceNetwork->ReadSurfaceFile(fileName);
   m_SurfaceNetwork->ReadVolumeFile(fileName);
   m_1DContainer->SetSurfaceNetwork(m_SurfaceNetwork);
+}
+
+void sv4guiPurkinjeNetworkEdit::SelectMesh()
+{
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SelectMesh] ";
 }
 
 // Load a surface mesh in VTK vtp format.

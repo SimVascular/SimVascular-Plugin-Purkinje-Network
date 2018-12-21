@@ -74,6 +74,7 @@ public slots:
     void displayMesh(bool state);
     void displayNetwork(bool state);
     void LoadMesh();
+    void SelectMesh();
     void CreateNetwork();
 
     //void ShowModel(bool checked = false);
@@ -117,6 +118,7 @@ protected:
     sv4guiPurkinjeNetworkMeshContainer::Pointer m_MeshContainer;
     sv4guiPurkinjeNetworkMeshMapper::Pointer m_MeshMapper;
     mitk::DataNode::Pointer m_MeshNode;
+    mitk::DataNode::Pointer m_ModelNode;
 
     sv4guiPurkinjeNetwork1DContainer::Pointer m_1DContainer;
     sv4guiPurkinjeNetwork1DMapper::Pointer m_1DMapper;
@@ -140,6 +142,7 @@ private:
 
     mitk::DataNode::Pointer getProjectNode();
     void Initialize();
+    void SetModelAndMesh();
 
 
 };
