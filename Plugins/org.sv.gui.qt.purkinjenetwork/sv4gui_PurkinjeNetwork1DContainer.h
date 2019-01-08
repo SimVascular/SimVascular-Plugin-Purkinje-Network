@@ -66,10 +66,8 @@ class sv4guiPurkinjeNetwork1DContainer : public mitk::BaseData {
 
     std::vector<double> hoverPoint = std::vector<double>();
 
-    void SetSurfaceMesh(sv4guiMesh* surfaceMesh);
-    sv4guiMesh* GetSurfaceMesh();
-
-    void SetSurfaceNetwork(sv4guiMesh* surfaceNetwork);
+    void SetSurfaceNetworkMesh(sv4guiMesh* mesh);
+    sv4guiMesh* GetSurfaceNetworkMesh();
     sv4guiMesh* GetSurfaceNetwork();
 
 protected:
@@ -83,8 +81,7 @@ private:
 
   std::vector< std::vector<double> > m_startSeeds;
   std::vector< std::vector< std::vector<double> > > m_endSeeds;
-  sv4guiMesh* m_SurfaceMesh;
-  sv4guiMesh* m_SurfaceNetwork;
+  sv4guiMesh* m_SurfaceNetworkMesh;
 
 };
 

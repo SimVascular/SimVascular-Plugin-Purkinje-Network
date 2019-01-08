@@ -118,7 +118,8 @@ protected:
     sv4guiPurkinjeNetworkMeshContainer::Pointer m_MeshContainer;
     sv4guiPurkinjeNetworkMeshMapper::Pointer m_MeshMapper;
     mitk::DataNode::Pointer m_MeshNode;
-    mitk::DataNode::Pointer m_ModelNode;
+    mitk::DataNode::Pointer m_MeshFolderNode;
+    mitk::DataNode::Pointer m_ModelFolderNode;
 
     sv4guiPurkinjeNetwork1DContainer::Pointer m_1DContainer;
     sv4guiPurkinjeNetwork1DMapper::Pointer m_1DMapper;
@@ -130,9 +131,8 @@ private:
 
     QString m_MeshFileName;
     QString m_MeshOutputFileName;
-    sv4guiMesh* m_SurfacMesh;
-
-    sv4guiMesh* m_SurfaceNetwork;
+    sv4guiMesh* m_SurfaceMesh;
+    sv4guiMesh* m_SurfaceNetworkMesh;
 
     sv4guiProjectManager svProj;
 
@@ -142,8 +142,10 @@ private:
 
     mitk::DataNode::Pointer getProjectNode();
     void Initialize();
-    void SetModelAndMesh();
-
+    void SetMeshInformation();
+    vtkSmartPointer<vtkPolyData> GetMeshSurface();
+    mitk::DataNode::Pointer GetMeshFolderDataNode();
+    mitk::DataNode::Pointer GetModelFolderDataNode();
 
 };
 

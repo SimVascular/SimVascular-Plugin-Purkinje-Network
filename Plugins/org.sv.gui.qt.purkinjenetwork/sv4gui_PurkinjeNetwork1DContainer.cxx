@@ -67,24 +67,14 @@ sv4guiPurkinjeNetwork1DContainer::~sv4guiPurkinjeNetwork1DContainer(){
 
 };
 
-void sv4guiPurkinjeNetwork1DContainer::SetSurfaceMesh(sv4guiMesh* surfaceMesh)
+sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceNetworkMesh()
 {
-  m_SurfaceMesh = surfaceMesh;
+  return m_SurfaceNetworkMesh;
 }
 
-sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceMesh()
+void sv4guiPurkinjeNetwork1DContainer::SetSurfaceNetworkMesh(sv4guiMesh* mesh)
 {
-  return m_SurfaceMesh;
-}
-
-void sv4guiPurkinjeNetwork1DContainer::SetSurfaceNetwork(sv4guiMesh* surfaceNetwork)
-{
-  m_SurfaceNetwork = surfaceNetwork;
-}
-
-sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceNetwork()
-{
-  return m_SurfaceNetwork;
+  m_SurfaceNetworkMesh = mesh;
 }
 
 void sv4guiPurkinjeNetwork1DContainer::addStartSeed(double x, double y, double z)

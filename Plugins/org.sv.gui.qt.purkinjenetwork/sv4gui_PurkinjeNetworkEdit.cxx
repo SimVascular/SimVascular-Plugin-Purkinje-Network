@@ -37,13 +37,18 @@
 
 #include "sv4gui_VtkPurkinjeNetworkSphereWidget.h"
 
+#include "sv4gui_MitkMesh.h"
+#include "sv_polydatasolid_utils.h"
+
 #include "sv4gui_Model.h"
+#include "sv4gui_ModelElement.h"
 //[dp] #include "sv4gui_MeshFactory.h"
 //[dp] #include "sv4gui_Mesh.h"
 //[dp] #include "sv4gui_MitkMesh.h"
 //[dp] #include "sv4gui_MitkMeshOperation.h"
 //[dp] #include "sv4gui_MitkMeshIO.h"
 #include "sv4gui_ProjectManager.h"
+
 
 #include "sv4gui_ModelElementPolyData.h"
 #include "sv4gui_ModelElementAnalytic.h"
@@ -273,90 +278,136 @@ void sv4guiPurkinjeNetworkEdit::Initialize()
       }
   }
 
-  SetModelAndMesh();
+  SetMeshInformation();
 }
 
 
-// -----------------
-//  SetModelAndMesh
-// -----------------
+// --------------------
+//  SetMeshInformation
+// --------------------
 
-void sv4guiPurkinjeNetworkEdit::SetModelAndMesh()
+void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
 {
-    //ui->comboBox->clear();
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetMeshInformation] ";
 
-    m_ModelNode = NULL;
-    m_MeshNode = NULL;
+  // Set the pointers to the model and mesh data nodes.
+  m_MeshFolderNode = this->GetMeshFolderDataNode();
+  m_ModelFolderNode = this->GetModelFolderDataNode();
 
-    //if(m_SelecteNode.IsNull())
-    //    return;
+  if (m_ModelFolderNode.IsNull()) {
+    MITK_WARN << "No model found!";
+    return;
+  }
+  MITK_INFO << "Model found";
 
-    /*
-    mitk::DataNode::Pointer selectedNode = m_SelecteNode;
-    mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSources(selectedNode, isProjFolder, false);
-    */
+  // Get the model name.
+  auto modelNodes = m_DataStorage->GetDerivations(m_ModelFolderNode,mitk::NodePredicateDataType::New("sv4guiModel"));
+  auto modelName = modelNodes->GetElement(0)->GetName();
+  MITK_INFO << "Model name " << modelName;
 
-    mitk::DataStorage::SetOfObjects::ConstPointer rs;
-    mitk::DataNode::Pointer projFolderNode = getProjectNode();
+  // Get the mesh surface.
+  vtkSmartPointer<vtkPolyData> meshSurface = this->GetMeshSurface();
+  if (meshSurface.GetPointer() == nullptr) {
+    MITK_WARN << "No mesh found!";
+    return;
+  }
+  MITK_INFO << "Mesh found";
+  vtkPolyData* geom = meshSurface.GetPointer();
+  if (geom == nullptr) { 
+    MITK_WARN << "No model faces associated with mesh.";
+    return;
+  }
+  MITK_INFO << "Model faces are associated with mesh.";
 
-    mitk::NodePredicateDataType::Pointer isMeshFolder = mitk::NodePredicateDataType::New("sv4guiMeshFolder");
-    mitk::NodePredicateDataType::Pointer isMesh = mitk::NodePredicateDataType::New("sv4guiMitkMesh");
-    rs = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiMeshFolder"));
+  // Check that a model is defined.
+  //
+  auto modelNode = m_DataStorage->GetNamedDerivedNode(modelName.c_str(),m_ModelFolderNode);
+  auto model = dynamic_cast<sv4guiModel*>(modelNode->GetData());
+  if (model == nullptr) {
+    MITK_WARN << "No model is defined.";
+    return;
+  }
 
-    if (rs->size() > 0) {
-      m_MeshNode = rs->GetElement(0);
-      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] Found mesh.";
-    } else {
-      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] **** No mesh!";
+  // Get the surface meshes associated with each model face.
+  //
+  sv4guiModelElement* modelElement = model->GetModelElement();
+
+  if (modelElement != NULL) {
+    std::vector<sv4guiModelElement::svFace*> faces = modelElement->GetFaces() ;
+    MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetMeshInformation] Number of model faces " << faces.size();
+    //for (int i = 0; i < faces.size(); i++) {
+    //  auto face = faces[i];
+    for (auto face = faces.begin(); face != faces.end(); ++face) {
+      MITK_INFO <<"[sv4guiPurkinjeNetworkEdit::SetMeshInformation] face id " <<face.id<<" "<<face.name;
+      //MITK_INFO <<"[sv4guiPurkinjeNetworkEdit::SetMeshInformation] face id " <<face->id<<" "<<face->name;
+      int faceID = modelElement->GetFaceIdentifierFromInnerSolid(face->id);
+      vtkSmartPointer<vtkPolyData> facePolyData = vtkSmartPointer<vtkPolyData>::New();
+      PlyDtaUtils_GetFacePolyData(geom, &faceID, facePolyData);
+      MITK_INFO <<"[sv4guiPurkinjeNetworkEdit::SetMeshInformation]   num tri  " << facePolyData->GetNumberOfCells();
     }
+  }
+}
 
-    /*
-    if (isMeshFolder->CheckNode(selectedNode)) {
-      m_MeshNode = selectedNode;
-    } else if (isMesh->CheckNode(selectedNode)) {
-      mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSources(selectedNode);
-      if (rs->size() > 0) {
-        m_MeshNode = rs->GetElement(0);
+// -----------------------
+//  GetMeshFolderDataNode 
+// -----------------------
+// Get the pointer to the mesh folder data node.
+
+mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::GetMeshFolderDataNode()
+{
+  auto projFolderNode = getProjectNode();
+  mitk::DataNode::Pointer meshFolderNode = NULL;
+  auto meshFolderNodes = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiMeshFolder"));
+  if (meshFolderNodes->size() > 0) {
+    meshFolderNode = meshFolderNodes->GetElement(0);
+  }
+  return meshFolderNode;
+}
+
+// -----------------------
+//  GetModelFolderDataNode 
+// -----------------------
+// Get the pointer to the model folder data node.
+
+mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::GetModelFolderDataNode()
+{
+  auto projFolderNode = getProjectNode();
+  mitk::DataNode::Pointer modelFolderNode = NULL;
+  auto modelFolderNodes = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiModelFolder"));
+  if (modelFolderNodes->size() > 0) {
+    modelFolderNode = modelFolderNodes->GetElement(0);
+  }
+
+  return modelFolderNode;
+}
+
+// ----------------
+//  GetMeshSurface
+// ----------------
+//
+// Get the surface of the mesh from the Meshes data node.
+
+vtkSmartPointer<vtkPolyData> sv4guiPurkinjeNetworkEdit::GetMeshSurface()
+{
+  auto projFolderNode = getProjectNode();
+  auto meshFolderNodes = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiMeshFolder"));
+  vtkSmartPointer<vtkPolyData> surfaceMesh;
+
+  if (meshFolderNodes->size() > 0) {
+    m_MeshFolderNode = meshFolderNodes->GetElement(0);
+    auto meshNodes = GetDataStorage()->GetDerivations(m_MeshFolderNode);
+    for (auto it = meshNodes->begin(); it != meshNodes->end(); ++it) {
+      sv4guiMitkMesh* mitkMesh = dynamic_cast<sv4guiMitkMesh*>((*it)->GetData());
+      if (mitkMesh) {
+        sv4guiMesh* mesh = mitkMesh->GetMesh();
+        if (mesh != NULL) {
+          surfaceMesh = mesh->GetSurfaceMesh();
+        }
       }
     }
-    */
+  }
 
-    rs = m_DataStorage->GetDerivations(projFolderNode, mitk::NodePredicateDataType::New("sv4guiModelFolder"));
-
-    if (rs->size() > 0) {
-      m_ModelNode = rs->GetElement(0);
-      rs = m_DataStorage->GetDerivations(m_ModelNode,mitk::NodePredicateDataType::New("sv4guiModel"));
-      //for (int i=0; i < rs->size(); i++) {
-        //ui->comboBox->addItem(QString::fromStdString(rs->GetElement(i)->GetName()));
-      //}
-
-      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] Found model.";
-    } else {
-      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SetModelAndMesh] **** No model!";
-    }
-
-    mitk::DataNode::Pointer modelNode = NULL;
-    mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSources(meshNode,isProjFolder,false);
-
-    if(rs->size()>0) {
-        mitk::DataNode::Pointer projFolderNode=rs->GetElement(0);
-
-        rs=GetDataStorage()->GetDerivations(projFolderNode,mitk::NodePredicateDataType::New("sv4guiModelFolder"));
-        if (rs->size()>0) {
-            mitk::DataNode::Pointer modelFolderNode=rs->GetElement(0);
-            modelNode=GetDataStorage()->GetNamedDerivedNode(modelName.c_str(),modelFolderNode);
-        }
-    }
-
-    sv4guiModel* model=NULL;
-    if(modelNode.IsNotNull()) {
-        model=dynamic_cast<sv4guiModel*>(modelNode->GetData());
-    }
-
-
-
+  return surfaceMesh;
 }
 
 mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::getProjectNode()
@@ -415,11 +466,9 @@ sv4guiMesh* sv4guiPurkinjeNetworkEdit::LoadNetwork(std::string fileName)
 {
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadNetwork] ";
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadNetwork] Read surface network " << fileName;
-
-  m_SurfaceNetwork = new sv4guiMesh();
-  //m_SurfaceNetwork->ReadSurfaceFile(fileName);
-  m_SurfaceNetwork->ReadVolumeFile(fileName);
-  m_1DContainer->SetSurfaceNetwork(m_SurfaceNetwork);
+  m_SurfaceNetworkMesh = new sv4guiMesh();
+  m_SurfaceNetworkMesh->ReadVolumeFile(fileName);
+  m_1DContainer->SetSurfaceNetworkMesh(m_SurfaceNetworkMesh);
 }
 
 void sv4guiPurkinjeNetworkEdit::SelectMesh()
@@ -464,9 +513,9 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
 
       MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadMesh] Read surface mesh " << m_MeshFileName.toStdString();
 
-      m_SurfacMesh = new sv4guiMesh();
-      m_SurfacMesh->ReadSurfaceFile(m_MeshFileName.toStdString());
-      auto polyMesh = m_SurfacMesh->GetSurfaceMesh();
+      m_SurfaceNetworkMesh = new sv4guiMesh();
+      m_SurfaceNetworkMesh->ReadSurfaceFile(m_MeshFileName.toStdString());
+      auto polyMesh = m_SurfaceNetworkMesh->GetSurfaceMesh();
 
       auto points = polyMesh->GetPoints();
       auto numPoints = points->GetNumberOfPoints();
@@ -476,7 +525,7 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
       auto numPolys = polygons->GetNumberOfCells();
       MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadMesh] Number of triangles " << numPolys; 
 
-      m_MeshContainer->SetSurfaceMesh(m_SurfacMesh);
+      m_MeshContainer->SetSurfaceMesh(m_SurfaceNetworkMesh);
 
       // Write mesh to project.
       QFileInfo fileInfo(m_MeshFileName);
@@ -487,7 +536,7 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
       QString QprojPath = QString(projPath.c_str());
       m_MeshOutputFileName = QprojPath + "/" + m_StoreDir + "/" + outFileName;
       MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadMesh] m_MeshOutputFileName " <<m_MeshOutputFileName.toStdString();
-      m_SurfacMesh->WriteSurfaceFile(m_MeshOutputFileName.toStdString());
+      m_SurfaceNetworkMesh->WriteSurfaceFile(m_MeshOutputFileName.toStdString());
   }
 
   catch(...) {
