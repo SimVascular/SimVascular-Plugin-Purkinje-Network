@@ -85,7 +85,7 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
 
   // Show network mesh.
   //
-  auto surfaceNetwork = mesh->GetSurfaceNetwork();
+  auto surfaceNetwork = mesh->GetSurfaceNetworkMesh();
 
   if (surfaceNetwork != NULL) {
     MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] Have surface network data ";

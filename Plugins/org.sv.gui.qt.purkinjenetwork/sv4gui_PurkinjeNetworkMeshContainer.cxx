@@ -77,6 +77,20 @@ sv4guiMesh* sv4guiPurkinjeNetworkMeshContainer::GetSurfaceMesh()
   return m_SurfaceMesh;
 }
 
+void sv4guiPurkinjeNetworkMeshContainer::SetModelFaces(std::vector<sv4guiModelElement::svFace*>& faces)
+{
+  for (const auto& face : faces) {
+    m_ModelFaces.emplace_back(face);
+  }
+
+}
+
+std::vector<sv4guiModelElement::svFace*> sv4guiPurkinjeNetworkMeshContainer::GetModelFaces()
+{
+  std::vector<sv4guiModelElement::svFace*> tmp(m_ModelFaces); 
+  return tmp;
+}
+
 void sv4guiPurkinjeNetworkMeshContainer::SetSurfaceNetwork(sv4guiMesh* surfaceNetwork)
 {
   m_SurfaceNetwork = surfaceNetwork;

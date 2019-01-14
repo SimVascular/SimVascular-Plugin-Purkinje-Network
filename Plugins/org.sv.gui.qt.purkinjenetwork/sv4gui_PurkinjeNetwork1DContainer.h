@@ -68,7 +68,6 @@ class sv4guiPurkinjeNetwork1DContainer : public mitk::BaseData {
 
     void SetSurfaceNetworkMesh(sv4guiMesh* mesh);
     sv4guiMesh* GetSurfaceNetworkMesh();
-    sv4guiMesh* GetSurfaceNetwork();
 
 protected:
 

@@ -69,6 +69,9 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetSurfaceMesh(sv4guiMesh* surfaceMesh);
     sv4guiMesh* GetSurfaceMesh();
 
+    void SetModelFaces(std::vector<sv4guiModelElement::svFace*>& faces);
+    std::vector<sv4guiModelElement::svFace*> GetModelFaces();
+
     void SetSurfaceNetwork(sv4guiMesh* surfaceNetwork);
     sv4guiMesh* GetSurfaceNetwork();
 
@@ -89,6 +92,7 @@ private:
   sv4guiMesh* m_SurfaceMesh;
   sv4guiMesh* m_SurfaceNetwork;
   mitk::Point3D m_currentPickedPoint;
+  std::vector<sv4guiModelElement::svFace*> m_ModelFaces;
 
 };
 

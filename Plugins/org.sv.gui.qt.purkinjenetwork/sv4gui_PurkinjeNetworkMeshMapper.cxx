@@ -89,14 +89,17 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   // Show surface mesh.
   //
   auto surfaceMesh = mesh->GetSurfaceMesh();
+  auto modelFaces = mesh->GetModelFaces();
 
   if (surfaceMesh != NULL && m_newMesh) {
     //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] Have surface mesh data ";
     auto polyMesh = surfaceMesh->GetSurfaceMesh();
     vtkSmartPointer<vtkPolyDataMapper> meshMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     meshMapper->SetInputData(polyMesh);
+    meshMapper->ScalarVisibilityOff();  // Turn off mapping of scalar data, otherwise can't set color.
     vtkSmartPointer<vtkActor> polyMeshActor = vtkSmartPointer<vtkActor>::New();
     polyMeshActor->SetMapper(meshMapper);
+    polyMeshActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
     polyMeshActor->GetProperty()->SetEdgeColor(0, 0, 0);
     polyMeshActor->GetProperty()->EdgeVisibilityOn();
     local_storage->m_PropAssembly->AddPart(polyMeshActor);
@@ -117,6 +120,28 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
       //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] No surface mesh data ";
   }
 
+  // Set Face color?
+/*
+  float selectedColor[3]= { 1.0f, 1.0f, 0.0f };
+  node->GetColor(selectedColor, renderer, "face selected color");
+
+  for (const auto& face : modelFaces) {
+    vtkSmartPointer<vtkPolyData> facePolyData = face->vpd;
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> faceMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
+    vtkSmartPointer<vtkActor> faceActor= vtkSmartPointer<vtkActor>::New();
+    faceActor->SetMapper(faceMapper);
+
+    //ApplyAllProperties(renderer, faceMapper, faceActor);
+
+    Superclass::ApplyColorAndOpacityProperties(renderer, faceActor);
+
+    ApplyAllProperties(node, renderer, faceMapper, faceActor, &m_LSH, true);
+
+    faceActor->GetProperty()->SetColor(selectedColor[0], selectedColor[1], selectedColor[2]);
+    faceActor->GetProperty()->SetOpacity(face->opacity);
+  }
+*/
+
   // Show picked point.
   local_storage->m_PropAssembly->GetParts()->RemoveItem(m_sphereActor);
   auto point = mesh->getPickedPoint();
@@ -127,6 +152,14 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   this->findClosestFace(mesh, point);
 
   local_storage->m_PropAssembly->VisibilityOn();
+}
+
+void sv4guiPurkinjeNetworkMeshMapper::ApplyAllProperties(mitk::DataNode *node, mitk::BaseRenderer* renderer, 
+    vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper, vtkSmartPointer<vtkActor> actor, 
+    mitk::LocalStorageHandler<LocalStorage>* handler, bool clipping)
+{
+  //ApplyMitkPropertiesToVtkProperty( node, actor->GetProperty(), renderer );
+
 }
 
 // Find the face in the mesh closest to the picked point.

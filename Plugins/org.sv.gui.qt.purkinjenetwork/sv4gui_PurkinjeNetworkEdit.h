@@ -71,8 +71,8 @@ public:
 
 public slots:
 
-    void displayMesh(bool state);
-    void displayNetwork(bool state);
+    void showMesh(bool state);
+    void showNetwork(bool state);
     void LoadMesh();
     void SelectMesh();
     void CreateNetwork();
@@ -143,7 +143,7 @@ private:
     mitk::DataNode::Pointer getProjectNode();
     void Initialize();
     void SetMeshInformation();
-    vtkSmartPointer<vtkPolyData> GetMeshSurface();
+    sv4guiMesh* GetDataNodeMesh();
     mitk::DataNode::Pointer GetMeshFolderDataNode();
     mitk::DataNode::Pointer GetModelFolderDataNode();
 

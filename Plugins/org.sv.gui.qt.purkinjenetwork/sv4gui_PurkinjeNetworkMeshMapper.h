@@ -99,7 +99,9 @@ protected:
     vtkSmartPointer<vtkActor> createSphereActor(mitk::Point3D& point);
     void findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, mitk::Point3D& point);
 
-
+    void ApplyAllProperties(mitk::DataNode *node, mitk::BaseRenderer* renderer,
+        vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper, vtkSmartPointer<vtkActor> actor,
+        mitk::LocalStorageHandler<LocalStorage>* handler, bool clipping);
 
 };
 
