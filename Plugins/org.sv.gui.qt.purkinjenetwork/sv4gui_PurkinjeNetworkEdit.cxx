@@ -286,6 +286,8 @@ void sv4guiPurkinjeNetworkEdit::Initialize()
 // --------------------
 //  SetMeshInformation
 // --------------------
+// Get model and mesh data neeeded to set the model surface meshes
+// on which to create purkinje networks.
 
 void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
 {
@@ -294,7 +296,7 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
   m_ModelFolderNode = GetModelFolderDataNode();
   m_MeshFolderNode = GetMeshFolderDataNode();
 
-  // Get the model name.
+  // Check that a model node exists (will always be true?).
   auto modelNodes = m_DataStorage->GetDerivations(m_ModelFolderNode,mitk::NodePredicateDataType::New("sv4guiModel"));
   if (modelNodes->size() == 0) {
     MITK_WARN << msgPrefix << "Model data node not found!";
@@ -302,6 +304,15 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
   }
   auto modelName = modelNodes->GetElement(0)->GetName();
   MITK_INFO << msgPrefix << "Model name " << modelName;
+
+  // Check that a model has been created.
+  //
+  auto modelNode = m_DataStorage->GetNamedDerivedNode(modelName.c_str(),m_ModelFolderNode);
+  auto model = dynamic_cast<sv4guiModel*>(modelNode->GetData());
+  if (model == nullptr) {
+    MITK_WARN << msgPrefix << "No model has been created!";
+    return;
+  }
 
   // Get the mesh and its surface from the Meshes data node.
   //
@@ -330,29 +341,23 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
   ui->meshCheckBox->setChecked(1);
   ui->meshCheckBox->isChecked();
 
-  // Check that a model has been created.
-  //
-  auto modelNode = m_DataStorage->GetNamedDerivedNode(modelName.c_str(),m_ModelFolderNode);
-  auto model = dynamic_cast<sv4guiModel*>(modelNode->GetData());
-  if (model == nullptr) {
-    MITK_WARN << msgPrefix << "No model has been created!";
-    return;
-  }
-
   // Get the surface mesh associated with each model face.
   //
   sv4guiModelElement* modelElement = model->GetModelElement();
+  m_MeshContainer->SetModelElement(modelElement);
 
   if (modelElement != nullptr) {
     std::vector<sv4guiModelElement::svFace*> faces = modelElement->GetFaces() ;
     MITK_INFO << msgPrefix << "Number of model faces " << faces.size();
     for (const auto& face : faces) { 
-      MITK_INFO << msgPrefix << "Face id " << face->id << " name " << face->name;
+      MITK_INFO << msgPrefix << "Face id " << face->id << " name '" << face->name << "'";
       int faceID = modelElement->GetFaceIdentifierFromInnerSolid(face->id);
       vtkSmartPointer<vtkPolyData> facePolyData = vtkSmartPointer<vtkPolyData>::New();
       PlyDtaUtils_GetFacePolyData(geom, &faceID, facePolyData);
       MITK_INFO << msgPrefix << "   Num tri  " << facePolyData->GetNumberOfCells();
     }
+
+    m_MeshContainer->SetModelFaces(faces);
   }
 }
 

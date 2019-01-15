@@ -78,6 +78,9 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     mitk::Point3D getPickedPoint() { return m_currentPickedPoint; }
     void setPickedPoint(mitk::Point3D& point) { m_currentPickedPoint = point; }
 
+    void SetModelElement(sv4guiModelElement* modelElement) { m_ModelElement = modelElement; {
+    sv4guiModelElement* GetModelElement() { return m_ModelElement; }
+
 protected:
 
   mitkCloneMacro(Self);
@@ -93,6 +96,7 @@ private:
   sv4guiMesh* m_SurfaceNetwork;
   mitk::Point3D m_currentPickedPoint;
   std::vector<sv4guiModelElement::svFace*> m_ModelFaces;
+  sv4guiModelElement* m_ModelElement;
 
 };
 

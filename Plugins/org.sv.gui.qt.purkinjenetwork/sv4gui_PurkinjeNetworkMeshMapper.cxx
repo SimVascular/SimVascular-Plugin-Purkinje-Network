@@ -45,11 +45,16 @@ sv4guiPurkinjeNetworkMeshMapper::~sv4guiPurkinjeNetworkMeshMapper()
 {
 }
 
+
+//-------------------------
+// GenerateDataForRenderer
+//-------------------------
 // Generate the data needed for rendering into renderer.
 //
 void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] ";
+  std::string msgPrefix = "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] ";
+  MITK_INFO << msgPrefix; 
 
   //make ls propassembly
   mitk::DataNode* node = GetDataNode();
@@ -92,7 +97,7 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   auto modelFaces = mesh->GetModelFaces();
 
   if (surfaceMesh != NULL && m_newMesh) {
-    //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] Have surface mesh data ";
+    MITK_INFO << msgPrefix << "Have surface mesh data";
     auto polyMesh = surfaceMesh->GetSurfaceMesh();
     vtkSmartPointer<vtkPolyDataMapper> meshMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     meshMapper->SetInputData(polyMesh);
@@ -116,9 +121,20 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     m_pickRadius = (m_pickRadius > dz) ? m_pickRadius : dz;
     m_newMesh = false;
 
+    MITK_INFO << msgPrefix << "Number of model faces " << modelFaces.size();
+    for (const auto& face : modelFaces) {
+      MITK_INFO << msgPrefix << "Face id " << face->id << " name '" << face->name << "'";
+      int faceID = modelElement->GetFaceIdentifierFromInnerSolid(face->id);
+      vtkSmartPointer<vtkPolyData> facePolyData = vtkSmartPointer<vtkPolyData>::New();
+      PlyDtaUtils_GetFacePolyData(geom, &faceID, facePolyData);
+      MITK_INFO << msgPrefix << "   Num tri  " << facePolyData->GetNumberOfCells();
+    }
+
   } else {
       //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] No surface mesh data ";
   }
+
+
 
   // Set Face color?
 /*
@@ -167,7 +183,8 @@ void sv4guiPurkinjeNetworkMeshMapper::ApplyAllProperties(mitk::DataNode *node, m
 void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, 
     mitk::Point3D& point)
 {
-  //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::findClosestFace] ";
+  std::string msgPrefix = "[sv4guiPurkinjeNetworkMeshMapper::findClosestFace] ";
+  MITK_INFO <<  msgPrefix;
   auto surfaceMesh = mesh->GetSurfaceMesh();
   if (surfaceMesh == NULL) {
     return;
@@ -194,6 +211,7 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
   MITK_INFO << "Squared distance to closest point: " << closestPointDist2;
   MITK_INFO << "CellId: " << cellId;
   */
+  MITK_INFO << msgPrefix + "CellId: " << cellId;
 
   vtkCell* cell = polyMesh->GetCell(cellId);
   vtkTriangle* triangle = dynamic_cast<vtkTriangle*>(cell);
