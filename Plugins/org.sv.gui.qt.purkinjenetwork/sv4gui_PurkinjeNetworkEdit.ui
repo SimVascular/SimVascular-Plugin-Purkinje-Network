@@ -28,28 +28,18 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="whatsThis">
+    <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
+   </property>
    <property name="text">
     <string>Load Mesh</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="meshCheckBox">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>70</y>
-     <width>102</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Show Mesh</string>
    </property>
   </widget>
   <widget class="QPushButton" name="buttonCreateNetwork">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>440</y>
+     <y>480</y>
      <width>131</width>
      <height>25</height>
     </rect>
@@ -62,7 +52,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>440</y>
+     <y>480</y>
      <width>131</width>
      <height>23</height>
     </rect>
@@ -75,7 +65,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>240</y>
+     <y>300</y>
      <width>231</width>
      <height>28</height>
     </rect>
@@ -101,7 +91,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>290</y>
+     <y>340</y>
      <width>231</width>
      <height>28</height>
     </rect>
@@ -123,37 +113,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_3">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>340</y>
-     <width>239</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_5">
-    <item>
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>Branch segment length </string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox_4">
-      <property name="value">
-       <double>0.010000000000000</double>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>1</x>
-     <y>140</y>
+     <y>220</y>
      <width>265</width>
      <height>28</height>
     </rect>
@@ -182,7 +146,7 @@
    <property name="geometry">
     <rect>
      <x>1</x>
-     <y>190</y>
+     <y>260</y>
      <width>231</width>
      <height>28</height>
     </rect>
@@ -204,12 +168,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>1</x>
      <y>31</y>
-     <width>187</width>
+     <width>193</width>
      <height>27</height>
     </rect>
    </property>
@@ -217,12 +181,110 @@
     <item>
      <widget class="QLabel" name="label_6">
       <property name="text">
-       <string>Select Mesh   </string>
+       <string>Select Model   </string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QComboBox" name="selectMeshComboBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>174</y>
+     <width>74</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start Point</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="startPointXLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>171</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="startPointYLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>151</x>
+     <y>171</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="startPointZLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>222</x>
+     <y>171</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>100</y>
+     <width>350</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Mesh Surface</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="meshSurfaceNameLineEdit"/>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="meshCheckBox">
+      <property name="text">
+       <string>Show Mesh</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>380</y>
+     <width>239</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Branch segment length </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox_4">
+      <property name="value">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

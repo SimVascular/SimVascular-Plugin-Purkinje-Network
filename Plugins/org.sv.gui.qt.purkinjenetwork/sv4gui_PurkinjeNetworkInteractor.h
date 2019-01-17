@@ -32,7 +32,12 @@
 #ifndef sv4guiPurkinjeNetworkINTERACTOR_H
 #define sv4guiPurkinjeNetworkINTERACTOR_H
 
+#include "sv4gui_PurkinjeNetworkMeshContainer.h"
+//#include "sv4gui_PurkinjeNetworkEdit.h"
+
+//#include <itkEventObject.h>
 #include <mitkDataInteractor.h>
+
 class sv4guiPurkinjeNetworkInteractor : public mitk::DataInteractor
 {
 public:
@@ -61,5 +66,10 @@ private:
   int m_currentStartSeed = -1;
   mitk::Point2D m_CurrentPickedDisplayPoint;
 };
+
+// Define classes for events.
+itkEventMacro( sv4guiPurkinjeNetworkMeshSelectFaceEvent, sv4guiPurkinjeNetworkMeshEvent );
+itkEventMacro( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent, sv4guiPurkinjeNetworkMeshEvent );
+
 
 #endif // sv4guiPurkinjeNetworkINTERACTOR_H

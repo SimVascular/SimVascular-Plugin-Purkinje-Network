@@ -38,16 +38,16 @@
 #include "sv4gui_DataNodeOperationInterface.h"
 #include "sv4gui_LocalTableDelegate.h"
 #include "sv4gui_Mesh.h"
-#include "sv4gui_PurkinjeNetworkDataInteractor.h"
 #include "sv4gui_ProjectManager.h"
 #include "sv4gui_PurkinjeNetworkMeshContainer.h"
 #include "sv4gui_PurkinjeNetworkMeshMapper.h"
 #include "sv4gui_PurkinjeNetwork1DContainer.h"
 #include "sv4gui_PurkinjeNetwork1DMapper.h"
 #include "sv4gui_PurkinjeNetworkInteractor.h"
-#include "sv4gui_PurkinjeNetworkInteractor.h"
 
 #include "sv4gui_QmitkFunctionality.h"
+
+#include <itkEventObject.h>
 
 #include <vtkSphereWidget.h>
 
@@ -76,8 +76,13 @@ public slots:
     void LoadMesh();
     void SelectMesh();
     void CreateNetwork();
+    void MeshSurfaceName();
+    void MeshSurfaceStartPoint();
 
     void AddObservers();
+
+    void UpdateFaceSelection();
+    void UpdateStartPointSelection();
 
     //void ShowModel(bool checked = false);
 
@@ -101,9 +106,6 @@ protected:
 
     Ui::sv4guiPurkinjeNetworkEdit *ui;
 
-    sv4guiPurkinjeNetworkDataInteractor::Pointer m_DataInteractor;
-
-    long m_ModelSelectFaceObserverTag;
 
     QmitkStdMultiWidget* m_DisplayWidget;
 
@@ -150,6 +152,8 @@ private:
     mitk::DataNode::Pointer GetMeshFolderDataNode();
     mitk::DataNode::Pointer GetModelFolderDataNode();
 
+    long m_MeshSelectFaceObserverTag;
+    long m_MeshSelectStartPointObserverTag;
 };
 
 #endif // SV4GUI_PURKINJENETWORKEDIT_H

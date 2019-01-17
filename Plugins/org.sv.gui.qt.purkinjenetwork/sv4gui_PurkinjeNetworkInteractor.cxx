@@ -100,6 +100,9 @@ void sv4guiPurkinjeNetworkInteractor::SelectPoint(mitk::StateMachineAction*, mit
 
   // Update all mappers (e.g. sv4guiPurkinjeNetworkMeshMapper).
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+
+  // Update GUI.
+  meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent() );
 }
 
 void sv4guiPurkinjeNetworkInteractor::AddStart(mitk::StateMachineAction*, 
@@ -204,15 +207,15 @@ void sv4guiPurkinjeNetworkInteractor::SelectSingleFace(mitk::StateMachineAction*
       //selectedFaceIndex = face->id;
       MITK_INFO << msgPrefix << "Selected face " << selectedFaceIndex; 
       MITK_INFO << msgPrefix << "Face id " << face->id << " name '" << face->name << "'";
+      meshContainer->SetSelectedFaceName(face->name);
+      meshContainer->SetSelectedFaceIndex(selectedFaceIndex);
       break;
     }
   }
 
-  if (selectedFaceIndex == -1) {
-    return;
-  }
+  //auto purkinjeNetworkNode = dynamic_cast<sv4guiPurkinjeNetworkEdit*>(this->GetDataNode()->GetData());
 
- meshContainer->SetSelectedFaceIndex(selectedFaceIndex);
+  meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectFaceEvent() );
 
 }
 

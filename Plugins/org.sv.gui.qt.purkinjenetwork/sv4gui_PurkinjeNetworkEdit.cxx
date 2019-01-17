@@ -86,10 +86,10 @@ static const std::string PurkinjeNetwork_NODE_NAME = "Purkinje-Network";
 
 sv4guiPurkinjeNetworkEdit::sv4guiPurkinjeNetworkEdit() : ui(new Ui::sv4guiPurkinjeNetworkEdit)
 {
-    m_DataInteractor = NULL;
-    m_ModelSelectFaceObserverTag = -1;
     m_SphereWidget = NULL;
     m_PurkinjeNetworkNode = NULL;
+    m_MeshSelectFaceObserverTag = -1;
+    m_MeshSelectStartPointObserverTag = -1;
 
     // [DaveP] The plugin does not currently references any module code so the module's shared 
     // library won't be loaded on Ubuntu (works ok on MacOS). This causes mitk to not find the 
@@ -131,6 +131,10 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
     connect(ui->buttonCreateNetwork, SIGNAL(clicked()), this, SLOT(CreateNetwork()));
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(showMesh(bool)));
     connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(showNetwork(bool)));
+    connect(ui->meshSurfaceNameLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceName()));
+    connect(ui->startPointXLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
+    connect(ui->startPointYLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
+    connect(ui->startPointZLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
 
     m_Interface = new sv4guiDataNodeOperationInterface();
 
@@ -173,8 +177,6 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
         m_MeshInteractor->LoadStateMachine("meshInteraction.xml", us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
         m_MeshInteractor->SetEventConfig("meshConfig.xml", us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
         m_MeshInteractor->SetDataNode(meshNode);
-        /*
-        */
 
         // Set visibility of Model data node.
         mitk::DataNode::Pointer model_folder_node = GetDataStorage()->GetNamedNode("Models");
@@ -194,26 +196,54 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
             MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Meshes folder is null";
         }
 
-        mitk::DataNode::Pointer m_PurkinjeNetworkNode = GetDataStorage()->GetNamedNode("Purkinje-Network");
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         m_init = false;
     }
 
     AddObservers();
-
-    // connect(ui->btnMeshInfo, SIGNAL(clicked()), this, SLOT(DisplayMeshInfo()) );
 }
 
+//-----------------
+// MeshSurfaceName
+//-----------------
+// Process mesh surface name type-in.
+//
+void sv4guiPurkinjeNetworkEdit::MeshSurfaceName()
+{
+  std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::MeshSurfaceName] "; 
+  MITK_INFO << msgPrefix; 
+  std::string meshName = ui->meshSurfaceNameLineEdit->text().trimmed().toStdString();
+
+  if (meshName == "") {
+    QMessageBox::warning(NULL,"Mesh surface name is empty", "Please give a mesh surface name.");
+    return;
+  }
+}
+
+//-----------------------
+// MeshSurfaceStartPoint 
+//-----------------------
+// Process mesh surface start point type-in.
+//
+void sv4guiPurkinjeNetworkEdit::MeshSurfaceStartPoint()
+{
+  std::string x = ui->startPointXLineEdit->text().trimmed().toStdString();
+  std::string y = ui->startPointYLineEdit->text().trimmed().toStdString();
+  std::string z = ui->startPointZLineEdit->text().trimmed().toStdString();
+}
+
+//----------
+// showMesh
+//----------
+// Process ths show mesh check box select.
+//
 void sv4guiPurkinjeNetworkEdit::showMesh(bool state)
 {
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::isplayMesh] state " << state;
-
   if (!state) {
       GetDataStorage()->Remove(m_MeshNode);
   } else {
       auto networkNode = GetDataStorage()->GetNamedNode("Purkinje-Network");
       if (networkNode) {
-          MITK_INFO << "[sv4guiPurkinjeNetworkEdit::showMesh] Add m_MeshNode to image_folder_node";
           GetDataStorage()->Add(m_MeshNode, networkNode);
       }
   }
@@ -277,12 +307,12 @@ void sv4guiPurkinjeNetworkEdit::Initialize()
   // Create the data folder.
   if (projFolderNode) {
       mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(PurkinjeNetwork_NODE_NAME);
-
       if (!node) {
           MITK_INFO << "[PurkinjeNetwork] No Purkinje Network node, creating";
           QString folderName = QString(PurkinjeNetwork_NODE_NAME.c_str());
           node = svProj.CreateDataFolder<PurkinjeNetworkFolder>(m_DataStorage, folderName, projFolderNode);
       }
+      m_PurkinjeNetworkNode = node;
   }
 
   // SetMeshInformation();
@@ -624,27 +654,70 @@ void sv4guiPurkinjeNetworkEdit::UpdateSphereData()
 {
 }
 
+//--------------
+// AddObservers
+//--------------
+// Add connecting events (e.g. selecting a mesh face) to callbacks
+// within this class. The callbacks will update gui widgets with
+// data (e.g. the selected mesh face name).
+//
+// Observer functions (e.g. sv4guiPurkinjeNetworkMeshSelectFaceEvent() ) 
+// are defined in sv4gui_PurkinjeNetworkInteractor.h.
+//
 void sv4guiPurkinjeNetworkEdit::AddObservers()
 {
-/*
-    if(m_ModelNode.IsNotNull())
-    {
-        if(m_ModelNode->GetDataInteractor().IsNull())
-        {
-            m_DataInteractor = sv4guiModelDataInteractor::New();
-            m_DataInteractor->LoadStateMachine("meshInteraction.xml", us::ModuleRegistry::GetModule("sv4guiPurkinjeNetworkModule"));
-            m_DataInteractor->SetEventConfig("meshConfig.xml", us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
-            m_DataInteractor->SetDataNode(m_ModelNode);
-        }
-        m_ModelNode->SetStringProperty("interactor user","modeling");
-        sv4guiModelDataInteractor* interactor=dynamic_cast<sv4guiModelDataInteractor*>(m_ModelNode->GetDataInteractor().GetPointer());
-        if(interactor)
-            interactor->SetFaceSelectionOnly(false);
-    }
+  if (m_MeshContainer.IsNull()) {
+    return;
+  }
+ 
+  // Connect selecting mesh face event. 
+  if (m_MeshSelectFaceObserverTag == -1) {
+    itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command = 
+        itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
+    command->SetCallbackFunction(this, &sv4guiPurkinjeNetworkEdit::UpdateFaceSelection);
+    m_MeshSelectFaceObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectFaceEvent(), command);
+  }
 
-*/
+  // Connect selecting start point event. 
+  if (m_MeshSelectStartPointObserverTag == -1) {
+    itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command =
+        itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
+    command->SetCallbackFunction(this, &sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection);
+    m_MeshSelectStartPointObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent(), 
+        command);
+  }
 }
 
+//---------------------
+// UpdateFaceSelection
+//---------------------
+// Update the face name GUI widget with the value of the selected face name.
+//
+void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
+{
+  std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::UpdateFaceSelection] ";
+  MITK_INFO << msgPrefix;
+  auto faceName = m_MeshContainer->GetSelectedFaceName();
+  MITK_INFO << msgPrefix << "Face name " << faceName;
+  ui->meshSurfaceNameLineEdit->setText(QString::fromStdString(faceName));
+}
+
+//---------------------------
+// UpdateStartPointSelection
+//---------------------------
+// Update the start point GUI widgets with the value of the selected start point.
+//
+void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
+{
+  auto point = m_MeshContainer->GetPickedPoint();
+  char str[20];
+  sprintf(str, "%g", point[0]);
+  ui->startPointXLineEdit->setText(QString::fromStdString(str));
+  sprintf(str, "%g", point[1]);
+  ui->startPointYLineEdit->setText(QString::fromStdString(str));
+  sprintf(str, "%g", point[2]);
+  ui->startPointZLineEdit->setText(QString::fromStdString(str));
+}
 
 
 

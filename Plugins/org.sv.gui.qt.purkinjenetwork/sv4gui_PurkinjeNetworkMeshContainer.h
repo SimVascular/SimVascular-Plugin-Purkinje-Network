@@ -36,6 +36,7 @@
 #include <vector>
 #include "mitkBaseData.h"
 #include "sv4gui_Mesh.h"
+#include <itkEventObject.h>
 
 class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
 
@@ -76,6 +77,9 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetSelectedFaceIndex(int index);
     int GetSelectedFaceIndex();
 
+    void SetSelectedFaceName(const std::string name);
+    std::string GetSelectedFaceName();
+
 protected:
 
   mitkCloneMacro(Self);
@@ -93,8 +97,12 @@ private:
   std::vector<sv4guiModelElement::svFace*> m_ModelFaces;
   sv4guiModelElement* m_ModelElement;
   int m_SelectedFaceIndex;
+  std::string  m_SelectedFaceName;
   bool m_NewPickedPoint;
 
 };
+
+itkEventMacro( sv4guiPurkinjeNetworkMeshEvent, itk::AnyEvent);
+itkEventMacro( sv4guiPurkinjeNetworkMeshSetEvent, sv4guiPurkinjeNetworkMeshEvent);
 
 #endif //SV4GUI_PURKINJENETWORK_MESH_CONTAINER_H

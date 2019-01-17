@@ -86,36 +86,58 @@ std::vector<sv4guiModelElement::svFace*> sv4guiPurkinjeNetworkMeshContainer::Get
   return tmp;
 }
 
+//------------------------
+// Get/Set SurfaceNetwork 
+//------------------------
 void sv4guiPurkinjeNetworkMeshContainer::SetSurfaceNetwork(sv4guiMesh* surfaceNetwork)
 {
   m_SurfaceNetwork = surfaceNetwork;
 }
-
 sv4guiMesh* sv4guiPurkinjeNetworkMeshContainer::GetSurfaceNetwork()
 {
   return m_SurfaceNetwork;
 }
 
+//--------------------------
+// Get/Set SelectedFaceName
+//--------------------------
+void sv4guiPurkinjeNetworkMeshContainer::SetSelectedFaceName(const std::string name)
+{
+  m_SelectedFaceName = name;
+}
+std::string sv4guiPurkinjeNetworkMeshContainer::GetSelectedFaceName()
+{
+  return m_SelectedFaceName;
+}
+
+//---------------------------
+// Get/Set SelectedFaceIndex
+//---------------------------
 void sv4guiPurkinjeNetworkMeshContainer::SetSelectedFaceIndex(int index)
 {
   m_SelectedFaceIndex = index;
 }
-
 int sv4guiPurkinjeNetworkMeshContainer::GetSelectedFaceIndex()
 {
   return m_SelectedFaceIndex;
 }
 
+//------------------------
+// Get/Set PickedPointdex
+//-------------------------
 mitk::Point3D sv4guiPurkinjeNetworkMeshContainer::GetPickedPoint() 
 { 
   return m_currentPickedPoint; 
 }
-
 void sv4guiPurkinjeNetworkMeshContainer::SetPickedPoint(mitk::Point3D& point) 
 { 
   m_currentPickedPoint = point; 
   m_NewPickedPoint = true;
 }
+
+//--------------------
+// HaveNewPickedPoint 
+//--------------------
 
 bool sv4guiPurkinjeNetworkMeshContainer::HaveNewPickedPoint(bool reset)
 {
