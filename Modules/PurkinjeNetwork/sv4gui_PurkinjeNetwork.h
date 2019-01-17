@@ -169,9 +169,9 @@ public:
 SV4GUIMODULEPURKINJENETWORK_EXPORT bool Equal( const sv4guiPurkinjeNetwork* leftHandSide, const sv4guiPurkinjeNetwork* rightHandSide, mitk::ScalarType eps, bool verbose );
 SV4GUIMODULEPURKINJENETWORK_EXPORT bool Equal( const sv4guiPurkinjeNetwork& leftHandSide, const sv4guiPurkinjeNetwork& rightHandSide, mitk::ScalarType eps, bool verbose );
 
+itkEventMacro( sv4guiPurkinjeNetworkEvent, itk::AnyEvent );
 
 /* [davep] what is this for?
-itkEventMacro( sv4guiPathEvent, itk::AnyEvent );
 
 itkEventMacro( sv4guiPathExtendTimeRangeEvent, sv4guiPathEvent );
 itkEventMacro( sv4guiPathSetEvent, sv4guiPathEvent );

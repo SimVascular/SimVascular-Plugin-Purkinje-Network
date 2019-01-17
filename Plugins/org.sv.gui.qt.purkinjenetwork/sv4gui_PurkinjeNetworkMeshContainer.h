@@ -45,15 +45,6 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void addStartSeed(double x, double y, double z);
-    void addEndSeed(double x, double y, double z, int seedIndex);
-    int getNumStartSeeds() const;
-    int getNumEndSeeds(int startSeedIndex) const;
-    std::vector<double> getStartSeed(int seedIndex) const;
-    std::vector<double> getEndSeed(int startSeedIndex, int endSeedIndex) const;
-    std::vector<int> findNearestSeed(double x, double y, double z, double tol);
-    void deleteSeed(int startIndex, int endIndex);
-    double distance(double x1,double y1,double z1,double x2,double y2,double z2) const;
     //virtual methods, that need to be implemented due to mitk::BaseData inheriting
     //from itk::DataObject
     //however if we dont intend to use this object with an itk filter we can leave them
@@ -75,11 +66,15 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetSurfaceNetwork(sv4guiMesh* surfaceNetwork);
     sv4guiMesh* GetSurfaceNetwork();
 
-    mitk::Point3D getPickedPoint() { return m_currentPickedPoint; }
-    void setPickedPoint(mitk::Point3D& point) { m_currentPickedPoint = point; }
+    mitk::Point3D GetPickedPoint();
+    void SetPickedPoint(mitk::Point3D& point);
+    bool HaveNewPickedPoint(bool reset = false);
 
-    void SetModelElement(sv4guiModelElement* modelElement) { m_ModelElement = modelElement; {
+    void SetModelElement(sv4guiModelElement* modelElement) { m_ModelElement = modelElement; }
     sv4guiModelElement* GetModelElement() { return m_ModelElement; }
+
+    void SetSelectedFaceIndex(int index);
+    int GetSelectedFaceIndex();
 
 protected:
 
@@ -90,13 +85,15 @@ protected:
 
 private:
 
-  std::vector< std::vector<double> > m_startSeeds;
-  std::vector< std::vector< std::vector<double> > > m_endSeeds;
+  //std::vector< std::vector<double> > m_startSeeds;
+  //std::vector< std::vector< std::vector<double> > > m_endSeeds;
   sv4guiMesh* m_SurfaceMesh;
   sv4guiMesh* m_SurfaceNetwork;
   mitk::Point3D m_currentPickedPoint;
   std::vector<sv4guiModelElement::svFace*> m_ModelFaces;
   sv4guiModelElement* m_ModelElement;
+  int m_SelectedFaceIndex;
+  bool m_NewPickedPoint;
 
 };
 

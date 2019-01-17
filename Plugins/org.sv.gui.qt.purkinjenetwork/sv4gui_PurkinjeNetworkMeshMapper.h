@@ -63,6 +63,8 @@ public:
     {
     public:
         vtkSmartPointer<vtkAssembly> m_PropAssembly;
+        std::vector<vtkSmartPointer<vtkActor>> m_FaceActors;
+        std::vector<vtkSmartPointer<vtkPolyData>> m_FacePolyData;
         LocalStorage() {
             m_PropAssembly = vtkSmartPointer<vtkAssembly>::New();
         }
@@ -85,7 +87,11 @@ public:
     double m_point1[3];
     double m_point2[3];
 
-    vtkSmartPointer<vtkActor> m_sphereActor;
+    vtkSmartPointer<vtkActor> m_SphereActor;
+
+    std::vector<vtkSmartPointer<vtkActor>> GetFaceActors(mitk::BaseRenderer* renderer);
+    std::vector<vtkSmartPointer<vtkPolyData>> GetFacePolyData(mitk::BaseRenderer* renderer);
+
 
 protected:
     sv4guiPurkinjeNetworkMeshMapper();

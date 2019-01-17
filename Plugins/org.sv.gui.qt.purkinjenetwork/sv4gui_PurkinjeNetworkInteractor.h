@@ -50,12 +50,16 @@ protected:
   void AddStart(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
 
   virtual void SelectPoint(mitk::StateMachineAction*, mitk::InteractionEvent*);
+  virtual void SelectSingleFace(mitk::StateMachineAction*, mitk::InteractionEvent*);
+
+  void GetPosition(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent);
 
 
 private:
   std::vector<int> m_selectedSeed;
   mitk::Point3D m_currentPickedPoint;
   int m_currentStartSeed = -1;
+  mitk::Point2D m_CurrentPickedDisplayPoint;
 };
 
 #endif // sv4guiPurkinjeNetworkINTERACTOR_H

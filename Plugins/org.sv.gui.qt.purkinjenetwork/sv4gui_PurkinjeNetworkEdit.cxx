@@ -89,6 +89,7 @@ sv4guiPurkinjeNetworkEdit::sv4guiPurkinjeNetworkEdit() : ui(new Ui::sv4guiPurkin
     m_DataInteractor = NULL;
     m_ModelSelectFaceObserverTag = -1;
     m_SphereWidget = NULL;
+    m_PurkinjeNetworkNode = NULL;
 
     // [DaveP] The plugin does not currently references any module code so the module's shared 
     // library won't be loaded on Ubuntu (works ok on MacOS). This causes mitk to not find the 
@@ -131,7 +132,7 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(showMesh(bool)));
     connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(showNetwork(bool)));
 
-    m_Interface= new sv4guiDataNodeOperationInterface();
+    m_Interface = new sv4guiDataNodeOperationInterface();
 
     if (m_init){
         MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Making network node";
@@ -175,25 +176,30 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
         /*
         */
 
-        // Set visibility of data node for Model.
+        // Set visibility of Model data node.
         mitk::DataNode::Pointer model_folder_node = GetDataStorage()->GetNamedNode("Models");
         if (model_folder_node) {
             MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Models folder not null";
-            model_folder_node->SetVisibility(true);
+            model_folder_node->SetVisibility(false);
         } else {
             MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Models folder is null";
         }
 
-        mitk::DataNode::Pointer images_folder_node = GetDataStorage()->GetNamedNode("Purkinje-Network");
-        //mitk::DataNode::Pointer images_folder_node = GetDataStorage()->GetNamedNode("Images");
-        if (images_folder_node) {
-            MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Images folder not null";
-            images_folder_node->SetVisibility(false);
+        // Set visibility for Meshes data node.
+        mitk::DataNode::Pointer mesh_folder_node = GetDataStorage()->GetNamedNode("Meshes");
+        if (mesh_folder_node) {
+            MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Meshes folder not null";
+            mesh_folder_node->SetVisibility(false);
+        } else {
+            MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Meshes folder is null";
         }
 
+        mitk::DataNode::Pointer m_PurkinjeNetworkNode = GetDataStorage()->GetNamedNode("Purkinje-Network");
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         m_init = false;
     }
+
+    AddObservers();
 
     // connect(ui->btnMeshInfo, SIGNAL(clicked()), this, SLOT(DisplayMeshInfo()) );
 }
@@ -303,7 +309,7 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
     return; 
   }
   auto modelName = modelNodes->GetElement(0)->GetName();
-  MITK_INFO << msgPrefix << "Model name " << modelName;
+  MITK_INFO << msgPrefix << "Model name '" << modelName << "'";
 
   // Check that a model has been created.
   //
@@ -313,6 +319,26 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
     MITK_WARN << msgPrefix << "No model has been created!";
     return;
   }
+  modelNode->SetVisibility(false);
+
+  // Check that a mesh node exists (will always be true?).
+  auto meshNodes = m_DataStorage->GetDerivations(m_MeshFolderNode,mitk::NodePredicateDataType::New("sv4guiMitkMesh"));
+  if (meshNodes->size() == 0) {
+    MITK_WARN << msgPrefix << "Mesh data node not found!";
+    return;
+  }
+  auto meshName = meshNodes->GetElement(0)->GetName();
+  MITK_INFO << msgPrefix << "Mesh name '" << meshName << "'";
+
+  // Check that a mesh has been created.
+  //
+  auto meshNode = m_DataStorage->GetNamedDerivedNode(meshName.c_str(),m_MeshFolderNode);
+  auto mitkMesh = dynamic_cast<sv4guiMitkMesh*>(meshNode->GetData());
+  if (mitkMesh == nullptr) {
+    MITK_WARN << msgPrefix << "No mesh has been created!";
+    return;
+  }
+  meshNode->SetVisibility(false);
 
   // Get the mesh and its surface from the Meshes data node.
   //
@@ -355,10 +381,13 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
       vtkSmartPointer<vtkPolyData> facePolyData = vtkSmartPointer<vtkPolyData>::New();
       PlyDtaUtils_GetFacePolyData(geom, &faceID, facePolyData);
       MITK_INFO << msgPrefix << "   Num tri  " << facePolyData->GetNumberOfCells();
+      MITK_INFO << msgPrefix << "   Face ptr " << facePolyData;
     }
 
     m_MeshContainer->SetModelFaces(faces);
   }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 // -----------------------
@@ -593,6 +622,27 @@ void sv4guiPurkinjeNetworkEdit::NodeRemoved(const mitk::DataNode* node)
 
 void sv4guiPurkinjeNetworkEdit::UpdateSphereData()
 {
+}
+
+void sv4guiPurkinjeNetworkEdit::AddObservers()
+{
+/*
+    if(m_ModelNode.IsNotNull())
+    {
+        if(m_ModelNode->GetDataInteractor().IsNull())
+        {
+            m_DataInteractor = sv4guiModelDataInteractor::New();
+            m_DataInteractor->LoadStateMachine("meshInteraction.xml", us::ModuleRegistry::GetModule("sv4guiPurkinjeNetworkModule"));
+            m_DataInteractor->SetEventConfig("meshConfig.xml", us::ModuleRegistry::GetModule("sv4guiModulePurkinjeNetwork"));
+            m_DataInteractor->SetDataNode(m_ModelNode);
+        }
+        m_ModelNode->SetStringProperty("interactor user","modeling");
+        sv4guiModelDataInteractor* interactor=dynamic_cast<sv4guiModelDataInteractor*>(m_ModelNode->GetDataInteractor().GetPointer());
+        if(interactor)
+            interactor->SetFaceSelectionOnly(false);
+    }
+
+*/
 }
 
 

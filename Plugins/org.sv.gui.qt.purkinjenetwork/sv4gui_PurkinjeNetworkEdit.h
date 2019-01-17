@@ -38,7 +38,7 @@
 #include "sv4gui_DataNodeOperationInterface.h"
 #include "sv4gui_LocalTableDelegate.h"
 #include "sv4gui_Mesh.h"
-#include "sv4gui_ModelDataInteractor.h"
+#include "sv4gui_PurkinjeNetworkDataInteractor.h"
 #include "sv4gui_ProjectManager.h"
 #include "sv4gui_PurkinjeNetworkMeshContainer.h"
 #include "sv4gui_PurkinjeNetworkMeshMapper.h"
@@ -77,6 +77,8 @@ public slots:
     void SelectMesh();
     void CreateNetwork();
 
+    void AddObservers();
+
     //void ShowModel(bool checked = false);
 
 public:
@@ -99,7 +101,7 @@ protected:
 
     Ui::sv4guiPurkinjeNetworkEdit *ui;
 
-    sv4guiModelDataInteractor::Pointer m_DataInteractor;
+    sv4guiPurkinjeNetworkDataInteractor::Pointer m_DataInteractor;
 
     long m_ModelSelectFaceObserverTag;
 
@@ -120,6 +122,7 @@ protected:
     mitk::DataNode::Pointer m_MeshNode;
     mitk::DataNode::Pointer m_MeshFolderNode;
     mitk::DataNode::Pointer m_ModelFolderNode;
+    mitk::DataNode::Pointer m_PurkinjeNetworkNode;
 
     sv4guiPurkinjeNetwork1DContainer::Pointer m_1DContainer;
     sv4guiPurkinjeNetwork1DMapper::Pointer m_1DMapper;
