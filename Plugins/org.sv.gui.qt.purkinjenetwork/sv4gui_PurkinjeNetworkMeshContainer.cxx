@@ -50,6 +50,11 @@ sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer()
   hoverPoint.push_back(0.0);
   m_SelectedFaceIndex = -1;
   m_NewPickedPoint = false;
+  m_FirstPointSelected = false;
+  for (int i = 0; i < 3; i++) {
+    m_FirstPoint[i] = 0.0;
+    m_SecondPoint[i] = 0.0;
+  }
 }
 
 //------------------
@@ -85,6 +90,25 @@ std::vector<sv4guiModelElement::svFace*> sv4guiPurkinjeNetworkMeshContainer::Get
   std::vector<sv4guiModelElement::svFace*> tmp(m_ModelFaces); 
   return tmp;
 }
+
+//------------------------
+// Get/Set Network Points 
+//------------------------
+void sv4guiPurkinjeNetworkMeshContainer::SetNetworkPoints(const double first[3], const double second[3])
+{
+  for (int i = 0; i < 3; i++) {
+    m_FirstPoint[i] = first[i];
+    m_SecondPoint[i] = second[i]; 
+  }
+}
+void sv4guiPurkinjeNetworkMeshContainer::GetNetworkPoints(double first[3], double second[3])
+{
+  for (int i = 0; i < 3; i++) {
+    first[i] = m_FirstPoint[i];
+    second[i] = m_SecondPoint[i]; 
+  }
+}
+
 
 //------------------------
 // Get/Set SurfaceNetwork 

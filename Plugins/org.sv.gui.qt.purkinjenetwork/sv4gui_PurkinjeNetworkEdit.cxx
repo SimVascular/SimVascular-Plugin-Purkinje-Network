@@ -488,26 +488,35 @@ mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::getProjectNode()
   return projFolderNode;
 }
 
+//---------------
+// CreateNetwork 
+//---------------
 // Create a Purkinje Network. 
 //
 void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 {
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] ";
-  double* point1 = m_MeshMapper->m_point1;
-  double* point2 = m_MeshMapper->m_point2;
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] point1 " << point1[0] << " " << point1[1] << "  " << point1[2];
+  std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::CreateNetwork] ";
+  MITK_INFO << msgPrefix; 
+
+  // Get the network start point and second point defining the
+  // direction of the initial segment.
+  double firstPoint[3], secondPoint[3];
+  m_MeshContainer->GetNetworkPoints(firstPoint, secondPoint);
+  MITK_INFO << msgPrefix << " First point" << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
 
   // Get the project data node. 
   mitk::DataNode::Pointer projFolderNode = getProjectNode();
   std::string projPath = "";
   projFolderNode->GetStringProperty("project path", projPath);
   QString QprojPath = QString(projPath.c_str());
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] projPath " << projPath;
+  MITK_INFO << msgPrefix << "projPath " << projPath;
 
   // Set the input and output files.
-  std::string dir = "/Users/parkerda/software/SimVascular/SimVascular-fork/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/";
+  //std::string dir = "/Users/parkerda/software/SimVascular/SimVascular-fork/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/";
   std::string infile = m_MeshOutputFileName.toStdString();
   std::string outfile = projPath + "/" + m_StoreDir.toStdString() + "/network";
+  MITK_INFO << msgPrefix << "Input surface Mesh file " << infile;
+  MITK_INFO << msgPrefix << "Output network file " << outfile;
 
   //  Execute python script to compute fractal tree network. 
   std::string cmd;
@@ -515,11 +524,11 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
   cmd += "fractal_tree.run(";
   cmd += "infile='" + infile + "',";
   cmd += "outfile='" + outfile + "',";
-  cmd += "init_node='[" + std::to_string(point1[0]) + "," + std::to_string(point1[1]) + 
-      "," + std::to_string(point1[2]) + "]',";
-  cmd += "second_node='[" + std::to_string(point2[0]) + "," + std::to_string(point2[1]) + 
-      "," + std::to_string(point2[2]) + "]')\n";
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateNetwork] cmd " << cmd;
+  cmd += "init_node='[" + std::to_string(firstPoint[0]) + "," + std::to_string(firstPoint[1]) + 
+      "," + std::to_string(firstPoint[2]) + "]',";
+  cmd += "second_node='[" + std::to_string(secondPoint[0]) + "," + std::to_string(secondPoint[1]) + 
+      "," + std::to_string(secondPoint[2]) + "]')\n";
+  MITK_INFO << msgPrefix << "cmd " << cmd;
   PyRun_SimpleString(cmd.c_str());
 
   // Load VTK file containing network elements.

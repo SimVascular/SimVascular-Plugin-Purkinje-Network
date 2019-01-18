@@ -19,6 +19,12 @@
   <property name="windowTitle">
    <string>Edit Path</string>
   </property>
+  <property name="toolTip">
+   <string>Load surface mesh from a VTK (.vtp) file.</string>
+  </property>
+  <property name="whatsThis">
+   <string/>
+  </property>
   <widget class="QPushButton" name="buttonLoadMesh">
    <property name="geometry">
     <rect>
@@ -43,6 +49,9 @@
      <width>131</width>
      <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Create a Purkinje Network using the selected starting point and parameters.</string>
    </property>
    <property name="text">
     <string>Create Network</string>
@@ -173,7 +182,7 @@
     <rect>
      <x>1</x>
      <y>31</y>
-     <width>193</width>
+     <width>200</width>
      <height>27</height>
     </rect>
    </property>
@@ -212,6 +221,9 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>The X-coordinate of the network start point.</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="startPointYLineEdit">
    <property name="geometry">
@@ -221,6 +233,9 @@
      <width>70</width>
      <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>The Y-coordinate of the network start point.</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="startPointZLineEdit">
@@ -232,14 +247,17 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>The Z-coordinate of the network start point.</string>
+   </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>1</x>
      <y>100</y>
      <width>350</width>
-     <height>27</height>
+     <height>28</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -251,7 +269,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="meshSurfaceNameLineEdit"/>
+     <widget class="QLineEdit" name="meshSurfaceNameLineEdit">
+      <property name="toolTip">
+       <string>Displays the name of the mesh face selected.</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QCheckBox" name="meshCheckBox">
@@ -262,7 +284,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>1</x>

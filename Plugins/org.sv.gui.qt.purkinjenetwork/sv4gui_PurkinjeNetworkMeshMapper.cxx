@@ -180,6 +180,8 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     local_storage->m_PropAssembly->AddPart(m_SphereActor);
     m_LineActor = createLineActor();
     local_storage->m_PropAssembly->AddPart(m_LineActor);
+
+    meshContainer->SetNetworkPoints(m_point1, m_point2);
   }
 
   local_storage->m_PropAssembly->VisibilityOn();

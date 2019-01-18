@@ -80,6 +80,9 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetSelectedFaceName(const std::string name);
     std::string GetSelectedFaceName();
 
+    void SetNetworkPoints(const double first[3], const double second[3]);
+    void GetNetworkPoints(double first[3], double second[3]);
+
 protected:
 
   mitkCloneMacro(Self);
@@ -99,6 +102,11 @@ private:
   int m_SelectedFaceIndex;
   std::string  m_SelectedFaceName;
   bool m_NewPickedPoint;
+
+  bool m_FirstPointSelected;
+  double m_FirstPoint[3];
+  double m_SecondPoint[3];
+
 
 };
 
