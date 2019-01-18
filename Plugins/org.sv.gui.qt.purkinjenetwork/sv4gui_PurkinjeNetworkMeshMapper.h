@@ -88,6 +88,7 @@ public:
     double m_point2[3];
 
     vtkSmartPointer<vtkActor> m_SphereActor;
+    vtkSmartPointer<vtkActor> m_LineActor;
 
     std::vector<vtkSmartPointer<vtkActor>> GetFaceActors(mitk::BaseRenderer* renderer);
     std::vector<vtkSmartPointer<vtkPolyData>> GetFacePolyData(mitk::BaseRenderer* renderer);
@@ -103,6 +104,7 @@ protected:
     virtual void ResetMapper( mitk::BaseRenderer* renderer ) override;
 
     vtkSmartPointer<vtkActor> createSphereActor(mitk::Point3D& point);
+    vtkSmartPointer<vtkActor> createLineActor();
     void findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, mitk::Point3D& point);
 
     void ApplyAllProperties(mitk::DataNode *node, mitk::BaseRenderer* renderer,

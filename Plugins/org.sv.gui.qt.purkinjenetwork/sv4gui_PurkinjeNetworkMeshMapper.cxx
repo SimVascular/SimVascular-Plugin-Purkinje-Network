@@ -100,45 +100,43 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   if (surfaceMesh != NULL && m_newMesh) {
     //MITK_INFO << msgPrefix << "Have surface mesh data";
     auto polyMesh = surfaceMesh->GetSurfaceMesh();
-/*
-    vtkSmartPointer<vtkPolyDataMapper> meshMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    meshMapper->SetInputData(polyMesh);
-    meshMapper->ScalarVisibilityOff();  // Turn off mapping of scalar data, otherwise can't set color.
-    vtkSmartPointer<vtkActor> polyMeshActor = vtkSmartPointer<vtkActor>::New();
-    polyMeshActor->SetMapper(meshMapper);
-    polyMeshActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-    polyMeshActor->GetProperty()->SetEdgeColor(0, 0, 0);
-    polyMeshActor->GetProperty()->EdgeVisibilityOn();
-    local_storage->m_PropAssembly->AddPart(polyMeshActor);
-*/
-
-    double bounds[6];
-    polyMesh->GetBounds(bounds);
-    double xmin = bounds[0]; double xmax = bounds[1]; double ymin = bounds[2];
-    double ymax = bounds[3]; double zmin = bounds[4]; double zmax = bounds[5];
-    double dx = xmax - xmin; double dy = ymax - ymin; double dz = zmax - zmin;
-    //MITK_INFO << "[sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer] dx "<< dx << "  dy "<<dy<< "  dz "<< dz;
-
-    m_pickRadius = (dx > dy) ? dx : dy;
-    m_pickRadius = (m_pickRadius > dz) ? m_pickRadius : dz;
-    m_newMesh = false;
-
-    // Show mesh faces.
-    //
     vtkPolyData* geom = polyMesh.GetPointer();
     if (geom == nullptr) {
       MITK_WARN << msgPrefix << "No model faces associated with mesh.";
       return;
     }
 
-    //MITK_INFO << msgPrefix << "Number of model faces " << modelFaces.size();
+    // Determine a reasonable pick sphere radius.
+    double avgr = 0;
+    double r, dx, dy, dz;
+    int numTri = 0;
+    for (vtkIdType i = 0; i < geom->GetNumberOfCells(); i++) {
+      vtkCell* cell = geom->GetCell(0);
+      vtkTriangle* triangle = dynamic_cast<vtkTriangle*>(cell);
+      double p0[3], p1[3], p2[3];
+      triangle->GetPoints()->GetPoint(0, p0);
+      triangle->GetPoints()->GetPoint(1, p1);
+      triangle->GetPoints()->GetPoint(2, p2);
+      dx = p0[0] - p1[0];
+      dy = p0[1] - p1[1];
+      dz = p0[2] - p1[2];
+      r = sqrt(dx*dx + dy*dy + dz*dz);
+      avgr += r;
+      numTri += 1;
+      if (i == 50) {
+        break;
+      }
+    }
+    m_pickRadius = (avgr / numTri) / 10.0;
+
+    // Show mesh faces.
+    //
+    m_newMesh = false;
+
     for (const auto& face : modelFaces) {
-      //MITK_INFO << msgPrefix << "Face id " << face->id << " name '" << face->name << "'";
       int faceID = modelElement->GetFaceIdentifierFromInnerSolid(face->id);
       vtkSmartPointer<vtkPolyData> facePolyData = vtkSmartPointer<vtkPolyData>::New();
       PlyDtaUtils_GetFacePolyData(geom, &faceID, facePolyData);
-      //MITK_INFO << msgPrefix << "   Num tri  " << facePolyData->GetNumberOfCells();
-      //MITK_INFO << msgPrefix << "   Face ptr " << facePolyData;
 
       vtkSmartPointer<vtkOpenGLPolyDataMapper> faceMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
       faceMapper->SetInputData(facePolyData);
@@ -171,14 +169,17 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   // determine the face / vertex that it is closest to.
   if (meshContainer->HaveNewPickedPoint(true)) {
     local_storage->m_PropAssembly->GetParts()->RemoveItem(m_SphereActor);
+    local_storage->m_PropAssembly->GetParts()->RemoveItem(m_LineActor);
     auto point = meshContainer->GetPickedPoint();
 
-    // Find closest face.
+    // Find closest face and move point to closest face vertex.
     this->findClosestFace(meshContainer, point);
 
+    // Show picked point.
     m_SphereActor = createSphereActor(point);
     local_storage->m_PropAssembly->AddPart(m_SphereActor);
-
+    m_LineActor = createLineActor();
+    local_storage->m_PropAssembly->AddPart(m_LineActor);
   }
 
   local_storage->m_PropAssembly->VisibilityOn();
@@ -208,6 +209,13 @@ void sv4guiPurkinjeNetworkMeshMapper::ApplyAllProperties(mitk::DataNode *node, m
 // findClosestFace
 //-----------------
 // Find the face in the mesh closest to the picked point.
+//
+// The input point is moved to the closest face vertex.
+//
+// The picked point is the start point for the generation of the purkinje network.
+// A second point called 'm_point2' is created as the mid-point between the edge
+// opposite the picked point and is used to determine the direction of the
+// first segment of the purkinje network. 
 //
 void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, 
     mitk::Point3D& point)
@@ -327,6 +335,11 @@ vtkProp* sv4guiPurkinjeNetworkMeshMapper::GetVtkProp(mitk::BaseRenderer* rendere
   return ls->m_PropAssembly;
 }
 
+//-------------------
+// createSphereActor
+//-------------------
+// Create a sphere positioned at the current selected point.
+//
 vtkSmartPointer<vtkActor> sv4guiPurkinjeNetworkMeshMapper::createSphereActor(mitk::Point3D& point)
 {
   vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
@@ -334,7 +347,7 @@ vtkSmartPointer<vtkActor> sv4guiPurkinjeNetworkMeshMapper::createSphereActor(mit
   if (true) { 
   //if (!m_sphereActor) { 
     vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-    double r = m_pickRadius / 100.0;
+    double r = m_pickRadius;
     sphere->SetRadius(r);
     sphere->SetCenter(point[0], point[1], point[2]);
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -347,4 +360,43 @@ vtkSmartPointer<vtkActor> sv4guiPurkinjeNetworkMeshMapper::createSphereActor(mit
 
   return actor;
 }
+
+//-----------------
+// createLineActor
+//-----------------
+// Create a line between the start point and the second point.
+//
+vtkSmartPointer<vtkActor> sv4guiPurkinjeNetworkMeshMapper::createLineActor()
+{
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+  double dx = m_point1[0] - m_point2[0];
+  double dy = m_point1[1] - m_point2[1];
+  double dz = m_point1[2] - m_point2[2];
+  double r = sqrt(dx*dx + dy*dy + dz*dz);
+
+  if (true) {
+    vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    pts->InsertNextPoint(m_point1);
+    pts->InsertNextPoint(m_point2);
+    linesPolyData->SetPoints(pts);
+
+    vtkSmartPointer<vtkLine> line0 = vtkSmartPointer<vtkLine>::New();
+    line0->GetPointIds()->SetId(0, 0); 
+    line0->GetPointIds()->SetId(1, 1);
+
+    vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+    lines->InsertNextCell(line0);
+    linesPolyData->SetLines(lines);
+ 
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputData(linesPolyData);
+
+    actor->SetMapper(mapper);
+    actor->GetProperty()->SetColor(1,0,0);
+  }
+
+  return actor;
+}
+
 
