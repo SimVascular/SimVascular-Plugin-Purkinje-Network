@@ -44,6 +44,7 @@
 #include "sv4gui_PurkinjeNetwork1DContainer.h"
 #include "sv4gui_PurkinjeNetwork1DMapper.h"
 #include "sv4gui_PurkinjeNetworkInteractor.h"
+#include "sv4gui_PurkinjeNetworkModel.h"
 
 #include "sv4gui_QmitkFunctionality.h"
 
@@ -99,6 +100,10 @@ public:
 
     virtual void Visible() override;
     virtual void Hidden() override;
+
+    void SetModelParameters(sv4guiPurkinjeNetworkModel& pnetModel);
+    void SetModelMesh(sv4guiPurkinjeNetworkModel& pnetModel);
+
 
 protected:
 

@@ -88,7 +88,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox_2">
+     <widget class="QDoubleSpinBox" name="avgBranchAnglesSpinBox">
       <property name="value">
        <double>0.500000000000000</double>
       </property>
@@ -109,12 +109,12 @@
     <item>
      <widget class="QLabel" name="label_4">
       <property name="text">
-       <string>Repulsive Parameter</string>
+       <string>Repulsive parameter</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox_3">
+     <widget class="QDoubleSpinBox" name="repulsiveParameterSpinBox">
       <property name="value">
        <double>0.100000000000000</double>
       </property>
@@ -140,7 +140,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QSpinBox" name="spinBox">
+     <widget class="QSpinBox" name="numBranchGenSpinBox">
       <property name="minimum">
        <number>1</number>
       </property>
@@ -302,7 +302,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox_4">
+     <widget class="QDoubleSpinBox" name="branchSegLengthSpinBox">
       <property name="value">
        <double>0.010000000000000</double>
       </property>

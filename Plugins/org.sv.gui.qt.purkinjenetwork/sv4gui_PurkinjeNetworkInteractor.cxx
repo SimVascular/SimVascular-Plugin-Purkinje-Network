@@ -78,18 +78,23 @@ void sv4guiPurkinjeNetworkInteractor::SelectPoint(mitk::StateMachineAction*, mit
   std::string msgPrefix = "[sv4guiPurkinjeNetworkInteractor::SelectPoint] ";
   MITK_INFO << msgPrefix; 
 
-  // Get the position event.
-  const mitk::InteractionPositionEvent* positionEvent = 
-    dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL) {
-    return;
-  }
-
   // Get the mesh container storing mesh data.
   sv4guiPurkinjeNetworkMeshContainer* meshContainer =
         static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
   if (meshContainer == NULL) {
       return;
+  }
+
+  // Don't select a point if no face is selected.
+  if (!meshContainer->HaveSelectedFace()) {
+    return;
+  }
+
+  // Get the position event.
+  const mitk::InteractionPositionEvent* positionEvent = 
+    dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == NULL) {
+    return;
   }
 
   // Get the picked point and set it for the mesh container..
@@ -163,6 +168,10 @@ void sv4guiPurkinjeNetworkInteractor::SelectSingleFace(mitk::StateMachineAction*
     return;
   }
   MITK_INFO << msgPrefix << "Number of face actors " << faceActors.size(); 
+  auto meshNode = mapper->GetDataNode();
+  auto meshContainer = dynamic_cast<sv4guiPurkinjeNetworkMeshContainer*>(meshNode->GetData());
+  meshContainer->SetSelectedFaceIndex(-1);
+  meshContainer->SetSelectedFaceName("");
 
   // Create a vtkCellPicker object to determine the closest geomety under the cursor.
   //
@@ -183,40 +192,39 @@ void sv4guiPurkinjeNetworkInteractor::SelectSingleFace(mitk::StateMachineAction*
   // Get the face selected.
   vtkPolyData* selectedFacePolyData = (vtkPolyData*)cellPicker->GetDataSet();
   if (selectedFacePolyData == nullptr) {
-    MITK_INFO << msgPrefix << "No face selected"; 
+    meshContainer->ResetNetworkPoints();
+    // Trigger events to unset selected face and point. 
+    meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectFaceEvent() );
+    meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent() );
     return;
   }
 
   // Determine which face was selected.
   //
-  auto meshNode = mapper->GetDataNode();
-  auto meshContainer = dynamic_cast<sv4guiPurkinjeNetworkMeshContainer*>(meshNode->GetData());
-  std::vector<sv4guiModelElement::svFace*> modelFaces = meshContainer->GetModelFaces();
+  // Faces are matched using pointers to their poly data.
+  //
   int selectedFaceIndex = -1;
-  MITK_INFO << msgPrefix << "Select face ptr " << selectedFacePolyData; 
-  MITK_INFO << msgPrefix << "  Num tri  " << selectedFacePolyData->GetNumberOfCells();
-  MITK_INFO << msgPrefix;
-  MITK_INFO << msgPrefix << "Check faces:";
-
+  meshContainer->SetSelectedFaceIndex(selectedFaceIndex);
+  meshContainer->SetSelectedFaceName("");
+  meshContainer->ResetNetworkPoints();
+  std::vector<sv4guiModelElement::svFace*> modelFaces = meshContainer->GetModelFaces();
   std::vector<vtkSmartPointer<vtkPolyData>> facesPolyData = mapper->GetFacePolyData(renderer);
+
   for (int i = 0; i < facesPolyData.size(); ++i) {
     auto polyData = facesPolyData[i];
     auto face = modelFaces[i];
     if (polyData == selectedFacePolyData) {
       selectedFaceIndex = i;
-      //selectedFaceIndex = face->id;
-      MITK_INFO << msgPrefix << "Selected face " << selectedFaceIndex; 
-      MITK_INFO << msgPrefix << "Face id " << face->id << " name '" << face->name << "'";
+      MITK_INFO << msgPrefix << "Select face '" << face->name << "'"; 
       meshContainer->SetSelectedFaceName(face->name);
       meshContainer->SetSelectedFaceIndex(selectedFaceIndex);
+      meshContainer->SetSelectedFacePolyData(polyData);
       break;
     }
   }
 
-  //auto purkinjeNetworkNode = dynamic_cast<sv4guiPurkinjeNetworkEdit*>(this->GetDataNode()->GetData());
-
+  // Trigger an event to highlight selected face. 
   meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectFaceEvent() );
-
 }
 
 //------------

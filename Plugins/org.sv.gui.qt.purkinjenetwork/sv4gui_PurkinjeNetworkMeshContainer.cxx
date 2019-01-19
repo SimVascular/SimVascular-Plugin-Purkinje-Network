@@ -100,15 +100,30 @@ void sv4guiPurkinjeNetworkMeshContainer::SetNetworkPoints(const double first[3],
     m_FirstPoint[i] = first[i];
     m_SecondPoint[i] = second[i]; 
   }
-}
-void sv4guiPurkinjeNetworkMeshContainer::GetNetworkPoints(double first[3], double second[3])
-{
-  for (int i = 0; i < 3; i++) {
-    first[i] = m_FirstPoint[i];
-    second[i] = m_SecondPoint[i]; 
-  }
+  m_FirstPointSelected = true;
 }
 
+void sv4guiPurkinjeNetworkMeshContainer::SetNetworkPoints(const std::array<double,3>& first, const std::array<double,3>& second)
+{
+  m_FirstPoint = first;
+  m_SecondPoint = second; 
+}
+
+void sv4guiPurkinjeNetworkMeshContainer::GetNetworkPoints(std::array<double,3>& first, std::array<double,3>& second)
+{
+  first = m_FirstPoint;
+  second = m_SecondPoint; 
+}
+
+void sv4guiPurkinjeNetworkMeshContainer::ResetNetworkPoints()
+{
+  m_FirstPointSelected = false;
+}
+
+bool sv4guiPurkinjeNetworkMeshContainer::HaveNetworkPoints()
+{
+  return m_FirstPointSelected;
+}
 
 //------------------------
 // Get/Set SurfaceNetwork 
@@ -122,6 +137,18 @@ sv4guiMesh* sv4guiPurkinjeNetworkMeshContainer::GetSurfaceNetwork()
   return m_SurfaceNetwork;
 }
 
+//------------------------------
+// Get/Set SelectedFacePolyData 
+//------------------------------
+void sv4guiPurkinjeNetworkMeshContainer::SetSelectedFacePolyData(vtkSmartPointer<vtkPolyData> polyData)
+{
+  m_SelectedFacePolyData = polyData;
+}
+vtkSmartPointer<vtkPolyData> sv4guiPurkinjeNetworkMeshContainer::GetSelectedFacePolyData()
+{
+  return m_SelectedFacePolyData;
+}
+
 //--------------------------
 // Get/Set SelectedFaceName
 //--------------------------
@@ -132,6 +159,11 @@ void sv4guiPurkinjeNetworkMeshContainer::SetSelectedFaceName(const std::string n
 std::string sv4guiPurkinjeNetworkMeshContainer::GetSelectedFaceName()
 {
   return m_SelectedFaceName;
+}
+
+bool sv4guiPurkinjeNetworkMeshContainer::HaveSelectedFace()
+{
+  return m_SelectedFaceName != "";
 }
 
 //---------------------------

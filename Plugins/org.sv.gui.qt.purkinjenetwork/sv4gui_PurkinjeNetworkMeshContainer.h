@@ -77,11 +77,18 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetSelectedFaceIndex(int index);
     int GetSelectedFaceIndex();
 
+    void SetSelectedFacePolyData(vtkSmartPointer<vtkPolyData> polyData);
+    vtkSmartPointer<vtkPolyData> GetSelectedFacePolyData();
+
     void SetSelectedFaceName(const std::string name);
     std::string GetSelectedFaceName();
+    bool HaveSelectedFace();
 
     void SetNetworkPoints(const double first[3], const double second[3]);
-    void GetNetworkPoints(double first[3], double second[3]);
+    void SetNetworkPoints(const std::array<double,3>& first, const std::array<double,3>& second);
+    void GetNetworkPoints(std::array<double,3>& first, std::array<double,3>& second);
+    void ResetNetworkPoints();
+    bool HaveNetworkPoints();
 
 protected:
 
@@ -101,12 +108,12 @@ private:
   sv4guiModelElement* m_ModelElement;
   int m_SelectedFaceIndex;
   std::string  m_SelectedFaceName;
+  vtkSmartPointer<vtkPolyData> m_SelectedFacePolyData;
   bool m_NewPickedPoint;
 
   bool m_FirstPointSelected;
-  double m_FirstPoint[3];
-  double m_SecondPoint[3];
-
+  std::array<double,3> m_FirstPoint;
+  std::array<double,3> m_SecondPoint;
 
 };
 

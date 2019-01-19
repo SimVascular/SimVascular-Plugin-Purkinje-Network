@@ -132,6 +132,7 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(showMesh(bool)));
     connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(showNetwork(bool)));
     connect(ui->meshSurfaceNameLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceName()));
+
     connect(ui->startPointXLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
     connect(ui->startPointYLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
     connect(ui->startPointZLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
@@ -498,9 +499,21 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
   std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::CreateNetwork] ";
   MITK_INFO << msgPrefix; 
 
-  // Get the network start point and second point defining the
-  // direction of the initial segment.
-  double firstPoint[3], secondPoint[3];
+  // Check that a face is selected.
+  if (!m_MeshContainer->HaveSelectedFace()) {
+    MITK_ERROR << msgPrefix << "No mesh face seleced.";
+    return;
+  }
+  auto faceName = m_MeshContainer->GetSelectedFaceName();
+  MITK_INFO << msgPrefix << "Face name " << faceName;
+
+  // Get the network start point and second point defining 
+  // the direction of the initial segment.
+  if (!m_MeshContainer->HaveNetworkPoints()) {
+    MITK_ERROR << msgPrefix << "No start point seleced.";
+    return;
+  }
+  std::array<double,3> firstPoint, secondPoint;
   m_MeshContainer->GetNetworkPoints(firstPoint, secondPoint);
   MITK_INFO << msgPrefix << " First point" << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
 
@@ -511,29 +524,37 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
   QString QprojPath = QString(projPath.c_str());
   MITK_INFO << msgPrefix << "projPath " << projPath;
 
-  // Set the input and output files.
-  //std::string dir = "/Users/parkerda/software/SimVascular/SimVascular-fork/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/";
-  std::string infile = m_MeshOutputFileName.toStdString();
-  std::string outfile = projPath + "/" + m_StoreDir.toStdString() + "/network";
-  MITK_INFO << msgPrefix << "Input surface Mesh file " << infile;
-  MITK_INFO << msgPrefix << "Output network file " << outfile;
+  // Create a Purkinje Network model.
+  sv4guiPurkinjeNetworkModel pnetModel(faceName, firstPoint, secondPoint);
+  SetModelParameters(pnetModel);
+  SetModelMesh(pnetModel);
+  auto outputPath = projPath + "/" + m_StoreDir.toStdString() + "/";
+  pnetModel.GenerateNetwork(outputPath);
 
-  //  Execute python script to compute fractal tree network. 
-  std::string cmd;
-  cmd += "import fractal_tree\n";
-  cmd += "fractal_tree.run(";
-  cmd += "infile='" + infile + "',";
-  cmd += "outfile='" + outfile + "',";
-  cmd += "init_node='[" + std::to_string(firstPoint[0]) + "," + std::to_string(firstPoint[1]) + 
-      "," + std::to_string(firstPoint[2]) + "]',";
-  cmd += "second_node='[" + std::to_string(secondPoint[0]) + "," + std::to_string(secondPoint[1]) + 
-      "," + std::to_string(secondPoint[2]) + "]')\n";
-  MITK_INFO << msgPrefix << "cmd " << cmd;
-  PyRun_SimpleString(cmd.c_str());
+  // Read the generated network (1D elements).
+  LoadNetwork(pnetModel.networkFileName);
 
-  // Load VTK file containing network elements.
-  std::string networkFileName = projPath + "/" + m_StoreDir.toStdString() + "/network.vtu";
-  LoadNetwork(networkFileName);
+}
+
+//--------------------
+// SetModelParameters
+//---------------------
+void sv4guiPurkinjeNetworkEdit::SetModelParameters(sv4guiPurkinjeNetworkModel& model)
+{
+  model.numBranchGenerations = ui->numBranchGenSpinBox->value();
+  model.avgBranchLength = ui->avgBranchLengthSpinBox->value();
+  model.avgBranchAngles = ui->avgBranchAnglesSpinBox->value();
+  model.repulsiveParameter = ui->repulsiveParameterSpinBox->value();
+  model.repulsiveParameter = ui->repulsiveParameterSpinBox->value();
+  model.branchSegLength = ui->branchSegLengthSpinBox->value();
+}
+
+//--------------
+// SetModelMesh 
+//--------------
+void sv4guiPurkinjeNetworkEdit::SetModelMesh(sv4guiPurkinjeNetworkModel& model)
+{
+  model.meshPolyData = m_MeshContainer->GetSelectedFacePolyData();
 }
 
 // Read a Purkinje network file.
@@ -679,7 +700,7 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
     return;
   }
  
-  // Connect selecting mesh face event. 
+  // Connect selecting a mesh face event. 
   if (m_MeshSelectFaceObserverTag == -1) {
     itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command = 
         itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
@@ -687,7 +708,7 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
     m_MeshSelectFaceObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectFaceEvent(), command);
   }
 
-  // Connect selecting start point event. 
+  // Connect selecting a start point event. 
   if (m_MeshSelectStartPointObserverTag == -1) {
     itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command =
         itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
@@ -704,10 +725,10 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
 //
 void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
 {
-  std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::UpdateFaceSelection] ";
-  MITK_INFO << msgPrefix;
+  //std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::UpdateFaceSelection] ";
+  //MITK_INFO << msgPrefix;
   auto faceName = m_MeshContainer->GetSelectedFaceName();
-  MITK_INFO << msgPrefix << "Face name " << faceName;
+  //MITK_INFO << msgPrefix << "Face name " << faceName;
   ui->meshSurfaceNameLineEdit->setText(QString::fromStdString(faceName));
 }
 
@@ -718,14 +739,22 @@ void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
 //
 void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
 {
-  auto point = m_MeshContainer->GetPickedPoint();
-  char str[20];
-  sprintf(str, "%g", point[0]);
-  ui->startPointXLineEdit->setText(QString::fromStdString(str));
-  sprintf(str, "%g", point[1]);
-  ui->startPointYLineEdit->setText(QString::fromStdString(str));
-  sprintf(str, "%g", point[2]);
-  ui->startPointZLineEdit->setText(QString::fromStdString(str));
+  char x[20], y[20], z[20];
+  if (m_MeshContainer->HaveSelectedFace()) {
+    auto point = m_MeshContainer->GetPickedPoint();
+    sprintf(x, "%g", point[0]);
+    sprintf(y, "%g", point[1]);
+    sprintf(z, "%g", point[2]);
+  } else {
+    sprintf(x, "%s", "");
+    sprintf(y, "%s", "");
+    sprintf(z, "%s", "");
+  }
+
+  ui->startPointXLineEdit->setText(QString::fromStdString(x));
+  ui->startPointYLineEdit->setText(QString::fromStdString(y));
+  ui->startPointZLineEdit->setText(QString::fromStdString(z));
+
 }
 
 

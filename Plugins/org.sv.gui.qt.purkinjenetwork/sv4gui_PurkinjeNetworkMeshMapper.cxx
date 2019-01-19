@@ -129,7 +129,7 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     }
     m_pickRadius = (avgr / numTri) / 10.0;
 
-    // Show mesh faces.
+    // Create face actors to display show mesh faces.
     //
     m_newMesh = false;
 
@@ -157,7 +157,6 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     std::vector<vtkSmartPointer<vtkActor>> faceActors = GetFaceActors(renderer);
     for (int i = 0; i < faceActors.size(); ++i) { 
       if (selectedFaceIndex == i) { 
-        //MITK_INFO << msgPrefix << "Selected face index " << selectedFaceIndex; 
         faceActors[i]->GetProperty()->SetColor(1.0, 1.0, 0.0);
       } else {
         faceActors[i]->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -165,14 +164,23 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     }
   }
 
-  // If a point has been picked on the mesh then show it and 
-  // determine the face / vertex that it is closest to.
-  if (meshContainer->HaveNewPickedPoint(true)) {
+  bool reset = true; // Reset have new picked point to false.
+
+  // If no face is selected then don't process a picked point.
+  //
+  if (!meshContainer->HaveSelectedFace()) {
     local_storage->m_PropAssembly->GetParts()->RemoveItem(m_SphereActor);
     local_storage->m_PropAssembly->GetParts()->RemoveItem(m_LineActor);
-    auto point = meshContainer->GetPickedPoint();
 
-    // Find closest face and move point to closest face vertex.
+  // If a new point has been picked on the mesh then show it 
+  // and determine the face / vertex that it is closest to.
+  //
+  } else if (meshContainer->HaveNewPickedPoint(reset)) {
+    auto point = meshContainer->GetPickedPoint();
+    local_storage->m_PropAssembly->GetParts()->RemoveItem(m_SphereActor);
+    local_storage->m_PropAssembly->GetParts()->RemoveItem(m_LineActor);
+
+    // Find closest face and move point to closest vertex on that face.
     this->findClosestFace(meshContainer, point);
 
     // Show picked point.
@@ -180,13 +188,16 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     local_storage->m_PropAssembly->AddPart(m_SphereActor);
     m_LineActor = createLineActor();
     local_storage->m_PropAssembly->AddPart(m_LineActor);
-
     meshContainer->SetNetworkPoints(m_point1, m_point2);
   }
 
   local_storage->m_PropAssembly->VisibilityOn();
 }
 
+//--------------------
+// Get/Set FaceActors
+//--------------------
+//
 std::vector<vtkSmartPointer<vtkActor>> sv4guiPurkinjeNetworkMeshMapper::GetFaceActors(mitk::BaseRenderer* renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -197,14 +208,6 @@ std::vector<vtkSmartPointer<vtkPolyData>> sv4guiPurkinjeNetworkMeshMapper::GetFa
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   return ls->m_FacePolyData;
-}
-
-void sv4guiPurkinjeNetworkMeshMapper::ApplyAllProperties(mitk::DataNode *node, mitk::BaseRenderer* renderer, 
-    vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper, vtkSmartPointer<vtkActor> actor, 
-    mitk::LocalStorageHandler<LocalStorage>* handler, bool clipping)
-{
-  //ApplyMitkPropertiesToVtkProperty( node, actor->GetProperty(), renderer );
-
 }
 
 //-----------------
