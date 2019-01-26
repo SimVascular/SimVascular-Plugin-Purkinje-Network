@@ -151,7 +151,7 @@ private:
     bool m_init = true;
 
     mitk::DataNode::Pointer getProjectNode();
-    void Initialize();
+    bool Initialize();
     void SetMeshInformation();
     sv4guiMesh* GetDataNodeMesh();
     mitk::DataNode::Pointer GetMeshFolderDataNode();

@@ -89,18 +89,20 @@ std::string sv4guiPurkinjeNetworkModel::CreateCommand(const std::string infile, 
   std::string cmd;
   cmd += "import fractal_tree\n";
   cmd += "fractal_tree.run(";
+  // Required parameters.
   cmd += "infile='" + infile + "',";
   cmd += "outfile='" + outfile + "',";
   cmd += "init_node='[" + std::to_string(this->firstPoint[0]) + "," + std::to_string(this->firstPoint[1]) + 
       "," + std::to_string(this->firstPoint[2]) + "]',";
   cmd += "second_node='[" + std::to_string(this->secondPoint[0]) + "," + std::to_string(this->secondPoint[1]) + 
-      "," + std::to_string(this->secondPoint[2]) + "]'";
+      "," + std::to_string(this->secondPoint[2]) + "]',";
 
+  // Optional parameters.
   cmd += "num_branch_gen='" + std::to_string(this->numBranchGenerations) + "',";
   cmd += "avg_branch_length='" + std::to_string(this->avgBranchLength) + "',";
-  cmd += "avg_branch_angles='" + std::to_string(this->avgBranchAngles) + "',";
+  cmd += "branch_angle='" + std::to_string(this->branchAngle) + "',";
   cmd += "repulsive_parameter='" + std::to_string(this->repulsiveParameter) + "',";
-  cmd += "branch_seg_length='" + std::to_string(this->branchSegLength) + "',";
+  cmd += "branch_seg_length='" + std::to_string(this->branchSegLength) + "'";
   cmd += ")\n"; 
 
   return cmd;

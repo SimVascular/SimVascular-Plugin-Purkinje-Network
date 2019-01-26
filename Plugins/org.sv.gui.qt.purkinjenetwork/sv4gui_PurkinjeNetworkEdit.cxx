@@ -86,19 +86,24 @@ static const std::string PurkinjeNetwork_NODE_NAME = "Purkinje-Network";
 
 sv4guiPurkinjeNetworkEdit::sv4guiPurkinjeNetworkEdit() : ui(new Ui::sv4guiPurkinjeNetworkEdit)
 {
-    m_SphereWidget = NULL;
-    m_PurkinjeNetworkNode = NULL;
-    m_MeshSelectFaceObserverTag = -1;
-    m_MeshSelectStartPointObserverTag = -1;
+  m_DataStorage = nullptr;
+  m_Parent = nullptr;
+  m_SphereWidget = nullptr;
+  m_PurkinjeNetworkNode = nullptr;
+  m_MeshSelectFaceObserverTag = -1;
+  m_MeshSelectStartPointObserverTag = -1;
+  m_PurkinjeNetworkNode = nullptr;
+  m_ModelFolderNode = nullptr; 
+  m_MeshFolderNode = nullptr; 
 
-    // [DaveP] The plugin does not currently references any module code so the module's shared 
-    // library won't be loaded on Ubuntu (works ok on MacOS). This causes mitk to not find the 
-    // state machine xml files which are stored in the module shared library. Force loading the 
-    // module shared library be using a module class here. 
-    //
-    // This will not be a problem when I rewrite this code and place most of it under the module.
-    //
-    auto nio = new sv4guiPurkinjeNetworkIO();
+  // [DaveP] The plugin does not currently references any module code so the module's shared 
+  // library won't be loaded on Ubuntu (works ok on MacOS). This causes mitk to not find the 
+  // state machine xml files which are stored in the module shared library. Force loading the 
+  // module shared library be using a module class here. 
+  //
+  // This will not be a problem when I rewrite this code and place most of it under the module.
+  //
+  auto nio = new sv4guiPurkinjeNetworkIO();
 }
 
 sv4guiPurkinjeNetworkEdit::~sv4guiPurkinjeNetworkEdit()
@@ -106,24 +111,28 @@ sv4guiPurkinjeNetworkEdit::~sv4guiPurkinjeNetworkEdit()
     delete ui;
 }
 
-void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
+//---------------------
+// CreateQtPartControl
+//---------------------
+
+void sv4guiPurkinjeNetworkEdit::CreateQtPartControl(QWidget* parent )
 {
-    MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] ";
+    std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] ";
+    MITK_INFO << msgPrefix; 
     m_Parent = parent;
     ui->setupUi(parent);
+    m_DisplayWidget = GetActiveStdMultiWidget();
 
-//    parent->setMaximumWidth(450);
-
-    m_DisplayWidget=GetActiveStdMultiWidget();
-
-    if (m_DisplayWidget==NULL) {
-        parent->setEnabled(false);
-        MITK_ERROR << "Plugin MeshEdit Init Error: No QmitkStdMultiWidget Available!";
-        return;
+    if (m_DisplayWidget == nullptr) {
+      parent->setEnabled(false);
+      MITK_ERROR << msgPrefix << "Plugin MeshEdit Init Error: No QmitkStdMultiWidget Available!";
+      return;
     }
 
     // Initialize folder nodes.
-    Initialize();
+    if (!Initialize()) {
+      return;
+    }
 
     // Define widget event handlers.
     connect(ui->buttonLoadMesh, SIGNAL(clicked()), this, SLOT(LoadMesh()));
@@ -140,7 +149,7 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
     m_Interface = new sv4guiDataNodeOperationInterface();
 
     if (m_init){
-        MITK_INFO << "[sv4guiPurkinjeNetworkEdit::CreateQtPartControl] Making network node";
+        MITK_INFO << msgPrefix << "Making network node";
 
         // Create mesh container, node and mapper.
         //
@@ -153,9 +162,12 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
         // Create mesh node under 'Purkinje-Network' node.
         auto parentNode = GetDataStorage()->GetNamedNode("Purkinje-Network");
         if (parentNode) {
-          GetDataStorage()->Add(m_1DNode, parentNode);
+          GetDataStorage()->Add(m_MeshNode, parentNode);
+        } else {
+          MITK_INFO << msgPrefix << "No Purkinje-Network node.";
         }
 
+        MITK_INFO << msgPrefix << "Make mapper.";
         m_MeshMapper = sv4guiPurkinjeNetworkMeshMapper::New();
         m_MeshMapper->SetDataNode(meshNode);
         m_MeshMapper->m_box = false;
@@ -302,54 +314,65 @@ void sv4guiPurkinjeNetworkEdit::showNetwork(bool state)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void sv4guiPurkinjeNetworkEdit::Initialize()
+//------------
+// Initialize
+//------------
+// Initialize the data manager nodes.
+//
+// We need to check for a null project folders because the pulgin is created before
+// a project is read in, need to disable this.
+
+bool sv4guiPurkinjeNetworkEdit::Initialize()
 {
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Initialize] Initialize";
+  auto msgPrefix = "[sv4guiPurkinjeNetworkEdit::Initialize] ";
+  MITK_INFO << msgPrefix << " Initialize";
   m_DataStorage = GetDataStorage();
+  if (m_DataStorage == nullptr) { 
+    MITK_INFO << msgPrefix << " m_DataStorage == nullptr";
+    return false;
+  }
 
   mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
-  mitk::DataNode::Pointer m_ProjFolderNode = m_DataStorage->GetNode(isProjFolder);
-
-  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Initialize] Making directory\n";
-  mitk::DataNode::Pointer projFolderNode = getProjectNode();
-  QDir dir;
+  mitk::DataNode::Pointer projFolderNode = m_DataStorage->GetNode(isProjFolder);
+  if (projFolderNode == nullptr) { 
+    MITK_INFO << msgPrefix << " projFolderNode == nullptr";
+    return false;
+  }
 
   // Get the project path.
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Initialize] Making directory\n";
+  QDir dir;
   std::string projPath = "";
   if (!projFolderNode){
-      MITK_ERROR << "[sv4guiPurkinjeNetworkEdit::Initialize] Project folder node null, cannot get project path\n";
-      dir = QDir("not_found");
+    MITK_ERROR << msgPrefix << "Project folder node null, cannot get project path.";
+    dir = QDir("not_found");
+    return false;
   } else{
-      projFolderNode->GetStringProperty("project path", projPath);
-      QString QprojPath = QString(projPath.c_str());
-      dir = QDir(QprojPath);
+    projFolderNode->GetStringProperty("project path", projPath);
+    QString QprojPath = QString(projPath.c_str());
+    dir = QDir(QprojPath);
   }
 
   // Create directory if it doesn't exist.
   if (dir.exists()) {
-      QString Qstore_dir = QString(PurkinjeNetwork_DIR_PATH.c_str());
-      m_StoreDir = Qstore_dir;
-
-      if (!dir.exists(Qstore_dir)) {
-          MITK_INFO <<"Purkinje Network directory doesnt exist, creating\n";
-          dir.mkdir(Qstore_dir);
-      } else {
-          MITK_INFO << "Purkinje Network directory already exists\n";
-      }
+    QString Qstore_dir = QString(PurkinjeNetwork_DIR_PATH.c_str());
+    m_StoreDir = Qstore_dir;
+    if (!dir.exists(Qstore_dir)) {
+      dir.mkdir(Qstore_dir);
+    }
   }
 
   // Create the data folder.
   if (projFolderNode) {
-      mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(PurkinjeNetwork_NODE_NAME);
-      if (!node) {
-          MITK_INFO << "[PurkinjeNetwork] No Purkinje Network node, creating";
-          QString folderName = QString(PurkinjeNetwork_NODE_NAME.c_str());
-          node = svProj.CreateDataFolder<PurkinjeNetworkFolder>(m_DataStorage, folderName, projFolderNode);
-      }
-      m_PurkinjeNetworkNode = node;
+    mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(PurkinjeNetwork_NODE_NAME);
+    if (!node) {
+      QString folderName = QString(PurkinjeNetwork_NODE_NAME.c_str());
+      node = svProj.CreateDataFolder<PurkinjeNetworkFolder>(m_DataStorage, folderName, projFolderNode);
+    }
+    m_PurkinjeNetworkNode = node;
   }
 
-  // SetMeshInformation();
+  return true;
 }
 
 
@@ -361,7 +384,7 @@ void sv4guiPurkinjeNetworkEdit::Initialize()
 
 void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
 {
-  std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::SetMeshInformation] ";
+  auto msgPrefix = "[sv4guiPurkinjeNetworkEdit::SetMeshInformation] ";
   MITK_INFO << msgPrefix; 
   m_ModelFolderNode = GetModelFolderDataNode();
   m_MeshFolderNode = GetMeshFolderDataNode();
@@ -417,6 +440,7 @@ void sv4guiPurkinjeNetworkEdit::SetMeshInformation()
   vtkSmartPointer<vtkPolyData> meshSurface = mesh->GetSurfaceMesh();
   if (meshSurface.GetPointer() == nullptr) {
     MITK_WARN << msgPrefix << "No mesh surface found!";
+    QMessageBox::warning(m_Parent, "No mesh surface", "No surface mesh has been found. A mesh has not been generated?");
     return;
   }
 
@@ -516,9 +540,11 @@ sv4guiMesh* sv4guiPurkinjeNetworkEdit::GetDataNodeMesh()
 
 mitk::DataNode::Pointer sv4guiPurkinjeNetworkEdit::getProjectNode()
 {
+  if (m_DataStorage == nullptr) {
+    return nullptr;
+  }
   mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("sv4guiProjectFolder");
-  //mitk::NodePredicateDataType::Pointer isProjFolder = mitk::NodePredicateDataType::New("svProjectFolder");
-  mitk::DataNode::Pointer projFolderNode = m_DataStorage->GetNode (isProjFolder);
+  mitk::DataNode::Pointer projFolderNode = m_DataStorage->GetNode(isProjFolder);
   return projFolderNode;
 }
 
@@ -534,7 +560,8 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 
   // Check that a face is selected.
   if (!m_MeshContainer->HaveSelectedFace()) {
-    MITK_ERROR << msgPrefix << "No mesh face seleced.";
+    MITK_WARN << msgPrefix << "No mesh face seleced.";
+    QMessageBox::warning(m_Parent, "No mesh face selected", "A mesh face must be selected.");
     return;
   }
   auto faceName = m_MeshContainer->GetSelectedFaceName();
@@ -543,7 +570,8 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
   // Get the network start point and second point defining 
   // the direction of the initial segment.
   if (!m_MeshContainer->HaveNetworkPoints()) {
-    MITK_ERROR << msgPrefix << "No start point seleced.";
+    MITK_WARN << msgPrefix << "No start point seleced.";
+    QMessageBox::warning(m_Parent, "No start point selected", "A start point must be selected.");
     return;
   }
   std::array<double,3> firstPoint, secondPoint;
@@ -576,7 +604,7 @@ void sv4guiPurkinjeNetworkEdit::SetModelParameters(sv4guiPurkinjeNetworkModel& m
 {
   model.numBranchGenerations = ui->numBranchGenSpinBox->value();
   model.avgBranchLength = ui->avgBranchLengthSpinBox->value();
-  model.avgBranchAngles = ui->avgBranchAnglesSpinBox->value();
+  model.branchAngle = ui->branchAngleSpinBox->value();
   model.repulsiveParameter = ui->repulsiveParameterSpinBox->value();
   model.branchSegLength = ui->branchSegLengthSpinBox->value();
 }
@@ -603,10 +631,10 @@ sv4guiMesh* sv4guiPurkinjeNetworkEdit::LoadNetwork(std::string fileName)
   m_1DContainer->SetSurfaceNetworkMesh(m_SurfaceNetworkMesh);
 
   if (ui->networkCheckBox->isChecked()) {
-    showNetwork(false);
     showNetwork(true);
+  } else {
+    showNetwork(false);
   }
-
 }
 
 void sv4guiPurkinjeNetworkEdit::SelectMesh()

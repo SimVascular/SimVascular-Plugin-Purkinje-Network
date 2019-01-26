@@ -62,7 +62,7 @@ class sv4guiPurkinjeNetworkModel {
     std::array<double,3> secondPoint;
     int numBranchGenerations;
     float avgBranchLength;
-    float avgBranchAngles;
+    float branchAngle;
     float repulsiveParameter;
     float branchSegLength;
     vtkSmartPointer<vtkPolyData> meshPolyData;

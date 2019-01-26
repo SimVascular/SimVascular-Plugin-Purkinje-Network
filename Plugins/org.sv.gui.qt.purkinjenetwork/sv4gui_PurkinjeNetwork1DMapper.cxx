@@ -109,7 +109,7 @@ void sv4guiPurkinjeNetwork1DMapper::ResetMapper(mitk::BaseRenderer* renderer){
 
 vtkProp* sv4guiPurkinjeNetwork1DMapper::GetVtkProp(mitk::BaseRenderer* renderer)
 {
-  MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GetVtkProp] ";
+  //MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GetVtkProp] ";
   ResetMapper(renderer);
   GenerateDataForRenderer(renderer);
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
