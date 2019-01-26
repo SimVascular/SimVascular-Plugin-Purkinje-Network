@@ -150,6 +150,11 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
         meshNode->SetVisibility(true);
         meshNode->SetName("mesh");
         m_MeshNode = meshNode;
+        // Create mesh node under 'Purkinje-Network' node.
+        auto parentNode = GetDataStorage()->GetNamedNode("Purkinje-Network");
+        if (parentNode) {
+          GetDataStorage()->Add(m_1DNode, parentNode);
+        }
 
         m_MeshMapper = sv4guiPurkinjeNetworkMeshMapper::New();
         m_MeshMapper->SetDataNode(meshNode);
@@ -165,8 +170,12 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl( QWidget *parent )
         auto node = mitk::DataNode::New();
         node->SetData(m_1DContainer);
         node->SetVisibility(true);
-        node->SetName("1D network");
+        node->SetName("1D Network");
         m_1DNode = node;
+        // Create 1D network node under 'Purkinje-Network' node.
+        if (parentNode) {
+          GetDataStorage()->Add(m_1DNode, parentNode);
+        }
 
         m_1DMapper = sv4guiPurkinjeNetwork1DMapper::New();
         m_1DMapper->SetDataNode(node);
@@ -236,10 +245,14 @@ void sv4guiPurkinjeNetworkEdit::MeshSurfaceStartPoint()
 //----------
 // showMesh
 //----------
-// Process ths show mesh check box select.
+// Process the show mesh check box select.
 //
+// Displays or hides the mesh in the graphics window.
+
 void sv4guiPurkinjeNetworkEdit::showMesh(bool state)
 {
+  m_MeshNode->SetVisibility(state);
+/*
   if (!state) {
       GetDataStorage()->Remove(m_MeshNode);
   } else {
@@ -248,23 +261,43 @@ void sv4guiPurkinjeNetworkEdit::showMesh(bool state)
           GetDataStorage()->Add(m_MeshNode, networkNode);
       }
   }
+*/
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+//-------------
+// showNetwork
+//-------------
+// Process the show network check box select.
+//
+// Displays or hides the 1D network model in the graphics window.
+
 void sv4guiPurkinjeNetworkEdit::showNetwork(bool state)
 {
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::showNetwork] state " << state;
+/*
+  auto node = GetDataStorage()->GetNamedNode("Purkinje-Network");
+  if (node) {
+    MITK_INFO << "[sv4guiPurkinjeNetworkEdit::showMesh] Add m_1DNode to Purkinje-Network folder node.";
+    GetDataStorage()->Add(m_1DNode, node);
+  }
+*/
 
+  m_1DNode->SetVisibility(state);
+
+/*
   if (!state) {
       GetDataStorage()->Remove(m_1DNode);
+      modelNode->SetVisibility(false);
   } else {
-      auto image_folder_node = GetDataStorage()->GetNamedNode("Purkinje-Network");
-      if(image_folder_node) {
+      auto node = GetDataStorage()->GetNamedNode("Purkinje-Network");
+      if(node) {
           MITK_INFO << "[sv4guiPurkinjeNetworkEdit::showMesh] Add m_MeshNode to image_folder_node";
-          GetDataStorage()->Add(m_1DNode, image_folder_node);
+          GetDataStorage()->Add(m_1DNode, node);
       }
   }
+*/
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -545,7 +578,6 @@ void sv4guiPurkinjeNetworkEdit::SetModelParameters(sv4guiPurkinjeNetworkModel& m
   model.avgBranchLength = ui->avgBranchLengthSpinBox->value();
   model.avgBranchAngles = ui->avgBranchAnglesSpinBox->value();
   model.repulsiveParameter = ui->repulsiveParameterSpinBox->value();
-  model.repulsiveParameter = ui->repulsiveParameterSpinBox->value();
   model.branchSegLength = ui->branchSegLengthSpinBox->value();
 }
 
@@ -569,6 +601,12 @@ sv4guiMesh* sv4guiPurkinjeNetworkEdit::LoadNetwork(std::string fileName)
   m_SurfaceNetworkMesh = new sv4guiMesh();
   m_SurfaceNetworkMesh->ReadVolumeFile(fileName);
   m_1DContainer->SetSurfaceNetworkMesh(m_SurfaceNetworkMesh);
+
+  if (ui->networkCheckBox->isChecked()) {
+    showNetwork(false);
+    showNetwork(true);
+  }
+
 }
 
 void sv4guiPurkinjeNetworkEdit::SelectMesh()
@@ -576,6 +614,9 @@ void sv4guiPurkinjeNetworkEdit::SelectMesh()
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SelectMesh] ";
 }
 
+//----------
+// LoadMesh
+//----------
 // Load a surface mesh in VTK vtp format.
 //
 void sv4guiPurkinjeNetworkEdit::LoadMesh()

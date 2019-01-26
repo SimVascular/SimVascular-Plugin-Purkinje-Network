@@ -76,6 +76,7 @@ public:
     bool m_needsUpdate = true;
     bool m_box = false;
     double m_seedRadius = 0.5;
+    bool m_NewMesh = true;
 
 protected:
 

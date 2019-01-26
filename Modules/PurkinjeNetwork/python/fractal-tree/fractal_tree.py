@@ -25,7 +25,9 @@ def init_logging():
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-def run(infile=None, outfile=None, init_node=None, second_node=None):
+def run(infile=None, outfile=None, init_node=None, second_node=None, init_length=None, num_branch_gen=None,
+        avg_branch_length=None, avg_branch_angles=None, repulsive_parameter=None, branch_seg_length=None ):
+
     init_logging()
     logger = logging.getLogger('fractal-tree')
 
@@ -62,6 +64,23 @@ def run(infile=None, outfile=None, init_node=None, second_node=None):
         param.second_node = np.array(ast.literal_eval(second_node))
         logger.info("Second node  %s" % str(param.second_node))
 
+    if init_length != None:
+        param.init_length = init_length 
+
+    if num_branch_gen != None:
+        param.N_it = num_branch_gen 
+
+    if avg_branch_length != None: 
+        param.length = avg_branch_length
+
+    if avg_branch_angles != None: 
+        param.branch_angle = avg_branch_angles 
+
+    if repulsive_parameter != None: 
+        param.w = repulsive_parameter 
+
+    if branch_seg_length != None:
+        param.l_segment = avg_branch_length
 
     ## Calculate the fractal tree.
     #

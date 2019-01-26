@@ -94,7 +94,14 @@ std::string sv4guiPurkinjeNetworkModel::CreateCommand(const std::string infile, 
   cmd += "init_node='[" + std::to_string(this->firstPoint[0]) + "," + std::to_string(this->firstPoint[1]) + 
       "," + std::to_string(this->firstPoint[2]) + "]',";
   cmd += "second_node='[" + std::to_string(this->secondPoint[0]) + "," + std::to_string(this->secondPoint[1]) + 
-      "," + std::to_string(this->secondPoint[2]) + "]')\n";
+      "," + std::to_string(this->secondPoint[2]) + "]'";
+
+  cmd += "num_branch_gen='" + std::to_string(this->numBranchGenerations) + "',";
+  cmd += "avg_branch_length='" + std::to_string(this->avgBranchLength) + "',";
+  cmd += "avg_branch_angles='" + std::to_string(this->avgBranchAngles) + "',";
+  cmd += "repulsive_parameter='" + std::to_string(this->repulsiveParameter) + "',";
+  cmd += "branch_seg_length='" + std::to_string(this->branchSegLength) + "',";
+  cmd += ")\n"; 
 
   return cmd;
 }

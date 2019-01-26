@@ -44,6 +44,7 @@ sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer()
   hoverPoint.push_back(0.0);
   hoverPoint.push_back(0.0);
   hoverPoint.push_back(0.0);
+  m_NewSurfaceNetworkMesh = true;
 }
 
 sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer(const sv4guiPurkinjeNetwork1DContainer& other)
@@ -67,6 +68,20 @@ sv4guiPurkinjeNetwork1DContainer::~sv4guiPurkinjeNetwork1DContainer(){
 
 };
 
+//-------------------------------
+// Get/Set NewSurfaceNetworkMesh
+//-------------------------------
+
+bool sv4guiPurkinjeNetwork1DContainer::IsNewSurfaceNetworkMesh()
+{
+  return m_NewSurfaceNetworkMesh;
+}
+void sv4guiPurkinjeNetwork1DContainer::SetNewSurfaceNetworkMesh(bool value)
+{
+  m_NewSurfaceNetworkMesh = value;
+}
+
+
 sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceNetworkMesh()
 {
   return m_SurfaceNetworkMesh;
@@ -75,6 +90,7 @@ sv4guiMesh* sv4guiPurkinjeNetwork1DContainer::GetSurfaceNetworkMesh()
 void sv4guiPurkinjeNetwork1DContainer::SetSurfaceNetworkMesh(sv4guiMesh* mesh)
 {
   m_SurfaceNetworkMesh = mesh;
+  m_NewSurfaceNetworkMesh = true;
 }
 
 void sv4guiPurkinjeNetwork1DContainer::addStartSeed(double x, double y, double z)

@@ -68,6 +68,8 @@ class sv4guiPurkinjeNetwork1DContainer : public mitk::BaseData {
 
     void SetSurfaceNetworkMesh(sv4guiMesh* mesh);
     sv4guiMesh* GetSurfaceNetworkMesh();
+    bool IsNewSurfaceNetworkMesh();
+    void SetNewSurfaceNetworkMesh(bool value);
 
 protected:
 
@@ -81,6 +83,7 @@ private:
   std::vector< std::vector<double> > m_startSeeds;
   std::vector< std::vector< std::vector<double> > > m_endSeeds;
   sv4guiMesh* m_SurfaceNetworkMesh;
+  bool m_NewSurfaceNetworkMesh;
 
 };
 

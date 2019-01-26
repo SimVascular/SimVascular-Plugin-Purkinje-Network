@@ -38,31 +38,33 @@
 
 sv4guiPurkinjeNetwork1DMapper::sv4guiPurkinjeNetwork1DMapper()
 {
+  m_NewMesh = true;
 }
 
 sv4guiPurkinjeNetwork1DMapper::~sv4guiPurkinjeNetwork1DMapper()
 {
 }
 
+//-------------------------
+// GenerateDataForRenderer
+//-------------------------
 // Generate the data needed for rendering into renderer.
 //
 void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
+  std::string msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
+  //MITK_INFO << msgPrefix; 
 
-  //make ls propassembly
+  // make ls propassembly
   mitk::DataNode* node = GetDataNode();
-
   if (node == NULL) {
-      MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] Data node is null";
-      return;
+    return;
   }
-
   LocalStorage* local_storage = m_LSH.GetLocalStorage(renderer);
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
-  MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] visible " << visible;
+  //MITK_INFO << msgPrefix << "visible " << visible;
 
   if (!visible) {
       local_storage->m_PropAssembly->VisibilityOff();
@@ -73,11 +75,8 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
     static_cast< sv4guiPurkinjeNetwork1DContainer* >( node->GetData() );
 
   if (mesh == NULL) {
-      MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] No data ";
       local_storage->m_PropAssembly->VisibilityOff();
       return;
-  } else {
-      MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] Have data ";
   }
 
   // [DaveP] Do we need to remove?
@@ -86,19 +85,20 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
   // Show network mesh.
   //
   auto surfaceNetwork = mesh->GetSurfaceNetworkMesh();
+  auto newMesh = mesh->IsNewSurfaceNetworkMesh();
 
-  if (surfaceNetwork != NULL) {
-    MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] Have surface network data ";
+  if ((surfaceNetwork != NULL) && newMesh) {
+    local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
+    //MITK_INFO << msgPrefix << "Have surface network data ";
     auto mesh = surfaceNetwork->GetVolumeMesh();
     vtkSmartPointer<vtkDataSetMapper> meshMapper = vtkSmartPointer<vtkDataSetMapper>::New();
     meshMapper->SetInputData(mesh);
     vtkSmartPointer<vtkActor> polyMeshActor = vtkSmartPointer<vtkActor>::New();
     polyMeshActor->SetMapper(meshMapper);
     local_storage->m_PropAssembly->AddPart(polyMeshActor);
-  } else {
-      MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] No surface network data ";
   }
 
+  mesh->SetNewSurfaceNetworkMesh(false);
   local_storage->m_PropAssembly->VisibilityOn();
 }
 
