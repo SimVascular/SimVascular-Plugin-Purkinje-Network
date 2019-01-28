@@ -87,14 +87,14 @@ static const std::string PurkinjeNetwork_NODE_NAME = "Purkinje-Network";
 sv4guiPurkinjeNetworkEdit::sv4guiPurkinjeNetworkEdit() : ui(new Ui::sv4guiPurkinjeNetworkEdit)
 {
   m_DataStorage = nullptr;
-  m_Parent = nullptr;
-  m_SphereWidget = nullptr;
-  m_PurkinjeNetworkNode = nullptr;
+  m_MeshFolderNode = nullptr; 
+  m_MeshMapper = nullptr;
   m_MeshSelectFaceObserverTag = -1;
   m_MeshSelectStartPointObserverTag = -1;
-  m_PurkinjeNetworkNode = nullptr;
   m_ModelFolderNode = nullptr; 
-  m_MeshFolderNode = nullptr; 
+  m_Parent = nullptr;
+  m_PurkinjeNetworkNode = nullptr;
+  m_SphereWidget = nullptr;
 
   // [DaveP] The plugin does not currently references any module code so the module's shared 
   // library won't be loaded on Ubuntu (works ok on MacOS). This causes mitk to not find the 
@@ -137,14 +137,19 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl(QWidget* parent )
     // Define widget event handlers.
     connect(ui->buttonLoadMesh, SIGNAL(clicked()), this, SLOT(LoadMesh()));
     connect(ui->selectMeshComboBox, SIGNAL(clicked()), this, SLOT(SelectMesh()));
-    connect(ui->buttonCreateNetwork, SIGNAL(clicked()), this, SLOT(CreateNetwork()));
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(showMesh(bool)));
-    connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(showNetwork(bool)));
     connect(ui->meshSurfaceNameLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceName()));
 
+    connect(ui->buttonLoadParameters, SIGNAL(clicked()), this, SLOT(LoadParameters()));
     connect(ui->startPointXLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
     connect(ui->startPointYLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
     connect(ui->startPointZLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
+    connect(ui->secondPointXLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceSecondPoint()));
+    connect(ui->secondPointYLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceSecondPoint()));
+    connect(ui->secondPointZLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceSecondPoint()));
+
+    connect(ui->buttonCreateNetwork, SIGNAL(clicked()), this, SLOT(CreateNetwork()));
+    connect(ui->networkCheckBox, SIGNAL(clicked(bool)), this, SLOT(showNetwork(bool)));
 
     m_Interface = new sv4guiDataNodeOperationInterface();
 
@@ -249,10 +254,29 @@ void sv4guiPurkinjeNetworkEdit::MeshSurfaceName()
 //
 void sv4guiPurkinjeNetworkEdit::MeshSurfaceStartPoint()
 {
-  std::string x = ui->startPointXLineEdit->text().trimmed().toStdString();
-  std::string y = ui->startPointYLineEdit->text().trimmed().toStdString();
-  std::string z = ui->startPointZLineEdit->text().trimmed().toStdString();
+  double point[3];
+  point[0] = std::stod(ui->startPointXLineEdit->text().trimmed().toStdString());
+  point[1] = std::stod(ui->startPointYLineEdit->text().trimmed().toStdString());
+  point[2] = std::stod(ui->startPointZLineEdit->text().trimmed().toStdString());
+  m_MeshContainer->SetFirstNetworkPoint(point);
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::MeshSurfaceStartPoint] set";
 }
+
+//-----------------------
+// MeshSurfaceSecondPoint 
+//-----------------------
+// Process mesh surface second point type-in.
+//
+void sv4guiPurkinjeNetworkEdit::MeshSurfaceSecondPoint()
+{
+  double point[3];
+  point[0] = std::stod(ui->secondPointXLineEdit->text().trimmed().toStdString());
+  point[1] = std::stod(ui->secondPointYLineEdit->text().trimmed().toStdString());
+  point[2] = std::stod(ui->secondPointZLineEdit->text().trimmed().toStdString());
+  m_MeshContainer->SetSecondNetworkPoint(point);
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::MeshSurfaceSescontPoint] set";
+}
+
 
 //----------
 // showMesh
@@ -642,6 +666,8 @@ void sv4guiPurkinjeNetworkEdit::SelectMesh()
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::SelectMesh] ";
 }
 
+
+
 //----------
 // LoadMesh
 //----------
@@ -715,6 +741,97 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
 
 }
 
+//----------------
+// LoadParameters
+//----------------
+
+void sv4guiPurkinjeNetworkEdit::LoadParameters()
+{
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadParameters] ";
+
+  try {
+      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+      berry::IPreferences::Pointer prefs;
+
+      if (prefService) {   
+          prefs = prefService->GetSystemPreferences()->Node("/General");
+      } else {
+          prefs = berry::IPreferences::Pointer(0);
+      }
+
+      QString lastFilePath = "";
+
+      if (prefs.IsNotNull()) {
+          lastFilePath = prefs->Get("LastFileOpenPath", "");
+      }
+
+      if (lastFilePath=="") {
+          lastFilePath=QDir::homePath();
+      }
+
+      m_ParameterFileName = QFileDialog::getOpenFileName(NULL, tr("Import Parameter File (Choose File)"), lastFilePath,
+        tr("Parameter file (*.txt)"));
+
+      m_ParameterFileName = m_ParameterFileName.trimmed();
+
+      if (m_ParameterFileName.isEmpty()) {
+          return;
+      }
+
+      // Read file.
+      MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadParameters] Read paramaers " << m_ParameterFileName.toStdString();
+      std::ifstream inFile(m_ParameterFileName.toStdString());
+      std::string line;
+      std::string name, v1, v2, v3;
+      double point[3];
+
+      while (std::getline(inFile, line)) {
+        std::stringstream ss(line);
+        ss >> name;
+        std::cout << " name " << name << std::endl;
+        if (name == "first_point") {
+          ss >> v1 >> v2 >> v3;
+          std::cout << " 1st v1 " << v1 << std::endl;
+          std::cout << " 1st v2 " << v2 << std::endl;
+          std::cout << " 1st v3 " << v3 << std::endl;
+          point[0] = std::stod(v1);
+          point[1] = std::stod(v2);
+          point[2] = std::stod(v3);
+          m_MeshContainer->SetFirstNetworkPoint(point);
+          ui->startPointXLineEdit->setText(QString::fromStdString(v1));
+          ui->startPointYLineEdit->setText(QString::fromStdString(v2));
+          ui->startPointZLineEdit->setText(QString::fromStdString(v3));
+        } else if (name == "second_point") {
+          ss >> v1 >> v2 >> v3;
+          std::cout << " 2nd v1 " << v1 << std::endl;
+          std::cout << " 2nd v2 " << v2 << std::endl;
+          std::cout << " 2nd v3 " << v3 << std::endl;
+          point[0] = std::stod(v1);
+          point[1] = std::stod(v2);
+          point[2] = std::stod(v3);
+          m_MeshContainer->SetSecondNetworkPoint(point);
+          ui->secondPointXLineEdit->setText(QString::fromStdString(v1));
+          ui->secondPointYLineEdit->setText(QString::fromStdString(v2));
+          ui->secondPointZLineEdit->setText(QString::fromStdString(v3));
+        } else if (name == "num_branch_generations") {
+          ss >> v1;
+          ui->numBranchGenSpinBox->setValue(std::stoi(v1));
+        } else if (name == "avg_branch_length") {
+          ss >> v1;
+          ui->avgBranchLengthSpinBox->setValue(std::stod(v1));
+        } else if (name == "branch_seg_length") {
+          ss >> v1;
+          ui->branchSegLengthSpinBox->setValue(std::stod(v1));
+        }
+      }
+      inFile.close();
+  }
+
+  catch(...) {
+      MITK_ERROR << "Error loading Purkinje parameter file.";
+  }
+}
+
 void sv4guiPurkinjeNetworkEdit::Visible()
 {
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Visible] "; 
@@ -765,7 +882,10 @@ void sv4guiPurkinjeNetworkEdit::UpdateSphereData()
 //
 void sv4guiPurkinjeNetworkEdit::AddObservers()
 {
+  auto msgprefix = "[sv4guiPurkinjeNetworkEdit::AddObservers] ";
+  MITK_INFO << msgprefix;
   if (m_MeshContainer.IsNull()) {
+    MITK_INFO << msgprefix << "Mesh container is null";
     return;
   }
  
@@ -808,21 +928,38 @@ void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
 //
 void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
 {
-  char x[20], y[20], z[20];
+  char x1[20], y1[20], z1[20];
+  char x2[20], y2[20], z2[20];
+
   if (m_MeshContainer->HaveSelectedFace()) {
-    auto point = m_MeshContainer->GetPickedPoint();
-    sprintf(x, "%g", point[0]);
-    sprintf(y, "%g", point[1]);
-    sprintf(z, "%g", point[2]);
+    //auto point = m_MeshContainer->GetPickedPoint();
+    std::array<double,3> firstPoint, secondPoint;
+    m_MeshContainer->GetNetworkPoints(firstPoint, secondPoint);
+    //MITK_INFO << msgPrefix << " First point" << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
+
+    sprintf(x1, "%g", firstPoint[0]);
+    sprintf(y1, "%g", firstPoint[1]);
+    sprintf(z1, "%g", firstPoint[2]);
+    sprintf(x2, "%g", secondPoint[0]);
+    sprintf(y2, "%g", secondPoint[1]);
+    sprintf(z2, "%g", secondPoint[2]);
+
   } else {
-    sprintf(x, "%s", "");
-    sprintf(y, "%s", "");
-    sprintf(z, "%s", "");
+    sprintf(x1, "%s", "");
+    sprintf(y1, "%s", "");
+    sprintf(z1, "%s", "");
+    sprintf(x2, "%s", "");
+    sprintf(y2, "%s", "");
+    sprintf(z2, "%s", "");
   }
 
-  ui->startPointXLineEdit->setText(QString::fromStdString(x));
-  ui->startPointYLineEdit->setText(QString::fromStdString(y));
-  ui->startPointZLineEdit->setText(QString::fromStdString(z));
+  ui->startPointXLineEdit->setText(QString::fromStdString(x1));
+  ui->startPointYLineEdit->setText(QString::fromStdString(y1));
+  ui->startPointZLineEdit->setText(QString::fromStdString(z1));
+
+  ui->secondPointXLineEdit->setText(QString::fromStdString(x2));
+  ui->secondPointYLineEdit->setText(QString::fromStdString(y2));
+  ui->secondPointZLineEdit->setText(QString::fromStdString(z2));
 
 }
 

@@ -50,7 +50,8 @@ sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer()
   hoverPoint.push_back(0.0);
   m_SelectedFaceIndex = -1;
   m_NewPickedPoint = false;
-  m_FirstPointSelected = false;
+  m_FirstPointDefined = false;
+  m_SecondPointDefined = false;
   for (int i = 0; i < 3; i++) {
     m_FirstPoint[i] = 0.0;
     m_SecondPoint[i] = 0.0;
@@ -100,8 +101,26 @@ void sv4guiPurkinjeNetworkMeshContainer::SetNetworkPoints(const double first[3],
     m_FirstPoint[i] = first[i];
     m_SecondPoint[i] = second[i]; 
   }
-  m_FirstPointSelected = true;
+  m_FirstPointDefined = true;
+  m_SecondPointDefined = true;
 }
+
+void sv4guiPurkinjeNetworkMeshContainer::SetFirstNetworkPoint(const double point[3])
+{
+  for (int i = 0; i < 3; i++) {
+    m_FirstPoint[i] = point[i];
+  }
+  m_FirstPointDefined = true;
+}
+
+void sv4guiPurkinjeNetworkMeshContainer::SetSecondNetworkPoint(const double point[3])
+{
+  for (int i = 0; i < 3; i++) {
+    m_SecondPoint[i] = point[i];
+  }
+  m_SecondPointDefined = true;
+}
+
 
 void sv4guiPurkinjeNetworkMeshContainer::SetNetworkPoints(const std::array<double,3>& first, const std::array<double,3>& second)
 {
@@ -117,12 +136,16 @@ void sv4guiPurkinjeNetworkMeshContainer::GetNetworkPoints(std::array<double,3>& 
 
 void sv4guiPurkinjeNetworkMeshContainer::ResetNetworkPoints()
 {
-  m_FirstPointSelected = false;
+  //MITK_INFO << "######## ResetNetworkPoints ";
+  m_FirstPointDefined = false;
+  m_SecondPointDefined = false;
 }
 
 bool sv4guiPurkinjeNetworkMeshContainer::HaveNetworkPoints()
 {
-  return m_FirstPointSelected;
+  //MITK_INFO << "######## m_FirstPointDefined " << m_FirstPointDefined;
+  //MITK_INFO << "######## m_SecondPointDefined " << m_SecondPointDefined;
+  return m_FirstPointDefined & m_SecondPointDefined;
 }
 
 //------------------------

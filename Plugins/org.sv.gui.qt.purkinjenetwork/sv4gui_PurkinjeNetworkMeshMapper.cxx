@@ -191,6 +191,9 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     meshContainer->SetNetworkPoints(m_point1, m_point2);
   }
 
+  // Update GUI.
+  meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent() );
+
   local_storage->m_PropAssembly->VisibilityOn();
 }
 

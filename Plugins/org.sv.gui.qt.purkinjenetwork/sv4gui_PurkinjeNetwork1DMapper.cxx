@@ -53,7 +53,7 @@ sv4guiPurkinjeNetwork1DMapper::~sv4guiPurkinjeNetwork1DMapper()
 void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   auto msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
-  MITK_INFO << msgPrefix; 
+  //MITK_INFO << msgPrefix; 
 
   // make ls propassembly
   mitk::DataNode* node = GetDataNode();

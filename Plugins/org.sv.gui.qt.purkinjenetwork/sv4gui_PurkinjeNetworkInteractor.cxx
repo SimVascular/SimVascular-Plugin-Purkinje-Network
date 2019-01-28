@@ -100,14 +100,15 @@ void sv4guiPurkinjeNetworkInteractor::SelectPoint(mitk::StateMachineAction*, mit
   // Get the picked point and set it for the mesh container..
   mitk::Point3D point3d = positionEvent->GetPositionInWorld();
   m_currentPickedPoint = point3d;
-  MITK_INFO << msgPrefix << "Point " << point3d[0] << " " << point3d[1] << "  " << point3d[2]; 
+  MITK_INFO << msgPrefix << "Picked point " << point3d[0] << " " << point3d[1] << "  " << point3d[2]; 
   meshContainer->SetPickedPoint(point3d);
 
   // Update all mappers (e.g. sv4guiPurkinjeNetworkMeshMapper).
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
   // Update GUI.
-  meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent() );
+  // meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent() );
+  
 }
 
 void sv4guiPurkinjeNetworkInteractor::AddStart(mitk::StateMachineAction*, 

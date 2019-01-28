@@ -87,6 +87,9 @@ class sv4guiPurkinjeNetworkMeshContainer : public mitk::BaseData {
     void SetNetworkPoints(const double first[3], const double second[3]);
     void SetNetworkPoints(const std::array<double,3>& first, const std::array<double,3>& second);
     void GetNetworkPoints(std::array<double,3>& first, std::array<double,3>& second);
+    void SetFirstNetworkPoint(const double point[3]);
+    void SetSecondNetworkPoint(const double point[3]);
+
     void ResetNetworkPoints();
     bool HaveNetworkPoints();
 
@@ -111,7 +114,8 @@ private:
   vtkSmartPointer<vtkPolyData> m_SelectedFacePolyData;
   bool m_NewPickedPoint;
 
-  bool m_FirstPointSelected;
+  bool m_FirstPointDefined;
+  bool m_SecondPointDefined;
   std::array<double,3> m_FirstPoint;
   std::array<double,3> m_SecondPoint;
 

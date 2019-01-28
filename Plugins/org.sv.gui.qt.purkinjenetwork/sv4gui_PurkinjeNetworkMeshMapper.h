@@ -37,6 +37,7 @@
 #include "mitkLocalStorageHandler.h"
 
 #include "sv4gui_PurkinjeNetworkMeshContainer.h"
+#include "sv4gui_PurkinjeNetworkInteractor.h"
 
 #include <vtkAssembly.h>
 #include <vtkPropAssembly.h>

@@ -75,10 +75,12 @@ public slots:
     void showMesh(bool state);
     void showNetwork(bool state);
     void LoadMesh();
+    void LoadParameters();
     void SelectMesh();
     void CreateNetwork();
     void MeshSurfaceName();
     void MeshSurfaceStartPoint();
+    void MeshSurfaceSecondPoint();
 
     void AddObservers();
 
@@ -143,6 +145,8 @@ private:
     QString m_MeshOutputFileName;
     sv4guiMesh* m_SurfaceMesh;
     sv4guiMesh* m_SurfaceNetworkMesh;
+
+    QString m_ParameterFileName;
 
     sv4guiProjectManager svProj;
 
