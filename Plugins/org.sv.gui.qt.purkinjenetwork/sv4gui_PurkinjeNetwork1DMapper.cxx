@@ -52,31 +52,35 @@ sv4guiPurkinjeNetwork1DMapper::~sv4guiPurkinjeNetwork1DMapper()
 //
 void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  std::string msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
-  //MITK_INFO << msgPrefix; 
+  auto msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
+  MITK_INFO << msgPrefix; 
 
   // make ls propassembly
   mitk::DataNode* node = GetDataNode();
-  if (node == NULL) {
+  if (node == nullptr) {
     return;
   }
   LocalStorage* local_storage = m_LSH.GetLocalStorage(renderer);
+  if (local_storage == nullptr) {
+    MITK_INFO << msgPrefix << "local_storage is null";
+    return;
+  }
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   //MITK_INFO << msgPrefix << "visible " << visible;
 
   if (!visible) {
-      local_storage->m_PropAssembly->VisibilityOff();
-      return;
+    local_storage->m_PropAssembly->VisibilityOff();
+    return;
   }
 
   sv4guiPurkinjeNetwork1DContainer* mesh = 
     static_cast< sv4guiPurkinjeNetwork1DContainer* >( node->GetData() );
 
-  if (mesh == NULL) {
-      local_storage->m_PropAssembly->VisibilityOff();
-      return;
+  if (mesh == nullptr) {
+    local_storage->m_PropAssembly->VisibilityOff();
+    return;
   }
 
   // [DaveP] Do we need to remove?
@@ -87,7 +91,7 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
   auto surfaceNetwork = mesh->GetSurfaceNetworkMesh();
   auto newMesh = mesh->IsNewSurfaceNetworkMesh();
 
-  if ((surfaceNetwork != NULL) && newMesh) {
+  if ((surfaceNetwork != nullptr) && newMesh) {
     local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
     //MITK_INFO << msgPrefix << "Have surface network data ";
     auto mesh = surfaceNetwork->GetVolumeMesh();
