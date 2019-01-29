@@ -141,6 +141,7 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl(QWidget* parent )
     connect(ui->meshSurfaceNameLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceName()));
 
     connect(ui->buttonLoadParameters, SIGNAL(clicked()), this, SLOT(LoadParameters()));
+    connect(ui->buttonExportParameters, SIGNAL(clicked()), this, SLOT(ExportParameters()));
     connect(ui->startPointXLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
     connect(ui->startPointYLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
     connect(ui->startPointZLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceStartPoint()));
@@ -831,6 +832,63 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
       MITK_ERROR << "Error loading Purkinje parameter file.";
   }
 }
+
+
+//------------------
+// ExportParameters
+//------------------
+
+void sv4guiPurkinjeNetworkEdit::ExportParameters()
+{
+  MITK_INFO << "[sv4guiPurkinjeNetworkEdit::ExportParameters] ";
+
+  try {
+      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+      berry::IPreferences::Pointer prefs;
+
+      if (prefService) {   
+          prefs = prefService->GetSystemPreferences()->Node("/General");
+      } else {
+          prefs = berry::IPreferences::Pointer(0);
+      }
+
+      QString lastFilePath = "";
+
+      if (prefs.IsNotNull()) {
+          lastFilePath = prefs->Get("LastFileOpenPath", "");
+      }
+
+      if (lastFilePath=="") {
+          lastFilePath=QDir::homePath();
+      }
+
+      auto fileName = QFileDialog::getSaveFileName(NULL, tr("Export Parameter File"), lastFilePath,
+        tr("Parameter file (*.txt)"));
+
+      fileName = fileName.trimmed();
+
+      if (fileName.isEmpty()) {
+          return;
+      }
+
+      // Write file.
+      std::ofstream outFile(fileName.toStdString());
+      std::string name, v1, v2, v3;
+      double point[3];
+      outFile << "first_point";
+
+      outFile.close();
+  }
+
+  catch(...) {
+      MITK_ERROR << "Error writing Purkinje parameter file.";
+  }
+}
+
+
+//---------
+// Visible
+//---------
 
 void sv4guiPurkinjeNetworkEdit::Visible()
 {

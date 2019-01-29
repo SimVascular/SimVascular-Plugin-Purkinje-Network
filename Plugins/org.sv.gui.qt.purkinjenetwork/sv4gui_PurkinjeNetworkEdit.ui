@@ -45,7 +45,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>500</y>
+     <y>530</y>
      <width>131</width>
      <height>25</height>
     </rect>
@@ -61,7 +61,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>500</y>
+     <y>530</y>
      <width>131</width>
      <height>23</height>
     </rect>
@@ -376,6 +376,22 @@
    </property>
    <property name="text">
     <string>Load Parameters</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonExportParameters">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>160</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="whatsThis">
+    <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
+   </property>
+   <property name="text">
+    <string>Export Parameters</string>
    </property>
   </widget>
  </widget>

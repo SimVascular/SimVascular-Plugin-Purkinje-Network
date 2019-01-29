@@ -76,6 +76,7 @@ public slots:
     void showNetwork(bool state);
     void LoadMesh();
     void LoadParameters();
+    void ExportParameters();
     void SelectMesh();
     void CreateNetwork();
     void MeshSurfaceName();
