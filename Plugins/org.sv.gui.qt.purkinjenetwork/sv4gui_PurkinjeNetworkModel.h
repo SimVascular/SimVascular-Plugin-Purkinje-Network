@@ -41,12 +41,35 @@
 
 #include <iostream>
 #include <array>
+#include <set>
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
-class sv4guiPurkinjeNetworkModel {
+class sv4guiPurkinjeNetworkModelParamNames
+{ 
+  public: 
+    sv4guiPurkinjeNetworkModelParamNames() {
+      allNames.insert(AvgBranchLength);
+      allNames.insert(BranchAngle);
+      allNames.insert(BranchSegLength);
+      allNames.insert(FirstPoint);
+      allNames.insert(NumBranchGenerations);
+      allNames.insert(RepulsiveParameter);
+      allNames.insert(SecondPoint);
+    }
+    const std::string AvgBranchLength = "avgBranchLength";
+    const std::string BranchAngle = "branchAngle";
+    const std::string BranchSegLength = "branchSegLength";
+    const std::string FirstPoint = "firstPoint";
+    const std::string NumBranchGenerations = "numBranchGenerations";
+    const std::string RepulsiveParameter = "repulsiveParameter";
+    const std::string SecondPoint = "secondPoint";
+    std::set<std::string> allNames;
+};
 
+class sv4guiPurkinjeNetworkModel 
+{
   public:
     sv4guiPurkinjeNetworkModel(const std::string name, const std::array<double,3>& firstPoint, 
         const std::array<double,3>& secondPoint);
@@ -55,18 +78,23 @@ class sv4guiPurkinjeNetworkModel {
     bool GenerateNetwork(const std::string outputPath);
     bool WriteMesh(const std::string fileName);
     std::string CreateCommand(const std::string infile, const std::string outfile);
+    void SetParameters(std::map<std::string, std::string>& params);
+    bool WriteParameters(const std::string fileName, std::map<std::string, std::string>& params);
 
     std::string name; 
     std::string networkFileName; 
     std::array<double,3> firstPoint;
     std::array<double,3> secondPoint;
+    /*
     int numBranchGenerations;
     float avgBranchLength;
     float branchAngle;
     float repulsiveParameter;
     float branchSegLength;
+    */
     vtkSmartPointer<vtkPolyData> meshPolyData;
-
+    sv4guiPurkinjeNetworkModelParamNames parameterNames;
+    std::map<std::string, std::string> parameterValues;
 };
 
 #endif //SV4GUI_PURKINJENETWORK_MODEL_H

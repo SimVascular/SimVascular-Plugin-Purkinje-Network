@@ -99,6 +99,8 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
     meshMapper->SetInputData(mesh);
     vtkSmartPointer<vtkActor> polyMeshActor = vtkSmartPointer<vtkActor>::New();
     polyMeshActor->SetMapper(meshMapper);
+    polyMeshActor->GetProperty()->SetColor(0.8,0,0);
+    polyMeshActor->GetProperty()->SetLineWidth(1.5);
     local_storage->m_PropAssembly->AddPart(polyMeshActor);
   }
 
@@ -106,16 +108,21 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
   local_storage->m_PropAssembly->VisibilityOn();
 }
 
-void sv4guiPurkinjeNetwork1DMapper::ResetMapper(mitk::BaseRenderer* renderer){
+void sv4guiPurkinjeNetwork1DMapper::ResetMapper(mitk::BaseRenderer* renderer)
+{
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   ls->m_PropAssembly->VisibilityOff();
 }
 
 vtkProp* sv4guiPurkinjeNetwork1DMapper::GetVtkProp(mitk::BaseRenderer* renderer)
 {
+  if (renderer == nullptr) {
+    return nullptr;
+  }
   //MITK_INFO << "[sv4guiPurkinjeNetwork1DMapper::GetVtkProp] ";
   ResetMapper(renderer);
   GenerateDataForRenderer(renderer);
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   return ls->m_PropAssembly;
 }
+

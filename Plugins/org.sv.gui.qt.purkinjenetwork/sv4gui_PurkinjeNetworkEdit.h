@@ -106,6 +106,7 @@ public:
 
     void SetModelParameters(sv4guiPurkinjeNetworkModel& pnetModel);
     void SetModelMesh(sv4guiPurkinjeNetworkModel& pnetModel);
+    std::map<std::string, std::string> GetParametersFromGui();
 
 
 protected:

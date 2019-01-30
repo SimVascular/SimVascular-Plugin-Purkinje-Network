@@ -31,6 +31,7 @@
 
 #include <Python.h>
 
+#include <map>
 #include "sv4gui_PurkinjeNetworkModel.h"
 #include <mitkLogMacros.h>
 
@@ -52,9 +53,37 @@ sv4guiPurkinjeNetworkModel::~sv4guiPurkinjeNetworkModel()
 {
 }
 
+//---------------
+// SetParameters
+//---------------
+// Set the Purkinje network generation parameters.
+//
+// The parameters are read frome the gui and passed in as map.
+// The map of parameters are checked and then copied into the
+// 'parameterValues' data member.
+
+void sv4guiPurkinjeNetworkModel::SetParameters(std::map<std::string, std::string>& params)
+{
+  auto msgPrefix = "[sv4guiPurkinjeNetworkModel::SetParameters] ";
+  MITK_INFO << msgPrefix;
+
+  std::map<std::string, std::string>::iterator it;
+  for (it = params.begin(); it != params.end(); ++it) {
+    MITK_INFO << '\t' << it->first << '\t' << it->second;
+    if (parameterNames.allNames.find(it->first) == parameterNames.allNames.end()) {
+      MITK_ERROR << "Unknown parameter name " << it->first;
+      return;
+    }
+  }
+
+  parameterValues = params;
+}
+
 //-----------------
 // GenerateNetwork
 //-----------------
+// Generate a Purkinje network.
+
 bool sv4guiPurkinjeNetworkModel::GenerateNetwork(const std::string outputPath)
 {
   std::string msgPrefix = "[sv4guiPurkinjeNetworkModel::GenerateNetwork] ";
@@ -69,7 +98,7 @@ bool sv4guiPurkinjeNetworkModel::GenerateNetwork(const std::string outputPath)
   auto outfile = outputPath + "/" + this->name;
   MITK_INFO << msgPrefix << "Output network file " << outfile;
 
-  // Execute Python command to generate network. 
+  // Execute the Python command used to generate the Purkinje network. 
   auto cmd = CreateCommand(meshFileName, outfile);
   MITK_INFO << msgPrefix << "Execute cmd " << cmd;
   PyRun_SimpleString(cmd.c_str());
@@ -77,32 +106,49 @@ bool sv4guiPurkinjeNetworkModel::GenerateNetwork(const std::string outputPath)
 
   // Set the name of the file containing the network of 1D elements.
   this->networkFileName = outputPath + "/" + this->name + ".vtu";
- 
 }
 
 //---------------
 // CreateCommand
 //---------------
+// Create the Python command used to generate a Purkinje network.
+//
+// The command will import the fractal_tree module and execute the 
+// fractal_tree.run() function.
+//
+// The parmeters used by the Python code are stored as a map in 
+// the sv4guiPurkinjeNetworkModel data member 'parameterValues'.
 
 std::string sv4guiPurkinjeNetworkModel::CreateCommand(const std::string infile, const std::string outfile)
 {
+  auto msgPrefix = "[sv4guiPurkinjeNetworkModel::CreateCommand] ";
+
+  // Get the values of the main parameters used by the fractal tree code.
+  //
+  auto avg_branch_length = parameterValues[parameterNames.AvgBranchLength];
+  auto branch_angle = parameterValues[parameterNames.BranchAngle];
+  auto branch_seg_length = parameterValues[parameterNames.BranchSegLength];
+  auto init_node = parameterValues[parameterNames.FirstPoint];
+  auto num_branch_gen = parameterValues[parameterNames.NumBranchGenerations];
+  auto repulsive_parameter = parameterValues[parameterNames.RepulsiveParameter];
+  auto second_node = parameterValues[parameterNames.SecondPoint];
+
+  // Create the command to generate the network.
+  //
   std::string cmd;
   cmd += "import fractal_tree\n";
   cmd += "fractal_tree.run(";
   // Required parameters.
   cmd += "infile='" + infile + "',";
   cmd += "outfile='" + outfile + "',";
-  cmd += "init_node='[" + std::to_string(this->firstPoint[0]) + "," + std::to_string(this->firstPoint[1]) + 
-      "," + std::to_string(this->firstPoint[2]) + "]',";
-  cmd += "second_node='[" + std::to_string(this->secondPoint[0]) + "," + std::to_string(this->secondPoint[1]) + 
-      "," + std::to_string(this->secondPoint[2]) + "]',";
-
+  cmd += "init_node='[" + init_node + "]',";
+  cmd += "second_node='[" + second_node +  "]',";
   // Optional parameters.
-  cmd += "num_branch_gen='" + std::to_string(this->numBranchGenerations) + "',";
-  cmd += "avg_branch_length='" + std::to_string(this->avgBranchLength) + "',";
-  cmd += "branch_angle='" + std::to_string(this->branchAngle) + "',";
-  cmd += "repulsive_parameter='" + std::to_string(this->repulsiveParameter) + "',";
-  cmd += "branch_seg_length='" + std::to_string(this->branchSegLength) + "'";
+  cmd += "avg_branch_length='" + avg_branch_length +  "',";
+  cmd += "branch_angle='" + branch_angle + "',";
+  cmd += "branch_seg_length='" + branch_seg_length + "',";
+  cmd += "num_branch_gen='" + num_branch_gen + "',";
+  cmd += "repulsive_parameter='" + repulsive_parameter + "'";
   cmd += ")\n"; 
 
   return cmd;
@@ -111,6 +157,9 @@ std::string sv4guiPurkinjeNetworkModel::CreateCommand(const std::string infile, 
 //-----------
 // WriteMesh 
 //-----------
+// Write the surface mesh on which to generate the network to a VTK .vtp
+// file. This file is read in by the Python fractal tree code.
+
 bool sv4guiPurkinjeNetworkModel::WriteMesh(const std::string fileName)
 {
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
@@ -119,4 +168,13 @@ bool sv4guiPurkinjeNetworkModel::WriteMesh(const std::string fileName)
   writer->Write();
 }
 
+//-----------------
+// WriteParameters
+//-----------------
+// Write the parameters used to generate a Purkinje network to a text file.
 
+bool sv4guiPurkinjeNetworkModel::WriteParameters(const std::string fileName, 
+    std::map<std::string, std::string>& params)
+{
+
+}

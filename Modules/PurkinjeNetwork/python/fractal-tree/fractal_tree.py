@@ -45,7 +45,6 @@ def run(**kwargs):
     init_node = None
     second_node = None
     for key, value in kwargs.items():
-        #print("{0} = {1}".format(key, value))
         if value == None:
             continue
         if key == "infile":
@@ -57,12 +56,12 @@ def run(**kwargs):
             logger.info("Output file name %s" % outfile)
             param.output_file_name = outfile
         elif key == "init_node":
-            init_node = value
-            param.init_node = np.array(ast.literal_eval(value))
+            init_node = " ".join(value.split()).replace(" ", ",")     # make sure array values are comma-separated.
+            param.init_node = np.array(ast.literal_eval(init_node))
             logger.info("Initial node  %s" % str(param.init_node))
         elif key == "second_node":
-            second_node = value
-            param.second_node = np.array(ast.literal_eval(value))
+            second_node = " ".join(value.split()).replace(" ", ",")  # make sure array values are comma-separated.
+            param.second_node = np.array(ast.literal_eval(second_node))
             logger.info("Second node  %s" % str(param.second_node))
         elif key == "num_branch_gen":
             param.N_it = int(value)

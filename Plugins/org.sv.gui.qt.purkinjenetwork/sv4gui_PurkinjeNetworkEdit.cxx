@@ -36,6 +36,7 @@
 #include "sv4gui_PurkinjeNetworkFolder.h"
 
 #include "sv4gui_VtkPurkinjeNetworkSphereWidget.h"
+#include "sv4gui_PurkinjeNetworkModel.h"
 
 #include "sv4gui_MitkMesh.h"
 #include "sv_polydatasolid_utils.h"
@@ -612,7 +613,9 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 
   // Create a Purkinje Network model.
   sv4guiPurkinjeNetworkModel pnetModel(faceName, firstPoint, secondPoint);
-  SetModelParameters(pnetModel);
+  auto params = GetParametersFromGui();
+  pnetModel.SetParameters(params);
+
   SetModelMesh(pnetModel);
   auto outputPath = projPath + "/" + m_StoreDir.toStdString() + "/";
   pnetModel.GenerateNetwork(outputPath);
@@ -622,16 +625,48 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 
 }
 
-//--------------------
-// SetModelParameters
-//---------------------
-void sv4guiPurkinjeNetworkEdit::SetModelParameters(sv4guiPurkinjeNetworkModel& model)
-{
-  model.numBranchGenerations = ui->numBranchGenSpinBox->value();
-  model.avgBranchLength = ui->avgBranchLengthSpinBox->value();
-  model.branchAngle = ui->branchAngleSpinBox->value();
-  model.repulsiveParameter = ui->repulsiveParameterSpinBox->value();
-  model.branchSegLength = ui->branchSegLengthSpinBox->value();
+//----------------------
+// GetParametersFromGui
+//----------------------
+// Get parameter values from the GUI.
+
+std::map<std::string, std::string> sv4guiPurkinjeNetworkEdit::GetParametersFromGui()
+{ 
+  std::map<std::string, std::string> params;
+  sv4guiPurkinjeNetworkModelParamNames paramNames;
+
+  // Get network points.
+  //
+  std::array<double,3> point1, point2;
+  m_MeshContainer->GetNetworkPoints(point1, point2);
+
+  std::stringstream ss1, ss2;
+  std::ostream_iterator<double> outIt1(ss1, " ");
+  std::copy(point1.begin(), point1.end(), outIt1);
+  params.insert(pair<std::string,std::string>(paramNames.FirstPoint, ss1.str()));
+
+  std::ostream_iterator<double> outIt2(ss2, " ");
+  std::copy(point2.begin(), point2.end(), outIt2);
+  params.insert(pair<std::string,std::string>(paramNames.SecondPoint, ss2.str()));
+
+  // Get other parameters.
+  //
+  auto avgBranchLength = std::to_string(ui->avgBranchLengthSpinBox->value());
+  params.insert(pair<std::string,std::string>(paramNames.AvgBranchLength, avgBranchLength));
+
+  auto branchAngle = std::to_string(ui->branchAngleSpinBox->value());
+  params.insert(pair<std::string,std::string>(paramNames.BranchAngle, branchAngle));
+
+  auto branchSegLength = std::to_string(ui->branchSegLengthSpinBox->value());
+  params.insert(pair<std::string,std::string>(paramNames.BranchSegLength, branchSegLength));
+
+  auto numBranchGenerations = std::to_string(ui->numBranchGenSpinBox->value());
+  params.insert(pair<std::string,std::string>(paramNames.NumBranchGenerations, numBranchGenerations));
+
+  auto repulsiveParameter = std::to_string(ui->repulsiveParameterSpinBox->value());
+  params.insert(pair<std::string,std::string>(paramNames.RepulsiveParameter, repulsiveParameter));
+
+  return params;
 }
 
 //--------------
@@ -785,12 +820,13 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
       std::string line;
       std::string name, v1, v2, v3;
       double point[3];
+      sv4guiPurkinjeNetworkModelParamNames paramNames;
 
       while (std::getline(inFile, line)) {
         std::stringstream ss(line);
         ss >> name;
         std::cout << " name " << name << std::endl;
-        if (name == "first_point") {
+        if (name == paramNames.FirstPoint) {
           ss >> v1 >> v2 >> v3;
           std::cout << " 1st v1 " << v1 << std::endl;
           std::cout << " 1st v2 " << v2 << std::endl;
@@ -802,7 +838,7 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
           ui->startPointXLineEdit->setText(QString::fromStdString(v1));
           ui->startPointYLineEdit->setText(QString::fromStdString(v2));
           ui->startPointZLineEdit->setText(QString::fromStdString(v3));
-        } else if (name == "second_point") {
+        } else if (name == paramNames.SecondPoint) {
           ss >> v1 >> v2 >> v3;
           std::cout << " 2nd v1 " << v1 << std::endl;
           std::cout << " 2nd v2 " << v2 << std::endl;
@@ -814,13 +850,13 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
           ui->secondPointXLineEdit->setText(QString::fromStdString(v1));
           ui->secondPointYLineEdit->setText(QString::fromStdString(v2));
           ui->secondPointZLineEdit->setText(QString::fromStdString(v3));
-        } else if (name == "num_branch_generations") {
+        } else if (name == paramNames.NumBranchGenerations) {
           ss >> v1;
           ui->numBranchGenSpinBox->setValue(std::stoi(v1));
-        } else if (name == "avg_branch_length") {
+        } else if (name == paramNames.AvgBranchLength) {
           ss >> v1;
           ui->avgBranchLengthSpinBox->setValue(std::stod(v1));
-        } else if (name == "branch_seg_length") {
+        } else if (name == paramNames.BranchSegLength) {
           ss >> v1;
           ui->branchSegLengthSpinBox->setValue(std::stod(v1));
         }
@@ -833,10 +869,10 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
   }
 }
 
-
 //------------------
 // ExportParameters
 //------------------
+// Export the Purkinje network parameters to a text file.
 
 void sv4guiPurkinjeNetworkEdit::ExportParameters()
 {
@@ -871,12 +907,14 @@ void sv4guiPurkinjeNetworkEdit::ExportParameters()
           return;
       }
 
+      auto parameters = GetParametersFromGui();
+
       // Write file.
       std::ofstream outFile(fileName.toStdString());
-      std::string name, v1, v2, v3;
-      double point[3];
-      outFile << "first_point";
-
+      std::map<std::string, std::string>::iterator it;
+      for (it = parameters.begin(); it != parameters.end(); ++it) {
+        outFile << it->first << " " << it->second << std::endl; 
+      }
       outFile.close();
   }
 
