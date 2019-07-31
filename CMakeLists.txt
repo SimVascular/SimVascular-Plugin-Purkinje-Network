@@ -26,7 +26,7 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
-set(SV_EXTERNALS_VERSION_NUMBER "2018.05" CACHE STRING "SimVascular Externals Release Version")
+set(SV_EXTERNALS_VERSION_NUMBER "2019.06" CACHE STRING "SimVascular Externals Release Version")
 message(STATUS "1) [CMakeList.txt] SV_EXTERNALS_VERSION_NUMBER ${SV_EXTERNALS_VERSION_NUMBER}")
 
 project(SV_PLUGIN)
