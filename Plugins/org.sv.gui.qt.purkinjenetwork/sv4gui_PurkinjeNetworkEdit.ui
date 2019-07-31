@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>sv4guiPurkinjeNetworkEdit</class>
+ <widget class="QWidget" name="sv4guiPurkinjeNetworkEdit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>394</width>
+    <height>695</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Edit Path</string>
+  </property>
+  <property name="toolTip">
+   <string>Load surface mesh from a VTK (.vtp) file.</string>
+  </property>
+  <property name="whatsThis">
+   <string/>
+  </property>
+  <widget class="QPushButton" name="buttonLoadMesh">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>50</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="whatsThis">
+    <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
+   </property>
+   <property name="text">
+    <string>Load Mesh</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonCreateNetwork">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>530</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Create a Purkinje Network using the selected starting point and parameters.</string>
+   </property>
+   <property name="text">
+    <string>Create Network</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="networkCheckBox">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>530</y>
+     <width>131</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Show Network</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>400</y>
+     <width>231</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <item>
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Repulsive parameter</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="repulsiveParameterSpinBox">
+      <property name="value">
+       <double>0.100000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>280</y>
+     <width>265</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Number of branch generations</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QSpinBox" name="numBranchGenSpinBox">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>320</y>
+     <width>231</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Average branch length</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox">
+      <property name="value">
+       <double>0.300000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>6</y>
+     <width>200</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_6">
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Select Model   </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="selectMeshComboBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>204</y>
+     <width>74</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start Point</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="startPointXLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>201</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The X-coordinate of the network start point.</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="startPointYLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>181</x>
+     <y>201</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The Y-coordinate of the network start point.</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="startPointZLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>252</x>
+     <y>201</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The Z-coordinate of the network start point.</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>90</y>
+     <width>350</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Mesh Surface</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="meshSurfaceNameLineEdit">
+      <property name="toolTip">
+       <string>Displays the name of the mesh face selected.</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="meshCheckBox">
+      <property name="text">
+       <string>Show Mesh</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>440</y>
+     <width>239</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Branch segment length </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="branchSegLengthSpinBox">
+      <property name="value">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>361</y>
+     <width>166</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Branch angle</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="branchAngleSpinBox">
+      <property name="value">
+       <double>0.150000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLineEdit" name="secondPointYLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>179</x>
+     <y>237</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The Y-coordinate of the network start point.</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="secondPointZLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>237</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The Z-coordinate of the network start point.</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="secondPointXLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>108</x>
+     <y>237</y>
+     <width>70</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>The X-coordinate of the network start point.</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>240</y>
+     <width>91</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Second Point</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonLoadParameters">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>160</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="whatsThis">
+    <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
+   </property>
+   <property name="text">
+    <string>Load Parameters</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonExportParameters">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>160</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="whatsThis">
+    <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
+   </property>
+   <property name="text">
+    <string>Export Parameters</string>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

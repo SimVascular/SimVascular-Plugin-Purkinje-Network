@@ -3,10 +3,13 @@
 This module contains the Branch class (one branch of the tree)  and the Nodes class
 """
 
+import logging
 import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 from operator import itemgetter
-from scipy.spatial import cKDTree
+#from scipy.spatial import cKDTree
+import vtk 
+from math import sqrt 
 
 pool = ThreadPool(16) 
 
@@ -45,6 +48,8 @@ class Branch:
 #        self.normal=np.array([0.0,0.0,0.0])
         self.queue=[]
         self.growing=True
+        self._logger = logging.getLogger('fractal-tree')
+        #
         shared_node=-1
         init_normal=mesh.normals[init_tri]
         nodes.update_collision_tree(brother_nodes)
@@ -64,13 +69,13 @@ class Branch:
             intriangle=self.add_node_to_queue(mesh,self.queue[i-1],dir*l/Nsegments)
             #print 'intriangle',intriangle
             if not intriangle:
-                print 'Point not in triangle',i
-#                print self.queue[i-1]+dir*l/50.
+                self._logger.debug('Point not in triangle %d' % i)
+#               print self.queue[i-1]+dir*l/50.
                 self.growing=False
                 break
             collision=nodes.collision(self.queue[i])
             if collision[1]<l/5.:
-                print "Collision",i, collision
+                self._logger.debug("Collision %d %s" % (i, str(collision)))
                 self.growing=False
                 self.queue.pop()
                 self.triangles.pop()
@@ -136,7 +141,16 @@ class Nodes:
         self.nodes.append(init_node)
         self.last_node=0
         self.end_nodes=[]
-        self.tree=cKDTree(self.nodes)
+
+        points = vtk.vtkPoints()
+        for node in self.nodes: 
+            points.InsertNextPoint( node[0], node[1], node[2] )
+        self.vtk_tree=vtk.vtkKdTree()
+        self.vtk_tree.BuildLocatorFromPoints(points)
+
+        #self.tree=cKDTree(self.nodes)
+        self._logger = logging.getLogger('fractal-tree')
+ 
     def add_nodes(self,queue):
         """This function stores a list of nodes of a branch and returns the node indices. It also updates the tree to compute distances.
         
@@ -151,8 +165,16 @@ class Nodes:
             self.nodes.append(point)
             self.last_node+=1
             nodes_id.append(self.last_node)
-        self.tree=cKDTree(self.nodes)
+
+        points = vtk.vtkPoints()
+        for node in self.nodes: 
+            points.InsertNextPoint( node[0], node[1], node[2] )
+        self.vtk_tree=vtk.vtkKdTree()
+        self.vtk_tree.BuildLocatorFromPoints(points)
+
+        #self.tree=cKDTree(self.nodes)
         return nodes_id
+
     def distance_from_point(self,point):
         """This function returns the distance from any point to the closest node in the tree.
         
@@ -162,12 +184,32 @@ class Nodes:
         Returns:
             d (float): the distance between point and the closest node in the tree.
         """
-        d,node=self.tree.query(point)
+
+        dist = 0.0
+        vtk_d = vtk.reference(dist)
+        vtk_node = self.vtk_tree.FindClosestPoint( point, vtk_d )
+        vtk_d = sqrt(vtk_d)
+        #if vtk_d == 0.0: vtk_d = 1.73205080756e+11
+
+        # [davep]
+        #d,node=self.tree.query(point)
+
+        self._logger.debug(" ----------------")
+        self._logger.debug("point %s " % (str(point)))
+        self._logger.debug("vtk d %f  node %d" % (vtk_d, vtk_node))
+        #self._logger.debug("sci d %f  node %d" % (d, node))
+
+        d = vtk_d
+        node = vtk_node
+
   #      distance=pool.map(lambda a: np.linalg.norm(a-point),self.nodes.values())
         return d
+
     def distance_from_node(self,node):
         """This function returns the distance from any node to the closest node in the tree.
         
+          [DaveP] Does not seem to be used.
+
         Args:
             node (int): the index of the node to calculate the distance from.
             
@@ -177,6 +219,7 @@ class Nodes:
         d, node = self.tree.query(self.nodes[node])
    #     distance=pool.map(lambda a: np.linalg.norm(a-self.nodes[node]),self.nodes.values())
         return d
+
     def update_collision_tree(self,nodes_to_exclude):
         """This function updates the collision_tree excluding a list of nodes from all the nodes in the tree. If all the existing nodes are excluded, one distant node is added.
         
@@ -193,8 +236,16 @@ class Nodes:
         if len(nodes_to_consider)==0:
             nodes_to_consider=[np.array([-100000000000.0,-100000000000.0,-100000000000.0])]
             self.nodes_to_consider_keys=[100000000]
-            print "no nodes to consider"
-        self.collision_tree=cKDTree(nodes_to_consider)
+            self._logger.debug("No nodes to consider")
+
+        points = vtk.vtkPoints()
+        for node in nodes_to_consider: 
+            points.InsertNextPoint( node[0], node[1], node[2] )
+        self.vtk_collision_tree=vtk.vtkKdTree()
+        self.vtk_collision_tree.BuildLocatorFromPoints(points)
+
+        #self.collision_tree=cKDTree(nodes_to_consider)
+
     def collision(self,point):
         """This function returns the distance between one point and the closest node in the tree and the index of the closest node using the collision_tree.
         
@@ -204,8 +255,25 @@ class Nodes:
         Returns:
             collision (tuple): (distance to the closest node, index of the closest node)
         """
-        d,node=self.collision_tree.query(point)
+        dist = 0.0
+        vtk_d = vtk.reference(dist)
+        vtk_node = self.vtk_collision_tree.FindClosestPoint( point, vtk_d )
+        vtk_d = sqrt(vtk_d)
+        if vtk_d == 0.0: vtk_d = float("inf") 
+
+        # [davep]
+        #d,node=self.collision_tree.query(point)
+
+        self._logger.debug("----------------")
+        self._logger.debug("point %s " % (str(point)))
+        self._logger.debug("vtk d %f  node %d" % (vtk_d, vtk_node))
+        #self._logger.debug("sci d %f  node %d" % (d, node))
+
+        d = vtk_d
+        node = vtk_node
+
         collision=(self.nodes_to_consider_keys[node],d)
+
         return collision
     def gradient(self,point):
         """This function returns the gradient of the distance from the existing points of the tree from any point. It uses a central finite difference approximation.

@@ -2,8 +2,9 @@
 """
 This module contains the mesh class. This class is the triangular surface where the fractal tree is grown. 
 """
+import vtk
 import numpy as np
-from scipy.spatial import cKDTree
+#from scipy.spatial import cKDTree
 import collections
 
 class Mesh:
@@ -22,7 +23,13 @@ class Mesh:
         
     """
     def __init__(self,filename):
-        verts, connectivity = self.loadOBJ(filename)
+        vtp_filename = filename
+        print("Input file name %s" % filename)
+        #vtu_filename = "sphere.vtu"
+        verts, connectivity, points = self.loadVtp(vtp_filename)
+        #verts, connectivity, points = self.loadVtu(vtu_filename)
+        #verts, connectivity = self.loadOBJ(filename)
+
         self.verts=np.array(verts)
         self.connectivity=np.array(connectivity)
         self.normals=np.zeros(self.connectivity.shape)
@@ -34,7 +41,89 @@ class Mesh:
             v=self.verts[self.connectivity[i,2],:]-self.verts[self.connectivity[i,0],:]
             n=np.cross(u,v)
             self.normals[i,:]=n/np.linalg.norm(n)
-        self.tree=cKDTree(verts)
+
+        #self.tree=cKDTree(verts)
+        self.tree=vtk.vtkKdTree()
+        #self.tree.BuildLocatorFromPoints(verts)
+        self.tree.BuildLocatorFromPoints(points)
+
+    def loadVtu(self,filename):
+        """This function reads a VTK .vtu mesh file
+        
+        Args:
+            filename (str): the path and filename of the VTU file.
+            
+        Returns:
+             verts (array): a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).
+             connectivity (array): a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.
+
+        """
+        numVerts = 0  
+        verts = []  
+        norms = []   
+        connectivity=[]
+
+        reader = vtk.vtkXMLUnstructuredGridReader()
+        reader.SetFileName(filename)
+        reader.Update()
+        grid = reader.GetOutput()
+
+        # Set coordinates.
+        points = grid.GetPoints()
+        num_points = points.GetNumberOfPoints()
+        for i in range(0, num_points):
+            x, y, z = points.GetPoint(i)
+            verts.append([x, y, z])
+
+        # Set connectivity.
+        cells = grid.GetCells()
+        num_cells = cells.GetNumberOfCells()
+        conn = cells.GetData()
+        ## [DaveP] fix for Python 3.5.
+        for i in range(0, num_cells):
+        #for i in xrange(0, num_cells):
+            connectivity.append([conn.GetValue(4*i+j) for j in range(1,4)])
+
+        return verts, connectivity, points
+
+    def loadVtp(self,filename):
+        """This function reads a VTK .vtp mesh file
+        
+        Args:
+            filename (str): the path and filename of the VTP file.
+            
+        Returns:
+             verts (array): a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).
+             connectivity (array): a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.
+
+        """
+        numVerts = 0  
+        verts = []  
+        norms = []   
+        connectivity=[]
+
+        reader = vtk.vtkXMLPolyDataReader()
+        reader.SetFileName(filename)
+        reader.Update()
+        poly_data = reader.GetOutput()
+
+        # Set coordinates.
+        points = poly_data.GetPoints()
+        num_points = points.GetNumberOfPoints()
+        for i in range(0, num_points):
+            x, y, z = points.GetPoint(i)
+            verts.append([x, y, z])
+
+        # Set connectivity.
+        polygons = poly_data.GetPolys()
+        num_polys = polygons.GetNumberOfCells()
+        conn = polygons.GetData()
+        ## [DaveP] fix for Python 3.5.
+        for i in range(0, num_polys):
+        #for i in xrange(0, num_cells):
+            connectivity.append([conn.GetValue(4*i+j) for j in range(1,4)])
+
+        return verts, connectivity, points
         
     def loadOBJ(self,filename):  
         """This function reads a .obj mesh file
@@ -68,6 +157,7 @@ class Mesh:
                         con.append(int(w[0])-1)
                         numVerts += 1  
                     connectivity.append(con)
+                    print(con)
         return verts, connectivity
     
 
@@ -83,7 +173,11 @@ class Mesh:
              intriangle (int): the index of the triangle where the projected point lies. If the point is outside surface, intriangle=-1.
         """
         #Get the closest point
-        d, node=self.tree.query(point)
+        dist = 0.0
+        d = vtk.reference(dist)
+        node = self.tree.FindClosestPoint( point, d )
+        #d, node=self.tree.query(point)
+
         #print d, node
         #Get triangles connected to that node
         triangles=self.node_to_tri[node]

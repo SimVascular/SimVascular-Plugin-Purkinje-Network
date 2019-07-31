@@ -37,9 +37,15 @@ simvascular_create_module(
   EXPORT_DIRECTIVE sv4guiModulePurkinjeNetwork
   SHARED_LIB ${SV_USE_MODULES_SHARED_LIBRARIES}
   LIBRARY_DEPENDS
-  ${MITK_LIBRARIES}
   ${ITK_LIBRARIES}
-  ${QT_LIBRARIES})
+  ${MITK_LIBRARIES}
+  ${SV_LIB_GLOBALS_NAME}
+  ${SV_LIB_PATH_NAME}
+  ${SV_LIB_UTILS_NAME}
+  ${SV_LIB_GEOM_NAME}
+  ${QT_LIBRARIES}
+  ${SV_LIB_MODULE_COMMON_NAME})
+
 #-----------------------------------------------------------------------------
 
 if(SV_INSTALL_LIBS)

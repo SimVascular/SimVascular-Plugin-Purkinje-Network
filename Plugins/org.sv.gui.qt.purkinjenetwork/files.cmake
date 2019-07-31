@@ -28,20 +28,50 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set(H_FILES
-    sv4gui_PurkinjeNetworkIO.h
-    sv4gui_PurkinjeNetworkUtils.h
-    sv4gui_PurkinjeNetworkFolder.h
-    sv4gui_PurkinjeNetwork.h
-)
-
 set(CPP_FILES
-    sv4gui_PurkinjeNetworkIO.cxx
-    sv4gui_PurkinjeNetworkUtils.cxx
-    sv4gui_PurkinjeNetwork.cxx
+    sv4gui_PurkinjeNetworkCreate.cxx
+    sv4gui_PurkinjeNetworkCreateAction.cxx
+    sv4gui_PurkinjeNetworkEdit.cxx
+    sv4gui_VtkPurkinjeNetworkSphereWidget.cxx
+    sv4gui_LocalTableDelegate.cxx
+    sv4gui_PurkinjeNetworkLegacySaveAction.cxx
+    sv4gui_PurkinjeNetworkLoadSurfaceAction.cxx
+    sv4gui_PurkinjeNetworkLoadVolumeAction.cxx
+    sv4gui_PurkinjeNetworkPluginActivator.cxx
+    sv4gui_PurkinjeNetworkMeshContainer.cxx
+    sv4gui_PurkinjeNetworkMeshMapper.cxx
+    sv4gui_PurkinjeNetworkInteractor.cxx
+    sv4gui_PurkinjeNetwork1DMapper.cxx
+    sv4gui_PurkinjeNetwork1DContainer.cxx
+    sv4gui_PurkinjeNetworkModel.cxx
 )
 
-set(RESOURCE_FILES
-  Interactions/meshConfig.xml
-  Interactions/meshInteraction.xml
+set(MOC_H_FILES
+    sv4gui_PurkinjeNetworkCreate.h
+    sv4gui_PurkinjeNetworkCreateAction.h
+    sv4gui_PurkinjeNetworkEdit.h
+    sv4gui_LocalTableDelegate.h
+    sv4gui_PurkinjeNetworkLegacySaveAction.h
+    sv4gui_PurkinjeNetworkLoadSurfaceAction.h
+    sv4gui_PurkinjeNetworkLoadVolumeAction.h
+    sv4gui_PurkinjeNetworkPluginActivator.h
+    sv4gui_PurkinjeNetworkMeshContainer.h
+    sv4gui_PurkinjeNetworkMeshMapper.h
+    sv4gui_PurkinjeNetworkInteractor.h
+    sv4gui_PurkinjeNetwork1DMapper.h
+    sv4gui_PurkinjeNetwork1DContainer.h
+    sv4gui_PurkinjeNetworkModel.h
+)
+
+set(UI_FILES
+    sv4gui_PurkinjeNetworkCreate.ui
+    sv4gui_PurkinjeNetworkEdit.ui
+)
+
+set(CACHED_RESOURCE_FILES
+  plugin.xml
+  resources/purkinje_network.png
+)
+
+set(QRC_FILES
 )

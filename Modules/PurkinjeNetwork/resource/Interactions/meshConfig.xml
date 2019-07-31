@@ -1,0 +1,16 @@
+<config>
+
+  <event_variant name="MouseMove" class="MouseMoveEvent" >
+  </event_variant>
+
+  <event_variant class="MousePressEvent" name="PrimaryButtonPressed">
+      <attribute name="EventButton" value="LeftMouseButton" />
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+  <event_variant class="InteractionKeyEvent" name="KeyPressed_S">
+    <attribute name="Key" value="S"/>
+  </event_variant>
+
+
+</config>
