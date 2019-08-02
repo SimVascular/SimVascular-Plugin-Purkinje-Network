@@ -1,0 +1,8 @@
+#!/bin/bash -f
+
+# Set the environment variable that SV uses to identify custom plugins.
+export SV_CUSTOM_PLUGINS=$SV_CUSTOM_PLUGINS:org_sv_gui_qt_purkinjenetwork
+
+# Set the environment variable that SV uses to search for custom plugins shared libraries.
+export SV_PLUGIN_PATH=$SV_PLUGIN_PATH:$1/lib
+

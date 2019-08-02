@@ -40,6 +40,13 @@ find_package(SimVascular REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SimVascular_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SimVascular_CXX_FLAGS}")
 
+#SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+#set(CMAKE_SKIP_BUILD_RPATH 1)
+#set(CMAKE_MACOSX_RPATH 1)
+
+set(CMAKE_INSTALL_RPATH "")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+
 include_directories(${SimVascular_INCLUDE_DIRS})
 
 message(STATUS "[CMakeLists] SimVascular_USE_EXTERNALS_FILE '${SimVascular_USE_EXTERNALS_FILE}'")
@@ -55,4 +62,5 @@ include_directories(
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/Modules/PurkinjeNetwork")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Plugins/${PLUGIN_NAME}")
+add_subdirectory("${CMAKE_SOURCE_DIR}/Distribution")
 

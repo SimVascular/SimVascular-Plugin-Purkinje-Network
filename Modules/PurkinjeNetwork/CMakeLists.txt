@@ -32,6 +32,7 @@
 set(lib "_simvascular_module_purkinjenetwork")
 #-----------------------------------------------------------------------------
 # Create module
+
 simvascular_create_module(
   TARGET ${lib}
   EXPORT_DIRECTIVE sv4guiModulePurkinjeNetwork
@@ -68,3 +69,33 @@ if(SV_INSTALL_HEADERS)
     DESTINATION ${SV_INSTALL_INCLUDE_DIR}/core COMPONENT CoreHeaders
   )
 endif()
+
+set_target_properties(${lib} PROPERTIES INSTALL_RPATH "@loader_path/lib")
+
+#set(CMAKE_SKIP_RPATH ON)
+#set(CMAKE_INSTALL_RPATH "")
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+
+#set_target_properties(${lib} PROPERTIES BUILD_WITH_INSTALL_RPATH 1 INSTALL_NAME_DIR "@brpath")
+
+#set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+#set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/lib)
+
+set_target_properties(${lib} PROPERTIES INSTALL_NAME_DIR "@loader_path/")
+
+
+#SET_TARGET_PROPERTIES (${lib}
+#  PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+#             INSTALL_NAME_DIR "@rpath"
+#  )
+
+## Set location to install the shared library.
+#
+# 'DESTINATION lib' specifies the directory to which a file will be installed: <InstallDir>/lib
+# 'COMPONENT libraries' is used in the CPack Distination/CMakeList.txt
+#
+install( TARGETS ${lib}
+         LIBRARY
+         DESTINATION lib
+         COMPONENT libraries )
+
