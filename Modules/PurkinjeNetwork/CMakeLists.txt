@@ -86,3 +86,8 @@ install( TARGETS ${lib}
          DESTINATION lib
          COMPONENT libraries )
 
+install( DIRECTORY "python/fractal-tree"
+         DESTINATION "python"
+         COMPONENT python_install
+         PATTERN __pycache__/ EXCLUDE ) 
+

@@ -11,4 +11,5 @@ export SV_PLUGIN_PATH=$SV_PLUGIN_PATH:$1/lib
 # libraries used by the custom plugin.
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$1/lib
 
+export PYTHONPATH=$PYTHONPATH:$1/python/fractal-tree
 

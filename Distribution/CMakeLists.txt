@@ -101,4 +101,3 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_SETUP_SCRIPT} DESTINATION 
 ## Include CPack to introduce the appropriate targets
 include(CPack)
 
-#  execute_process(COMMAND install_name_tool -change lib_simvascular_module_purkinjenetwork.dylib bob/lib_simvascular_module_purkinjenetwork.dylib ${CPACK_PACKAGING_INSTALL_PREFIX}/lib/plugins/liborg_sv_gui_qt_purkinjenetwork.dylib)
