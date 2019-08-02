@@ -28,10 +28,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#set(lib ${SV_LIB_MODULE_IMAGEPROCESSING_NAME})
 set(lib "_simvascular_module_purkinjenetwork")
-#-----------------------------------------------------------------------------
-# Create module
+
+## Create the module.
+#
 simvascular_create_module(
   TARGET ${lib}
   EXPORT_DIRECTIVE sv4guiModulePurkinjeNetwork
@@ -45,8 +45,6 @@ simvascular_create_module(
   ${SV_LIB_GEOM_NAME}
   ${QT_LIBRARIES}
   ${SV_LIB_MODULE_COMMON_NAME})
-
-#-----------------------------------------------------------------------------
 
 if(SV_INSTALL_LIBS)
   install(TARGETS ${lib}
@@ -68,3 +66,28 @@ if(SV_INSTALL_HEADERS)
     DESTINATION ${SV_INSTALL_INCLUDE_DIR}/core COMPONENT CoreHeaders
   )
 endif()
+
+## Set directory name for installed targets.
+#
+# This sets the name of this shared library in the
+# plugin shared library so the loader can find it.
+# 
+if (APPLE)
+    set_target_properties(${lib} PROPERTIES INSTALL_NAME_DIR "@loader_path/")
+endif()
+
+## Set location to install the shared library.
+#
+# 'DESTINATION lib' specifies the directory to which a file will be installed: <InstallDir>/lib
+# 'COMPONENT libraries' is used in the CPack Distination/CMakeList.txt
+#
+install( TARGETS ${lib}
+         LIBRARY
+         DESTINATION lib
+         COMPONENT libraries )
+
+install( DIRECTORY "python/fractal-tree"
+         DESTINATION "python"
+         COMPONENT python_install
+         PATTERN __pycache__/ EXCLUDE ) 
+
