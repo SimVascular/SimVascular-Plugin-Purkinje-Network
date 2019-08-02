@@ -28,11 +28,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#set(lib ${SV_LIB_MODULE_IMAGEPROCESSING_NAME})
 set(lib "_simvascular_module_purkinjenetwork")
-#-----------------------------------------------------------------------------
-# Create module
 
+## Create the module.
+#
 simvascular_create_module(
   TARGET ${lib}
   EXPORT_DIRECTIVE sv4guiModulePurkinjeNetwork
@@ -46,8 +45,6 @@ simvascular_create_module(
   ${SV_LIB_GEOM_NAME}
   ${QT_LIBRARIES}
   ${SV_LIB_MODULE_COMMON_NAME})
-
-#-----------------------------------------------------------------------------
 
 if(SV_INSTALL_LIBS)
   install(TARGETS ${lib}
@@ -70,24 +67,14 @@ if(SV_INSTALL_HEADERS)
   )
 endif()
 
-set_target_properties(${lib} PROPERTIES INSTALL_RPATH "@loader_path/lib")
-
-#set(CMAKE_SKIP_RPATH ON)
-#set(CMAKE_INSTALL_RPATH "")
-#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
-
-#set_target_properties(${lib} PROPERTIES BUILD_WITH_INSTALL_RPATH 1 INSTALL_NAME_DIR "@brpath")
-
-#set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-#set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/lib)
-
-set_target_properties(${lib} PROPERTIES INSTALL_NAME_DIR "@loader_path/")
-
-
-#SET_TARGET_PROPERTIES (${lib}
-#  PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-#             INSTALL_NAME_DIR "@rpath"
-#  )
+## Set directory name for installed targets.
+#
+# This sets the name of this shared library in the
+# plugin shared library so the loader can find it.
+# 
+if (APPLE)
+    set_target_properties(${lib} PROPERTIES INSTALL_NAME_DIR "@loader_path/")
+endif()
 
 ## Set location to install the shared library.
 #
