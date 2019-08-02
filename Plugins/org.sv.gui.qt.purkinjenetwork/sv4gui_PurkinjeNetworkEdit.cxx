@@ -88,6 +88,7 @@ static const std::string PurkinjeNetwork_NODE_NAME = "Purkinje-Network";
 sv4guiPurkinjeNetworkEdit::sv4guiPurkinjeNetworkEdit() : ui(new Ui::sv4guiPurkinjeNetworkEdit)
 {
   m_DataStorage = nullptr;
+  m_ProjFolderNode = nullptr;
   m_MeshFolderNode = nullptr; 
   m_MeshMapper = nullptr;
   m_MeshSelectFaceObserverTag = -1;
@@ -137,7 +138,7 @@ void sv4guiPurkinjeNetworkEdit::CreateQtPartControl(QWidget* parent )
 
     // Define widget event handlers.
     connect(ui->buttonLoadMesh, SIGNAL(clicked()), this, SLOT(LoadMesh()));
-    connect(ui->selectMeshComboBox, SIGNAL(clicked()), this, SLOT(SelectMesh()));
+    //connect(ui->selectMeshComboBox, SIGNAL(clicked()), this, SLOT(SelectMesh()));
     connect(ui->meshCheckBox, SIGNAL(clicked(bool)), this, SLOT(showMesh(bool)));
     connect(ui->meshSurfaceNameLineEdit, SIGNAL(returnPressed()), this, SLOT(MeshSurfaceName()));
 
@@ -364,6 +365,7 @@ bool sv4guiPurkinjeNetworkEdit::Initialize()
     MITK_INFO << msgPrefix << " projFolderNode == nullptr";
     return false;
   }
+  m_ProjFolderNode = projFolderNode;
 
   // Get the project path.
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Initialize] Making directory\n";
@@ -780,7 +782,8 @@ void sv4guiPurkinjeNetworkEdit::LoadMesh()
 //----------------
 // LoadParameters
 //----------------
-
+// Load compute parameters from a file.
+//
 void sv4guiPurkinjeNetworkEdit::LoadParameters()
 {
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::LoadParameters] ";
@@ -930,6 +933,9 @@ void sv4guiPurkinjeNetworkEdit::ExportParameters()
 
 void sv4guiPurkinjeNetworkEdit::Visible()
 {
+  if (m_ProjFolderNode == nullptr) {
+      return;
+  }
   MITK_INFO << "[sv4guiPurkinjeNetworkEdit::Visible] "; 
   OnSelectionChanged(GetDataManagerSelection());
 }
@@ -986,6 +992,7 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
   }
  
   // Connect selecting a mesh face event. 
+  MITK_INFO << msgprefix << "Connect selecting a mesh face event";
   if (m_MeshSelectFaceObserverTag == -1) {
     itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command = 
         itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
@@ -994,6 +1001,7 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
   }
 
   // Connect selecting a start point event. 
+  MITK_INFO << msgprefix << "Connect selecting a start point event";
   if (m_MeshSelectStartPointObserverTag == -1) {
     itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command =
         itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
@@ -1001,6 +1009,7 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
     m_MeshSelectStartPointObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent(), 
         command);
   }
+  MITK_INFO << msgprefix << "Done! ";
 }
 
 //---------------------
@@ -1010,11 +1019,20 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
 //
 void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
 {
-  //std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::UpdateFaceSelection] ";
-  //MITK_INFO << msgPrefix;
+  std::string msgPrefix = "[sv4guiPurkinjeNetworkEdit::UpdateFaceSelection] ";
+  MITK_INFO << msgPrefix;
+  MITK_INFO << msgPrefix << "---------- UpdateFaceSelection ----------";
   auto faceName = m_MeshContainer->GetSelectedFaceName();
-  //MITK_INFO << msgPrefix << "Face name " << faceName;
+  MITK_INFO << msgPrefix << "Face name " << faceName;
   ui->meshSurfaceNameLineEdit->setText(QString::fromStdString(faceName));
+
+  ui->startPointXLineEdit->setText(" ");
+  ui->startPointYLineEdit->setText(" ");
+  ui->startPointZLineEdit->setText(" ");
+
+  ui->secondPointXLineEdit->setText(" ");
+  ui->secondPointYLineEdit->setText(" ");
+  ui->secondPointZLineEdit->setText(" ");
 }
 
 //---------------------------
@@ -1024,14 +1042,33 @@ void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
 //
 void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
 {
+
+  auto msg = "[sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection] ";
+  auto reset = true;
+
+  if (!m_MeshContainer->HaveNewNetworkPoints(reset)) {
+      return;
+  }
+
+  MITK_INFO << msg << "---------- UpdateStartPointSelection ---------";
+  MITK_INFO << msg << "New network points. ";
+
   char x1[20], y1[20], z1[20];
   char x2[20], y2[20], z2[20];
 
+  if (m_MeshContainer == nullptr) { 
+      MITK_WARN << msg << "m_MeshContainer is null. ";
+      return;
+  }
+
+  MITK_INFO << msg << "check HaveSelectedFace"; 
+
   if (m_MeshContainer->HaveSelectedFace()) {
+    MITK_INFO << msg << "HaveSelectedFace"; 
     //auto point = m_MeshContainer->GetPickedPoint();
     std::array<double,3> firstPoint, secondPoint;
     m_MeshContainer->GetNetworkPoints(firstPoint, secondPoint);
-    //MITK_INFO << msgPrefix << " First point" << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
+    MITK_INFO << msg << " First point" << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
 
     sprintf(x1, "%g", firstPoint[0]);
     sprintf(y1, "%g", firstPoint[1]);
@@ -1041,12 +1078,12 @@ void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
     sprintf(z2, "%g", secondPoint[2]);
 
   } else {
-    sprintf(x1, "%s", "");
-    sprintf(y1, "%s", "");
-    sprintf(z1, "%s", "");
-    sprintf(x2, "%s", "");
-    sprintf(y2, "%s", "");
-    sprintf(z2, "%s", "");
+    sprintf(x1, "%s", " ");
+    sprintf(y1, "%s", " ");
+    sprintf(z1, "%s", " ");
+    sprintf(x2, "%s", " ");
+    sprintf(y2, "%s", " ");
+    sprintf(z2, "%s", " ");
   }
 
   ui->startPointXLineEdit->setText(QString::fromStdString(x1));
@@ -1057,8 +1094,6 @@ void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
   ui->secondPointYLineEdit->setText(QString::fromStdString(y2));
   ui->secondPointZLineEdit->setText(QString::fromStdString(z2));
 
+  MITK_INFO << msg << "done"; 
+
 }
-
-
-
-

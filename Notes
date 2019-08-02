@@ -1,0 +1,8 @@
+
+For developement need to set in sv scripts:
+
+  #export SV_PLUGIN_INSTALL_DIR=/usr/local/sv/svplugins/2019-08-02
+
+  export PYTHONPATH=$PYTHONPATH:$HOME/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/
+
+

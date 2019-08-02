@@ -103,6 +103,7 @@ void sv4guiPurkinjeNetworkMeshContainer::SetNetworkPoints(const double first[3],
   }
   m_FirstPointDefined = true;
   m_SecondPointDefined = true;
+  m_NewNetworkPoints = true;
 }
 
 void sv4guiPurkinjeNetworkMeshContainer::SetFirstNetworkPoint(const double point[3])
@@ -136,15 +137,16 @@ void sv4guiPurkinjeNetworkMeshContainer::GetNetworkPoints(std::array<double,3>& 
 
 void sv4guiPurkinjeNetworkMeshContainer::ResetNetworkPoints()
 {
-  //MITK_INFO << "######## ResetNetworkPoints ";
+  MITK_INFO << "######## ResetNetworkPoints ";
   m_FirstPointDefined = false;
   m_SecondPointDefined = false;
 }
 
 bool sv4guiPurkinjeNetworkMeshContainer::HaveNetworkPoints()
 {
-  //MITK_INFO << "######## m_FirstPointDefined " << m_FirstPointDefined;
-  //MITK_INFO << "######## m_SecondPointDefined " << m_SecondPointDefined;
+  auto msg = "[sv4guiPurkinjeNetworkMeshContainer::HaveNetworkPoints] ";
+  MITK_INFO << msg << "m_FirstPointDefined: " << m_FirstPointDefined;
+  MITK_INFO << msg << "m_SecondPointDefined: " << m_SecondPointDefined;
   return m_FirstPointDefined & m_SecondPointDefined;
 }
 
@@ -213,6 +215,16 @@ void sv4guiPurkinjeNetworkMeshContainer::SetPickedPoint(mitk::Point3D& point)
   m_currentPickedPoint = point; 
   m_NewPickedPoint = true;
 }
+
+bool sv4guiPurkinjeNetworkMeshContainer::HaveNewNetworkPoints(bool reset)
+{
+  auto tmp = m_NewNetworkPoints;
+  if (reset) {
+    m_NewNetworkPoints = false;
+  }
+  return tmp; 
+}
+
 
 //--------------------
 // HaveNewPickedPoint 
