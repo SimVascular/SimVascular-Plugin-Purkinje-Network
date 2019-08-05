@@ -1042,7 +1042,6 @@ void sv4guiPurkinjeNetworkEdit::UpdateFaceSelection()
 //
 void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
 {
-
   auto msg = "[sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection] ";
   auto reset = true;
 

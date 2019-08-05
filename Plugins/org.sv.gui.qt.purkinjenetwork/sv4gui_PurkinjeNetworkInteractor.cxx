@@ -171,6 +171,7 @@ void sv4guiPurkinjeNetworkInteractor::SelectSingleFace(mitk::StateMachineAction*
   MITK_INFO << msgPrefix << "Number of face actors " << faceActors.size(); 
   auto meshNode = mapper->GetDataNode();
   auto meshContainer = dynamic_cast<sv4guiPurkinjeNetworkMeshContainer*>(meshNode->GetData());
+
   meshContainer->SetSelectedFaceIndex(-1);
   meshContainer->SetSelectedFaceName("");
 
@@ -180,7 +181,9 @@ void sv4guiPurkinjeNetworkInteractor::SelectSingleFace(mitk::StateMachineAction*
   // position stored in 'm_CurrentPickedDisplayPoint'.
   //
   vtkSmartPointer<vtkCellPicker> cellPicker = vtkSmartPointer<vtkCellPicker>::New();
+  
   for (const auto& face : faceActors) {
+    //face->GetProperty()->GetColor(rgb);
     cellPicker->AddPickList(face);
   }
 

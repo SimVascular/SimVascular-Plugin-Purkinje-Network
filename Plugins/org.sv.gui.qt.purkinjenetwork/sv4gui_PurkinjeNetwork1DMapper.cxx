@@ -52,9 +52,9 @@ sv4guiPurkinjeNetwork1DMapper::~sv4guiPurkinjeNetwork1DMapper()
 //
 void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  auto msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
-  MITK_INFO << msgPrefix;
-  MITK_INFO << msgPrefix << "---------- GenerateDataForRenderer ---------"; 
+  //auto msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
+  //MITK_INFO << msgPrefix;
+  //MITK_INFO << msgPrefix << "---------- GenerateDataForRenderer ---------"; 
 
   // make ls propassembly
   mitk::DataNode* node = GetDataNode();
@@ -63,13 +63,13 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
   }
   LocalStorage* local_storage = m_LSH.GetLocalStorage(renderer);
   if (local_storage == nullptr) {
-    MITK_INFO << msgPrefix << "local_storage is null";
+    //MITK_INFO << msgPrefix << "local_storage is null";
     return;
   }
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
-  MITK_INFO << msgPrefix << "visible " << visible;
+  //MITK_INFO << msgPrefix << "visible " << visible;
 
   if (!visible) {
     local_storage->m_PropAssembly->VisibilityOff();
@@ -94,16 +94,13 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
 
   if ((surfaceNetwork != nullptr) && newMesh) {
     local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
-    MITK_INFO << msgPrefix << "Have surface network data ";
-
+    //MITK_INFO << msgPrefix << "Have surface network data ";
     auto volumeMesh = surfaceNetwork->GetVolumeMesh();
-
     if (volumeMesh == nullptr) {
-        MITK_WARN << msgPrefix << "No volume mesh.";
+        MITK_WARN << "No volume mesh.";
         return;
      }
-     MITK_INFO << msgPrefix << "Have volume mesh.";
-
+    //MITK_INFO << msgPrefix << "Have volume mesh.";
     vtkSmartPointer<vtkDataSetMapper> meshMapper = vtkSmartPointer<vtkDataSetMapper>::New();
     meshMapper->SetInputData(volumeMesh);
     vtkSmartPointer<vtkActor> polyMeshActor = vtkSmartPointer<vtkActor>::New();

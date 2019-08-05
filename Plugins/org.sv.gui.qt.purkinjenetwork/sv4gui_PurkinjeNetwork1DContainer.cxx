@@ -45,6 +45,7 @@ sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer()
   hoverPoint.push_back(0.0);
   hoverPoint.push_back(0.0);
   m_NewSurfaceNetworkMesh = true;
+  m_SurfaceNetworkMesh = nullptr;
 }
 
 sv4guiPurkinjeNetwork1DContainer::sv4guiPurkinjeNetwork1DContainer(const sv4guiPurkinjeNetwork1DContainer& other)

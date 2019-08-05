@@ -105,8 +105,8 @@ protected:
 
     vtkSmartPointer<vtkActor> createSphereActor(mitk::Point3D& point);
     vtkSmartPointer<vtkActor> createLineActor();
-    void findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, mitk::Point3D& point);
-
+    bool findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, vtkSmartPointer<vtkPolyData> facePolyData, 
+           mitk::Point3D& point);
 };
 
 #endif /* SV4GUIPURKINJENETWORKMAPPER_H */

@@ -101,8 +101,9 @@ bool sv4guiPurkinjeNetworkModel::GenerateNetwork(const std::string outputPath)
   // Execute the Python command used to generate the Purkinje network. 
   auto cmd = CreateCommand(meshFileName, outfile);
   MITK_INFO << msgPrefix << "Execute cmd " << cmd;
-  PyRun_SimpleString(cmd.c_str());
+  auto error = PyRun_SimpleString(cmd.c_str());
   MITK_INFO << msgPrefix << "Done!";
+  MITK_INFO << msgPrefix << "Error: " << error;
 
   // Set the name of the file containing the network of 1D elements.
   this->networkFileName = outputPath + "/" + this->name + ".vtu";

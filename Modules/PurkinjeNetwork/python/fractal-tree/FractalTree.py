@@ -36,11 +36,12 @@ def Fractal_Tree_3D(param):
 
     # Project the first node to the mesh.
     point,tri = mesh.project_new_point(nodes.nodes[0])
-    if tri>=0:
+
+    if tri >= 0:
         init_tri=tri
     else:
         logger.error('initial point not in mesh')
-        sys.exit(0)
+        return None, None
 
     #Initialize the dictionary that stores the branches objects
     branches={}
