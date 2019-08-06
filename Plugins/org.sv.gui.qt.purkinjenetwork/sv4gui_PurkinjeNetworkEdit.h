@@ -151,6 +151,7 @@ private:
     QString m_ParameterFileName;
 
     sv4guiProjectManager svProj;
+    mitk::DataNode::Pointer m_ProjFolderNode;
 
     sv4guiPurkinjeNetworkInteractor::Pointer m_MeshInteractor;
 

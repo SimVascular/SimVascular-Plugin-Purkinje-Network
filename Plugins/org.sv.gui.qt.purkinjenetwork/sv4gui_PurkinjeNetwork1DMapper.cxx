@@ -52,8 +52,9 @@ sv4guiPurkinjeNetwork1DMapper::~sv4guiPurkinjeNetwork1DMapper()
 //
 void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  auto msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
-  //MITK_INFO << msgPrefix; 
+  //auto msgPrefix = "[sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer] ";
+  //MITK_INFO << msgPrefix;
+  //MITK_INFO << msgPrefix << "---------- GenerateDataForRenderer ---------"; 
 
   // make ls propassembly
   mitk::DataNode* node = GetDataNode();
@@ -62,7 +63,7 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
   }
   LocalStorage* local_storage = m_LSH.GetLocalStorage(renderer);
   if (local_storage == nullptr) {
-    MITK_INFO << msgPrefix << "local_storage is null";
+    //MITK_INFO << msgPrefix << "local_storage is null";
     return;
   }
 
@@ -94,9 +95,14 @@ void sv4guiPurkinjeNetwork1DMapper::GenerateDataForRenderer(mitk::BaseRenderer* 
   if ((surfaceNetwork != nullptr) && newMesh) {
     local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
     //MITK_INFO << msgPrefix << "Have surface network data ";
-    auto mesh = surfaceNetwork->GetVolumeMesh();
+    auto volumeMesh = surfaceNetwork->GetVolumeMesh();
+    if (volumeMesh == nullptr) {
+        MITK_WARN << "No volume mesh.";
+        return;
+     }
+    //MITK_INFO << msgPrefix << "Have volume mesh.";
     vtkSmartPointer<vtkDataSetMapper> meshMapper = vtkSmartPointer<vtkDataSetMapper>::New();
-    meshMapper->SetInputData(mesh);
+    meshMapper->SetInputData(volumeMesh);
     vtkSmartPointer<vtkActor> polyMeshActor = vtkSmartPointer<vtkActor>::New();
     polyMeshActor->SetMapper(meshMapper);
     polyMeshActor->GetProperty()->SetColor(0.8,0,0);

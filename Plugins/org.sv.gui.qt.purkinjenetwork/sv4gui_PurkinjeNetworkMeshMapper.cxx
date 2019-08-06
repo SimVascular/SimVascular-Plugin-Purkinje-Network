@@ -70,7 +70,6 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   node->GetColor(edgeColor, renderer, "edge color");
 
   LocalStorage* local_storage = m_LSH.GetLocalStorage(renderer);
-
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible) {
@@ -96,9 +95,9 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   auto modelFaces = meshContainer->GetModelFaces();
   sv4guiModelElement* modelElement = meshContainer->GetModelElement();
   int selectedFaceIndex = meshContainer->GetSelectedFaceIndex();
+  //MITK_INFO << msgPrefix << "##### selectedFaceIndex: " << selectedFaceIndex; 
 
   if (surfaceMesh != NULL && m_newMesh) {
-    //MITK_INFO << msgPrefix << "Have surface mesh data";
     auto polyMesh = surfaceMesh->GetSurfaceMesh();
     vtkPolyData* geom = polyMesh.GetPointer();
     if (geom == nullptr) {
@@ -153,14 +152,26 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
       local_storage->m_FacePolyData.push_back(facePolyData);
     }
 
+  // Set color and enable picking of selected surface.
+  //
+  // [TODO:DaveP] I'm not sure what to do here. Faces need to be
+  // pickable to select faces and points.
+  //
   } else {
     std::vector<vtkSmartPointer<vtkActor>> faceActors = GetFaceActors(renderer);
     for (int i = 0; i < faceActors.size(); ++i) { 
       if (selectedFaceIndex == i) { 
         faceActors[i]->GetProperty()->SetColor(1.0, 1.0, 0.0);
-      } else {
+        //faceActors[i]->PickableOn();
+      } else { 
         faceActors[i]->GetProperty()->SetColor(1.0, 1.0, 1.0);
+        //faceActors[i]->PickableOff();
       }
+      /*
+      if (selectedFaceIndex == -1) {
+        faceActors[i]->PickableOn();
+      }
+      */
     }
   }
 
@@ -173,15 +184,35 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     local_storage->m_PropAssembly->GetParts()->RemoveItem(m_LineActor);
 
   // If a new point has been picked on the mesh then show it 
-  // and determine the face / vertex that it is closest to.
+  // and determine the face/vertex that it is closest to.
   //
   } else if (meshContainer->HaveNewPickedPoint(reset)) {
+    MITK_INFO << msgPrefix; 
+    MITK_INFO << msgPrefix << "------------------------ GenerateDataForRenderer -------------------"; 
+
     auto point = meshContainer->GetPickedPoint();
     local_storage->m_PropAssembly->GetParts()->RemoveItem(m_SphereActor);
     local_storage->m_PropAssembly->GetParts()->RemoveItem(m_LineActor);
+    MITK_INFO << msgPrefix << "Picked point: " << point[0] << "  " << point[1] << "  " << point[2]; 
+    MITK_INFO << msgPrefix << "selectedFaceIndex: " << selectedFaceIndex;
+
+    // Get the selected face polydata.
+    //
+    auto polyMesh = surfaceMesh->GetSurfaceMesh();
+    vtkPolyData* geom = polyMesh.GetPointer();
+    vtkSmartPointer<vtkPolyData> facePolyData;
+    int faceIndex = 0;
+    for (const auto& face : modelFaces) {
+      if (selectedFaceIndex == faceIndex) { 
+        int faceID = modelElement->GetFaceIdentifierFromInnerSolid(face->id);
+        facePolyData = vtkSmartPointer<vtkPolyData>::New();
+        PlyDtaUtils_GetFacePolyData(geom, &faceID, facePolyData);
+      }
+      faceIndex += 1;
+    }
 
     // Find closest face and move point to closest vertex on that face.
-    this->findClosestFace(meshContainer, point);
+    auto validPoint = this->findClosestFace(meshContainer, facePolyData, point);
 
     // Show picked point.
     m_SphereActor = createSphereActor(point);
@@ -225,14 +256,19 @@ std::vector<vtkSmartPointer<vtkPolyData>> sv4guiPurkinjeNetworkMeshMapper::GetFa
 // opposite the picked point and is used to determine the direction of the
 // first segment of the purkinje network. 
 //
-void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, 
-    mitk::Point3D& point)
+// [TODO:DaveP] We need to prevent selecting points on faces that are not selected. 
+// I'm not sure how to do that yet so for now check that the selected point is on 
+// the selected face.
+//
+bool sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshContainer* mesh, 
+       vtkSmartPointer<vtkPolyData> facePolyData, mitk::Point3D& point)
 {
   std::string msgPrefix = "[sv4guiPurkinjeNetworkMeshMapper::findClosestFace] ";
-  //MITK_INFO <<  msgPrefix;
+  //MITK_INFO <<  msgPrefix << "========== findClosestFace ==========";
+
   auto surfaceMesh = mesh->GetSurfaceMesh();
   if (surfaceMesh == NULL) {
-    return;
+    return false;
   }
 
   //MITK_INFO << msgPrefix << "Query point: " << point[0] << " " << point[1] << " " << point[2];
@@ -257,11 +293,13 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
   MITK_INFO << "CellId: " << cellId;
   MITK_INFO << msgPrefix + "CellId: " << cellId;
   MITK_INFO << msgPrefix + "subId: " << subId;
+  MITK_INFO << msgPrefix << "polyMesh num cells: " << polyMesh->GetNumberOfCells();
+  MITK_INFO << msgPrefix << "CellId: " << cellId;
   */
 
   vtkCell* cell = polyMesh->GetCell(cellId);
   if (cell == nullptr) {
-    return;
+    return false;
   }
 
   // Get the points on the face.
@@ -273,6 +311,7 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
   vtkSmartPointer<vtkPoints> points = triangle->GetPoints();
 
   // Find the closest face vertex.
+  //
   double d, minDist = 1e9;
   int minIndex = -1;
   for (int i = 0; i < 3; i++) {
@@ -289,6 +328,25 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
   for (int i = 0; i < 3; i++) {
     point[i] = minPt[i];
   }
+  //MITK_INFO << msgPrefix << "Min point: " << point[0] << "  " << point[1] << "  " << point[2]; 
+
+  // Check that the point is on the currently selected face.
+  //
+  minDist = 1e9;
+  minIndex = -1;
+  for (vtkIdType i = 0; i < facePolyData->GetNumberOfPoints(); i++) {
+    double pt[3];
+    facePolyData->GetPoint(i,pt);
+    d = (pt[0]-point[0])*(pt[0]-point[0]) + (pt[1]-point[1])*(pt[1]-point[1]) + (pt[2]-point[2])*(pt[2]-point[2]);
+    if (d < minDist) {
+      minDist = d;
+      minIndex = i;
+    }
+  }
+  MITK_INFO << msgPrefix << "Face points min dist: " << minDist; 
+  if (minDist != 0.0) {
+    return false;
+  }
 
   // Calculate the second point as the midpoint of the
   // edge oposite the closest face vertex.
@@ -303,29 +361,7 @@ void sv4guiPurkinjeNetworkMeshMapper::findClosestFace(sv4guiPurkinjeNetworkMeshC
     }
   }
 
-  // Find neighbor cells.
-/*
-  vtkSmartPointer<vtkIdList> cellPointIds = vtkSmartPointer<vtkIdList>::New();
-  polyMesh->GetCellPoints(cellId, cellPointIds);
-  std::set<vtkIdType> neighbors;
-  for(vtkIdType i = 0; i < cellPointIds->GetNumberOfIds(); i++) {
-    vtkSmartPointer<vtkIdList> idList = vtkSmartPointer<vtkIdList>::New();
-    idList->InsertNextId(cellPointIds->GetId(i));
-    //get the neighbors of the cell
-    vtkSmartPointer<vtkIdList> neighborCellIds = vtkSmartPointer<vtkIdList>::New();
-    polyMesh->GetCellNeighbors(cellId, idList, neighborCellIds);
-
-    for(vtkIdType j = 0; j < neighborCellIds->GetNumberOfIds(); j++) {
-      neighbors.insert(neighborCellIds->GetId(j));
-    }
-  }
-
-  MITK_INFO << "Point neighbor ids are: ";
-  for(std::set<vtkIdType>::iterator it1 = neighbors.begin(); it1 != neighbors.end(); it1++) {
-    MITK_INFO << " " << *it1;
-  }
-*/
-
+  return true;
 }
 
 void sv4guiPurkinjeNetworkMeshMapper::ResetMapper(mitk::BaseRenderer* renderer)
