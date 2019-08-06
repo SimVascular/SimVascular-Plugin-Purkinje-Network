@@ -43,7 +43,7 @@ The installer installs the Purkinje Plugin in
 ```
 Unix and MacOs: /usr/local/sv/svplugins/SVDATE/Purkinje-Plugin/DATE
 ```
-This directory contains the plugin shared libraries, a setup.sh script and Python scripts. The setup.sh script sets the **SV_CUSTOM_PLUGINS** and **SV_PLUGIN_PATH** environment variables. The **SV_CUSTOM_PLUGINS** environment variable defines the name of the pluging (org_sv_gui_qt_purkinjenetwork) and the locatation of the plugin shared library (e.g. liborg_sv_gui_qt_purkinjenetwork.so).
+This directory contains the plugin shared libraries, a setup.sh script and Python scripts. The setup.sh script sets the **SV_CUSTOM_PLUGINS** and **SV_PLUGIN_PATH** environment variables. The **SV_CUSTOM_PLUGINS** environment variable defines the name of the pluging (org_sv_gui_qt_purkinjenetwork) and the **SV_PLUGIN_PATH** environment variable defines the locatation of the plugin shared library (e.g. liborg_sv_gui_qt_purkinjenetwork.so).
 
 Note that **SVDATE** must match the date of the installed SimVascular application.
 
