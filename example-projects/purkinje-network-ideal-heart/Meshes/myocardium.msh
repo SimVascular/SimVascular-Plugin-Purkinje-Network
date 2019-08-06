@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<format version="1.0" />
+<mitk_mesh type="TetGen" model_name="myocardium">
+    <timestep id="0">
+        <mesh type="TetGen">
+            <command_history>
+                <command content="option surface 1" />
+                <command content="option volume 1" />
+                <command content="option UseMMG 1" />
+                <command content="option GlobalEdgeSize 5" />
+                <command content="setWalls" />
+                <command content="option Optimization 3" />
+                <command content="option QualityRatio 1.4" />
+                <command content="option NoBisect" />
+                <command content="AllowMultipleRegions 0" />
+                <command content="generateMesh" />
+                <command content="writeMesh" />
+            </command_history>
+        </mesh>
+    </timestep>
+</mitk_mesh>
