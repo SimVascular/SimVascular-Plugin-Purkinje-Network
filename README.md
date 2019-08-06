@@ -72,14 +72,7 @@ The Purkinje Plugin ideal heart project generates a Purkinje network on an ideal
 <img src="images/ideal-heart-1.png" alt="alt text"> 
 
 
+> When starting SimVascular a Purkinje Plugin tool panel may be present before a project is opened. Delete this panel before opening a project.
 
-<h3>HTML</h3>
-<p>
-
-<div style="background-color: #F0F0F0; padding: 10px; border: 1px solid #e6e600; border-left: 6px solid #e6e600">
-</p>
-
-When starting SimVascular a Purkinje Plugin tool panel may be present before a project is opened. Delete this panel before opening a project.
-</div>
 
 
