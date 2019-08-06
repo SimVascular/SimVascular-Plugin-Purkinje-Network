@@ -1,6 +1,9 @@
 # SimCardio
 This is the repository for the SimCardio project. The project currently contains only the Purkinje Plugin.
 
+# Purkinje Plugin
+The Purkinje Plugin is used to create a Purkinje network on a surface model of the heart.
+
 ## Building the Purkinje Plugin Shared Libraries
 The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a SimVascular build so a SimVascular build must be present. The Purkinje Plugin is built from source using the following steps
 
