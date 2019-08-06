@@ -5,7 +5,7 @@ This is the repository for the SimCardio project. The project currently contains
 The Purkinje Plugin is used to create a Purkinje network on a surface model of the heart.
 
 ## Building the Purkinje Plugin Shared Libraries
-The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a SimVascular build so a SimVascular build must be present. The Purkinje Plugin is built from source using the following steps
+The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a local SimVascular build so a SimVascular local build must be present. The Purkinje Plugin is built from source using the following steps
 
 ```
 git clone https://github.com/SimVascular/SimCardio.git
@@ -16,21 +16,31 @@ ccmake -DACCEPT_DOWNLOAD_EXTERNALS=ON ..
 make 
 ```
 
-Next set two environment variables that SimVascular uses to identify and load custom plugins
+Next set the environment variables that SimVascular uses to identify and load custom plugins
 
 ```
-cd SimCardio 
-
+cd $PROJECT_DIR/SimCardio 
 export SV_CUSTOM_PLUGINS=$SV_CUSTOM_PLUGINS:org_sv_gui_qt_purkinjenetwork
-
 export SV_PLUGIN_PATH=$SV_PLUGIN_PATH:$PWD/build/lib/plugins/
+export LD_LIBRARY_PATH=$PWD/build/lib/
 ```
+To use the Purkinje Plugin with the local SimVascular development build the **sv** launch script in SimVascular/build/SimVascular-build must be modified to use the Purkinje Plugin developement shared libraries and Python scripts rather than those that might be installed.
 
-SimVascular is then run by executing the launch script from the commnd line
-```
-Linux:  /usr/local/sv/simvascular/DATE/simvascular
-MacOS:  /Applications/SimVascular.app/Contents/MacOS/Simvascular
-```
+In the $PROJECT_DIR/SimVascular/build/SimVascular-build/sv script
+
+  1) Comment out: 
+
+        'export SV_PLUGIN_INSTALL_DIR=' 
+
+   2) Add: 
+
+        export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/:
+
+      after: 
+
+       export PYTHONPATH=$PYTHONPATH:$SV_PLUGIN_PATH
+
+
 ## Building the Purkinje Plugin Installer
 The Purkinje Plugin installer is created using the following steps
 ```
