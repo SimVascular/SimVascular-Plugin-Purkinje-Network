@@ -50,6 +50,6 @@ Note that **SVDATE** must match the date of the installed SimVascular applicatio
 ## Using the Purkinje Plugin 
 The SimVascular application starts by executing a launch script that looks for plugins in the plugin install directory. When a plugin is found its setup.sh script is executed. The SimVascular application is then executed and loads in core and then custom plugins. Plugins are loaded using the plugin shared library (e.g. liborg_sv_gui_qt_purkinjenetwork.so).
 
-If the plugin is successfully loaded you will see the Purkinje Plugin icon ![Alt text](images/purkinje_network.png?raw=true "Title") on the SimVascular toolbar.
+If the plugin is successfully loaded you will see the Purkinje Plugin icon ![](images/purkinje_network.png) on the SimVascular toolbar.
 
 
