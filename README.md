@@ -1,6 +1,8 @@
 # SimCardio
 This is the repository for the SimCardio project. The project currently contains only the Purkinje Plugin.
 
+> The Purkinje Plugin code is under active developement and is not stable. There is limited error checking in the Python script and the GUI is still in developement.
+
 # Purkinje Plugin
 The Purkinje Plugin is a custom SimVascular plugin used to create a Purkinje network on a surface model of the heart. When loaded into SimVascular the Purkinje Plugin adds a **Purkinje Network** tool to the SimVascular menu bar. 
 
@@ -17,19 +19,25 @@ When the **Purkinje Network** tool is activated it displays the triangular surfa
 
 The Purkinje network is generated using a Python script. The input to the script is a triangular surface, a network starting point, a second point defining the direction of the first network branch, and the parameters used to control the shape of the network.
 
-The parameters used to generated the network is are 
+The parameters used to generated the network are 
 
 - Starting point - Initial node of the network.
 - Second point - Defines the direction in which the network initial branch will grow.
 - Number of branch generations - The maximum number of network branches generated from the initial node.
-- Average branch length - Average length of the branches L. The length of each branch is calculted from a random normal distribution with mean L and variance 0.4*L^2. 
+- Average branch length - Average length L of the branches. The length of each branch is calculted from a random normal distribution with mean L and variance 0.4*L^2. 
 - Branch angle - Angle with respect to the direction of the previous branch and the new branch.
 - Repulsive parameter - Regulates the branch curvature: the larger the repulsion parameter, the more the branches repel each other.
 - Branch segment length - Approximate length of the segments that compose one branch (the length of a branch is random).
 
+The  **Purkinje Network** tool writes files to the SimVascular project **Purkinje-Network** directory. The files are prefixed with a face name. The following files are created for each network
 
-
-> The Purkinje Plugin code is under active developement and is not stable. There is limited error checking in the Python script and the GUI is still in developement.
+```
+FACENAME.vtp - Triangular surface the network is generated on.
+FACENAME.vtu - Network geometry represented as polylines of n segments and n+1 nodes.
+FACENAME_endnodes.txt - Indices of nodes at the ends of network segments (i.e. not connected to other nodes).
+FACENAME_ien.txt - Network connectivity as a list of node indices into FACENAME_xyz.txt.
+FACENAME_xyz.txt - Network node coordinates.
+```
 
 ## Building the Purkinje Plugin Shared Libraries
 The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a local SimVascular build so a SimVascular local build must be present. The Purkinje Plugin is built from source using the following steps
