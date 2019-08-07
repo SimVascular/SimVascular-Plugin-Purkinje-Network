@@ -1,0 +1,7 @@
+avgBranchLength 3.5
+branchAngle 0.15
+branchSegLength 0.35
+firstPoint 28.95409966 47.9695015 70
+numBranchGenerations 20
+repulsiveParameter 0.100000
+secondPoint 28.95409966 47.9695015 69
