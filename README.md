@@ -12,7 +12,7 @@ When the **Purkinje Network** tool is activated it displays the triangular surfa
 ```
 1) Select a face on the mesh
 2) Select the network starting point on the face
-3) Set network generation paramters
+3) Set network generation parameters
 4) Generate the network
 5) Display the network
 ```
@@ -116,7 +116,7 @@ Now select the **Purkinje Network** tool icon <img src="images/purkinje_network.
 
 <img src="images/ideal-heart-4.png" alt="alt text"> 
 
-A model face is selected by moving the mouse cursor over a face and pressing the **s** key. Select the left ventricle face. The face surface mesh is highlighed in yellow and its name is displayed in the **Mesh Surface** text box.
+A mesh face is selected by moving the mouse cursor over a face and pressing the **s** key. Select the left ventricle face. The face surface mesh is highlighed in yellow and its name is displayed in the **Mesh Surface** text box.
 
 <img src="images/ideal-heart-5.png" alt="alt text"> 
 
