@@ -39,7 +39,7 @@ FACENAME_ien.txt - Network connectivity as a list of node indices into FACENAME_
 FACENAME_xyz.txt - Network node coordinates.
 ```
 
-For a detailed discussion of the algorithm used to generate the Purkinje network see [[1]](#References)
+For a detailed discussion of the algorithm used to generate the Purkinje network see [[1]](#References).
 
 ## Building the Purkinje Plugin Shared Libraries
 The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a local SimVascular build so a SimVascular local build must be present. The Purkinje Plugin is built from source using the following steps
