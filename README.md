@@ -131,7 +131,7 @@ After adjusting some parameters the Purkinje network is created by selecting the
 <img src="images/ideal-heart-7.png" alt="alt text"> 
 
 
-<h2 id="References">My header</h2>
+<h2 id="References">References</h2>
 
 [1] Francisco Sahli Costabal, Daniel E. Hurtado, Ellen Kuhl, Generating Purkinje networks in the human heart, Journal of Biomechanics, Volume 49, Issue 12,2016, Pages 2455-2465
 
