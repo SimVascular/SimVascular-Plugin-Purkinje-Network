@@ -93,7 +93,7 @@ Now select a starting point of the Purkinje network by moving the mouse cursor t
 
 After adjusting some parameters the Purkinje network is created by selecting the **Create Network** button. The network is displayed by selecting the **Show Network** checkbox.
 
-<img src="images/ideal-heart-6.png" alt="alt text"> 
+<img src="images/ideal-heart-7.png" alt="alt text"> 
 
 
 
