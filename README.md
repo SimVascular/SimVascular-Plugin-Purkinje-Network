@@ -2,7 +2,32 @@
 This is the repository for the SimCardio project. The project currently contains only the Purkinje Plugin.
 
 # Purkinje Plugin
-The Purkinje Plugin is used to create a Purkinje network on a surface model of the heart.
+The Purkinje Plugin is a custom SimVascular plugin used to create a Purkinje network on a surface model of the heart. When loaded into SimVascular the Purkinje Plugin adds a **Purkinje Network** tool to the SimVascular menu bar. 
+
+A geometric model of a heart is first created using SimVascular **Paths**, **Segmentations** and **Models** tools. The geometric model may also be imported using the **Models** tool. Model faces are extracted and assigned names and types (cap or wall) using the **Models** tool. The **Meshes** tool is then used to create a finite element tetrehedral mesh of the geometric model. The triangular surfaces of this mesh are identified with the model faces named in the **Models** tool.
+
+When the **Purkinje Network** tool is activated it displays the triangular surfaces of the mesh. A Purkinje network is created using the **Purkinje Network** tool using the following steps
+```
+1) Select a face on the mesh
+2) Select the network starting point on the face
+3) Set network generation paramters
+4) Generate the network
+5) Display the network
+```
+
+The Purkinje network is generated using a Python script. The input to the script is a triangular surface, a network starting point, a second point defining the direction of the first network branch, and the parameters used to control the shape of the network.
+
+The parameters used to generated the network is are 
+
+- Starting point - Initial node of the network.
+- Second point - Defines the direction in which the network initial branch will grow.
+- Number of branch generations - The maximum number of network branches generated from the initial node.
+- Average branch length - Average length of the branches L. The length of each branch is calculted from a random normal distribution with mean L and variance 0.4*L^2. 
+- Branch angle - Angle with respect to the direction of the previous branch and the new branch.
+- Repulsive parameter - Regulates the branch curvature: the larger the repulsion parameter, the more the branches repel each other.
+- Branch segment length - Approximate length of the segments that compose one branch (the length of a branch is random).
+
+
 
 > The Purkinje Plugin code is under active developement and is not stable. There is limited error checking in the Python script and the GUI is still in developement.
 
