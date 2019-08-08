@@ -34,6 +34,9 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Load a mesh from a file.</string>
+   </property>
    <property name="whatsThis">
     <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
    </property>
@@ -69,6 +72,9 @@
    <property name="text">
     <string>Show Network</string>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QWidget" name="layoutWidget_2">
    <property name="geometry">
@@ -89,6 +95,9 @@
     </item>
     <item>
      <widget class="QDoubleSpinBox" name="repulsiveParameterSpinBox">
+      <property name="toolTip">
+       <string>Regulates the branch curvature: the larger the repulsion parameter, the more the branches repel each other.</string>
+      </property>
       <property name="value">
        <double>0.100000000000000</double>
       </property>
@@ -115,6 +124,9 @@
     </item>
     <item>
      <widget class="QSpinBox" name="numBranchGenSpinBox">
+      <property name="toolTip">
+       <string>The maximum number of network branches generated from the initial node.</string>
+      </property>
       <property name="minimum">
        <number>1</number>
       </property>
@@ -144,6 +156,9 @@
     </item>
     <item>
      <widget class="QDoubleSpinBox" name="avgBranchLengthSpinBox">
+      <property name="toolTip">
+       <string>The average length L of the branches. The length of each branch is calculted from a random normal distribution with mean L.</string>
+      </property>
       <property name="value">
        <double>0.300000000000000</double>
       </property>
@@ -238,7 +253,7 @@
     <item>
      <widget class="QLabel" name="label_7">
       <property name="text">
-       <string>Mesh Surface</string>
+       <string>Mesh Face</string>
       </property>
      </widget>
     </item>
@@ -251,6 +266,9 @@
     </item>
     <item>
      <widget class="QCheckBox" name="meshCheckBox">
+      <property name="toolTip">
+       <string>Toggle the display of the mesh.</string>
+      </property>
       <property name="text">
        <string>Show Mesh</string>
       </property>
@@ -277,6 +295,9 @@
     </item>
     <item>
      <widget class="QDoubleSpinBox" name="branchSegLengthSpinBox">
+      <property name="toolTip">
+       <string>Approximate length of the segments that compose one branch (the length of a branch is random).</string>
+      </property>
       <property name="value">
        <double>0.010000000000000</double>
       </property>
@@ -303,6 +324,9 @@
     </item>
     <item>
      <widget class="QDoubleSpinBox" name="branchAngleSpinBox">
+      <property name="toolTip">
+       <string>The angle with respect to the direction of the previous branch and the new branch.</string>
+      </property>
       <property name="value">
        <double>0.150000000000000</double>
       </property>
@@ -371,6 +395,9 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Write the current parameter values to a file.</string>
+   </property>
    <property name="whatsThis">
     <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
    </property>
@@ -386,6 +413,9 @@
      <width>131</width>
      <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Set the current parameters from a file.</string>
    </property>
    <property name="whatsThis">
     <string extracomment="Load a surface mesh from a VTK (.vtp) file."/>
