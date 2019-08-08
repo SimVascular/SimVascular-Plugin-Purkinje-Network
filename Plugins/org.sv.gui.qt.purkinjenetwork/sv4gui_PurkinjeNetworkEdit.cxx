@@ -620,7 +620,43 @@ void sv4guiPurkinjeNetworkEdit::CreateNetwork()
 
   SetModelMesh(pnetModel);
   auto outputPath = projPath + "/" + m_StoreDir.toStdString() + "/";
-  pnetModel.GenerateNetwork(outputPath);
+  auto status = pnetModel.GenerateNetwork(outputPath);
+
+  if (!status) { 
+    QMessageBox::warning(QApplication::activeWindow(), "Purkinje Network Tool", "The Purkinje network generation failed.");
+    return;
+  }
+
+  // Read output files.
+  //
+  // Node coordinates file.
+  int numNodes = 0;
+  QFile nodeFile(QString::fromStdString(outputPath) + "/" + QString::fromStdString(faceName) + "_xyz.txt");
+    if (nodeFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&nodeFile);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            numNodes += 1;
+        }
+        nodeFile.close();
+    }
+
+  // Element connectivity file.
+  int numElems = 0;
+  QFile elemFile(QString::fromStdString(outputPath) + "/" + QString::fromStdString(faceName) + "_ien.txt");
+    if (elemFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&elemFile);
+        while (!in.atEnd()) {
+            QString line = in.readLine(); 
+            numElems += 1;
+        }
+        elemFile.close();
+    }
+
+  QString msg = "A Purkinje network has been successfully generated.\n";
+  msg += "Number of segments: " + QString::number(numElems) + "\n";
+  msg += "Number of nodes: " + QString::number(numNodes) + "\n";
+  QMessageBox::information(NULL, "Purkinje Network Tool", msg); 
 
   // Read the generated network (1D elements).
   LoadNetwork(pnetModel.networkFileName);
@@ -992,22 +1028,21 @@ void sv4guiPurkinjeNetworkEdit::AddObservers()
   }
  
   // Connect selecting a mesh face event. 
+  //
   MITK_INFO << msgprefix << "Connect selecting a mesh face event";
   if (m_MeshSelectFaceObserverTag == -1) {
-    itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command = 
-        itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
+    itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command = itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
     command->SetCallbackFunction(this, &sv4guiPurkinjeNetworkEdit::UpdateFaceSelection);
     m_MeshSelectFaceObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectFaceEvent(), command);
   }
 
   // Connect selecting a start point event. 
+  //
   MITK_INFO << msgprefix << "Connect selecting a start point event";
   if (m_MeshSelectStartPointObserverTag == -1) {
-    itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command =
-        itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
+    itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::Pointer command = itk::SimpleMemberCommand<sv4guiPurkinjeNetworkEdit>::New();
     command->SetCallbackFunction(this, &sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection);
-    m_MeshSelectStartPointObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent(), 
-        command);
+    m_MeshSelectStartPointObserverTag = m_MeshContainer->AddObserver(sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent(), command);
   }
   MITK_INFO << msgprefix << "Done! ";
 }
@@ -1067,14 +1102,27 @@ void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
     //auto point = m_MeshContainer->GetPickedPoint();
     std::array<double,3> firstPoint, secondPoint;
     m_MeshContainer->GetNetworkPoints(firstPoint, secondPoint);
-    MITK_INFO << msg << " First point" << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
+    MITK_INFO << msg << " First point: " << firstPoint[0] << " " << firstPoint[1] << "  " << firstPoint[2];
+    MITK_INFO << msg << "######### m_MeshContainer->PickedPointIsValid(): " << m_MeshContainer->PickedPointIsValid() << std::endl;
 
-    sprintf(x1, "%g", firstPoint[0]);
-    sprintf(y1, "%g", firstPoint[1]);
-    sprintf(z1, "%g", firstPoint[2]);
-    sprintf(x2, "%g", secondPoint[0]);
-    sprintf(y2, "%g", secondPoint[1]);
-    sprintf(z2, "%g", secondPoint[2]);
+    if (!m_MeshContainer->PickedPointIsValid()) {
+      auto value = "------";
+      sprintf(x1, "%s", value);
+      sprintf(y1, "%s", value);
+      sprintf(z1, "%s", value);
+      sprintf(x2, "%s", value);
+      sprintf(y2, "%s", value);
+      sprintf(z2, "%s", value);
+      // [TODO:DaveP] This clears the display. Figure out how to do this using events?
+      //QMessageBox::warning(QApplication::activeWindow(), "Purkinje Network Tool", "The selected point is not on the selected face.");
+    } else {
+      sprintf(x1, "%g", firstPoint[0]);
+      sprintf(y1, "%g", firstPoint[1]);
+      sprintf(z1, "%g", firstPoint[2]);
+      sprintf(x2, "%g", secondPoint[0]);
+      sprintf(y2, "%g", secondPoint[1]);
+      sprintf(z2, "%g", secondPoint[2]);
+    }
 
   } else {
     sprintf(x1, "%s", " ");
@@ -1094,5 +1142,4 @@ void sv4guiPurkinjeNetworkEdit::UpdateStartPointSelection()
   ui->secondPointZLineEdit->setText(QString::fromStdString(z2));
 
   MITK_INFO << msg << "done"; 
-
 }

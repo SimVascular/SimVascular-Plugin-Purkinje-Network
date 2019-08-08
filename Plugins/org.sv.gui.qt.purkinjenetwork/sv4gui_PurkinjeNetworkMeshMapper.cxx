@@ -39,20 +39,39 @@
 
 #include "sv_polydatasolid_utils.h"
 
+#include <QMessageBox>
+
 sv4guiPurkinjeNetworkMeshMapper::sv4guiPurkinjeNetworkMeshMapper()
 {
   //m_SphereActor = nullptr;
+  m_point1[0] = 0.0;
+  m_point1[1] = 0.0;
+  m_point1[2] = 0.0;
+
+  m_point2[0] = 0.0;
+  m_point2[1] = 0.0;
+  m_point2[2] = 0.0;
 }
 
 sv4guiPurkinjeNetworkMeshMapper::~sv4guiPurkinjeNetworkMeshMapper()
 {
 }
 
-
 //-------------------------
 // GenerateDataForRenderer
 //-------------------------
 // Generate the data needed for rendering into renderer.
+//
+// This method is called when anything happens in the graphics window
+//   - rotate 
+//   - translate, 
+//   - pick.
+//
+// [TODO:DaveP] Why is this called all the time? 
+//
+//  When just clicking in the graphics window it is called 22 times! 
+//
+//  This is also leaking memory.
 //
 void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
@@ -77,15 +96,15 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     return;
   }
 
-  sv4guiPurkinjeNetworkMeshContainer* meshContainer = 
-    static_cast< sv4guiPurkinjeNetworkMeshContainer* >( node->GetData() );
+  sv4guiPurkinjeNetworkMeshContainer* meshContainer = static_cast< sv4guiPurkinjeNetworkMeshContainer* >( node->GetData() );
   if (meshContainer == NULL) {
     local_storage->m_PropAssembly->VisibilityOff();
     return;
   }
 
   // [DaveP] Do we need to remove?
-  // local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
+  // If this is called then no mesh is displayed.
+  //local_storage->m_PropAssembly->GetParts()->RemoveAllItems();
 
   //local_storage->m_PropAssembly->VisibilityOn();
 
@@ -98,6 +117,7 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   //MITK_INFO << msgPrefix << "##### selectedFaceIndex: " << selectedFaceIndex; 
 
   if (surfaceMesh != NULL && m_newMesh) {
+    MITK_INFO << msgPrefix << ">>>>>>>> new mesh <<<<<<<<<< "; 
     auto polyMesh = surfaceMesh->GetSurfaceMesh();
     vtkPolyData* geom = polyMesh.GetPointer();
     if (geom == nullptr) {
@@ -158,6 +178,7 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
   // pickable to select faces and points.
   //
   } else {
+    //MITK_INFO << msgPrefix << "##### set selected face color "; 
     std::vector<vtkSmartPointer<vtkActor>> faceActors = GetFaceActors(renderer);
     for (int i = 0; i < faceActors.size(); ++i) { 
       if (selectedFaceIndex == i) { 
@@ -212,18 +233,23 @@ void sv4guiPurkinjeNetworkMeshMapper::GenerateDataForRenderer(mitk::BaseRenderer
     }
 
     // Find closest face and move point to closest vertex on that face.
+    //
     auto validPoint = this->findClosestFace(meshContainer, facePolyData, point);
+    meshContainer->SetValidPickedPoint(validPoint);
 
     // Show picked point.
-    m_SphereActor = createSphereActor(point);
-    local_storage->m_PropAssembly->AddPart(m_SphereActor);
-    m_LineActor = createLineActor();
-    local_storage->m_PropAssembly->AddPart(m_LineActor);
-    meshContainer->SetNetworkPoints(m_point1, m_point2);
-  }
+    //
+    if (validPoint) {
+      m_SphereActor = createSphereActor(point);
+      local_storage->m_PropAssembly->AddPart(m_SphereActor);
+      m_LineActor = createLineActor();
+      local_storage->m_PropAssembly->AddPart(m_LineActor);
+      meshContainer->SetNetworkPoints(m_point1, m_point2);
+    }
 
   // Update GUI.
   meshContainer->InvokeEvent( sv4guiPurkinjeNetworkMeshSelectStartPointFaceEvent() );
+  }
 
   local_storage->m_PropAssembly->VisibilityOn();
 }

@@ -75,29 +75,37 @@ def run(**kwargs):
             param.l_segment = float(value)
         else:
             logger.error("Unknown parameter name %s" % key)
-            return
+            return None
     #_for key, value in kwargs.items()
 
     if infile == None:
         logger.error("No input file name given.")
-        return 
+        return None
 
     if outfile == None:
         logger.error("No output file name given.")
-        return 
+        return None
 
     if init_node == None:
         logger.error("No initial node given.")
-        return 
+        return None
 
     if second_node == None:
         logger.error("No second node given.")
-        return 
+        return None
 
     ## Calculate the fractal tree.
-    branches, nodes = Fractal_Tree_3D(param)
+    branches, nodes, ien = Fractal_Tree_3D(param)
+    logger.info("Number of nodes generated: %d" % len(nodes.nodes))
+    logger.info("Number of segments generated: %d" % len(ien))
+    result = "Network: num_nodes=%d num_segs=%d\n" % (len(nodes.nodes), len(ien))
+    return result 
 
 if __name__ == '__main__':
     args, print_help = parse_args()
-    run(**vars(args))
+    result = run(**vars(args))
+    status = 0
+    if not result:
+        status = 1
+    sys.exit(status)
 

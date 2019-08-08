@@ -50,11 +50,14 @@ sv4guiPurkinjeNetworkMeshContainer::sv4guiPurkinjeNetworkMeshContainer()
   hoverPoint.push_back(0.0);
   m_SelectedFaceIndex = -1;
   m_NewPickedPoint = false;
+  m_ValidPickedPoint = false;
   m_FirstPointDefined = false;
   m_SecondPointDefined = false;
+
   for (int i = 0; i < 3; i++) {
     m_FirstPoint[i] = 0.0;
     m_SecondPoint[i] = 0.0;
+    m_currentPickedPoint[i] = 0.0;
   }
 }
 
@@ -214,6 +217,16 @@ void sv4guiPurkinjeNetworkMeshContainer::SetPickedPoint(mitk::Point3D& point)
 { 
   m_currentPickedPoint = point; 
   m_NewPickedPoint = true;
+}
+
+void sv4guiPurkinjeNetworkMeshContainer::SetValidPickedPoint(bool validPoint)
+{
+  m_ValidPickedPoint = validPoint;
+}
+
+bool sv4guiPurkinjeNetworkMeshContainer::PickedPointIsValid()
+{
+  return m_ValidPickedPoint;
 }
 
 bool sv4guiPurkinjeNetworkMeshContainer::HaveNewNetworkPoints(bool reset)

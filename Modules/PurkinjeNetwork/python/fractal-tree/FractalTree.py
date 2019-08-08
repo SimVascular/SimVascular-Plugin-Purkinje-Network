@@ -116,5 +116,5 @@ def Fractal_Tree_3D(param):
         np.savetxt(param.output_file_name +'_xyz.txt',xyz)
         np.savetxt(param.output_file_name +'_endnodes.txt',nodes.end_nodes,fmt='%d')
 
-    return branches,nodes
+    return branches, nodes, ien
 
