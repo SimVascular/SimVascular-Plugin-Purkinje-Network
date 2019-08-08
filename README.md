@@ -47,8 +47,8 @@ For a detailed discussion of the algorithm used to generate the Purkinje network
 The Purkinje Plugin code is under active developement. The current known issues and limitations are
 ```
 1) SimVascular does not record that the plugin was added to a project. Therefore the plugin must be added to the project each time a project is opened. The project **Purkinje-Network** directory is saved between project sessions.
-2) If the **Purkinje Network** tool is added to a project before a mesh is loaded the tool does not know there is a mesh and will not work. 
-3) The **Purkinje Network** tool does not know if the mesh changes. If the mesh is changed then the project must be saved and then reopened.
+2) If the Purkinje Network tool is added to a project before a mesh is loaded the tool does not know there is a mesh and will not work. 
+3) The Purkinje Network tool does not know when the mesh changes. If the mesh is changed then the project must be saved and then reopened.
 ```
 
 ## Building the Purkinje Plugin Shared Libraries
