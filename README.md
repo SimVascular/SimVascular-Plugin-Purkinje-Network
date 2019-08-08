@@ -41,6 +41,14 @@ FACENAME_xyz.txt - Network node coordinates.
 
 For a detailed discussion of the algorithm used to generate the Purkinje network see [[1]](#References).
 
+## Known Issues
+The Purkinje Plugin code is under active developement. The current known issues and limitations are
+```
+1) SimVascular does not record that the plugin was added to a project. Therefore the plugin must be added to the project each time a project is opened. The project **Purkinje-Network** directory is saved between project sessions.
+2) If the **Purkinje Network** tool is added to a project before a mesh is loaded the tool does not know there is a mesh and will not work. 
+3) The **Purkinje Network** tool does not know if the mesh changes. If the mesh is changed then the project must be saved and then reopened.
+```
+
 ## Building the Purkinje Plugin Shared Libraries
 The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a local SimVascular build so a SimVascular local build must be present. The Purkinje Plugin is built from source using the following steps
 
