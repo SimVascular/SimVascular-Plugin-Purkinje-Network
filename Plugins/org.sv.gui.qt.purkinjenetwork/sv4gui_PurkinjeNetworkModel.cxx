@@ -103,10 +103,15 @@ bool sv4guiPurkinjeNetworkModel::GenerateNetwork(const std::string outputPath)
   MITK_INFO << msgPrefix << "Execute cmd " << cmd;
   auto error = PyRun_SimpleString(cmd.c_str());
   MITK_INFO << msgPrefix << "Done!";
-  MITK_INFO << msgPrefix << "Error: " << error;
+
+  if (error != 0) {
+    MITK_WARN << msgPrefix << "Error: " << error;
+    return false;
+  }
 
   // Set the name of the file containing the network of 1D elements.
   this->networkFileName = outputPath + "/" + this->name + ".vtu";
+  return true;
 }
 
 //---------------

@@ -79,8 +79,7 @@ void sv4guiPurkinjeNetworkInteractor::SelectPoint(mitk::StateMachineAction*, mit
   MITK_INFO << msgPrefix; 
 
   // Get the mesh container storing mesh data.
-  sv4guiPurkinjeNetworkMeshContainer* meshContainer =
-        static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
+  sv4guiPurkinjeNetworkMeshContainer* meshContainer = static_cast< sv4guiPurkinjeNetworkMeshContainer* >( GetDataNode()->GetData() );
   if (meshContainer == NULL) {
       return;
   }
@@ -91,8 +90,7 @@ void sv4guiPurkinjeNetworkInteractor::SelectPoint(mitk::StateMachineAction*, mit
   }
 
   // Get the position event.
-  const mitk::InteractionPositionEvent* positionEvent = 
-    dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL) {
     return;
   }
