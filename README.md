@@ -29,6 +29,8 @@ The parameters used to generated the network are
 - Repulsive parameter - Regulates the branch curvature: the larger the repulsion parameter, the more the branches repel each other.
 - Branch segment length - Approximate length of the segments that compose one branch (the length of a branch is random).
 
+The parameter values set in the GUI can be saved to a text file by selecting the **Export Paramters** button. The GUI parameter values can be set from a file by selecting the **Load Paramters** button. Example parameter files can be found in the repository's **example-projects/purkinje-network-ideal-heart/parameter-files** directory.
+
 The  **Purkinje Network** tool writes files to the SimVascular project **Purkinje-Network** directory. The files are prefixed with a face name. The following files are created for each network
 
 ```
