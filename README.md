@@ -6,6 +6,7 @@ This is the repository for the SimCardio project. The project currently contains
 # Purkinje Plugin
 The Purkinje Plugin is a custom SimVascular plugin used to create a Purkinje network on a surface model of the heart. When loaded into SimVascular the Purkinje Plugin adds a **Purkinje Network** tool to the SimVascular menu bar. 
 
+### Work flow
 A geometric model of a heart is first created using SimVascular **Paths**, **Segmentations** and **Models** tools. The geometric model may also be imported using the **Models** tool. Model faces are extracted and assigned names and types (cap or wall) using the **Models** tool. The **Meshes** tool is then used to create a finite element tetrehedral mesh of the geometric model. The triangular surfaces of this mesh are identified with the model faces named in the **Models** tool.
 
 When the **Purkinje Network** tool is activated it displays the triangular surfaces of the mesh. A Purkinje network is created using the **Purkinje Network** tool using the following steps
@@ -17,6 +18,7 @@ When the **Purkinje Network** tool is activated it displays the triangular surfa
 5) Display the network
 ```
 
+### Parameters
 The Purkinje network is generated using a Python script. The input to the script is a triangular surface, a network starting point, a second point defining the direction of the first network branch, and the parameters used to control the shape of the network.
 
 The parameters used to generated the network are 
@@ -29,6 +31,9 @@ The parameters used to generated the network are
 - Repulsive parameter - Regulates the branch curvature: the larger the repulsion parameter, the more the branches repel each other.
 - Branch segment length - Approximate length of the segments that compose one branch (the length of a branch is random).
 
+The parameter values set in the GUI can be saved to a text file by selecting the **Export Paramters** button. The GUI parameter values can be set from a file by selecting the **Load Paramters** button. Example parameter files can be found in the repository's **example-projects/purkinje-network-ideal-heart/parameter-files** directory.
+
+### Output
 The  **Purkinje Network** tool writes files to the SimVascular project **Purkinje-Network** directory. The files are prefixed with a face name. The following files are created for each network
 
 ```
@@ -40,6 +45,15 @@ FACENAME_xyz.txt - Network node coordinates.
 ```
 
 For a detailed discussion of the algorithm used to generate the Purkinje network see [[1]](#References).
+
+### Known Issues
+The Purkinje Plugin code is under active developement. The current known issues and limitations are
+```
+1) SimVascular does not record that the plugin was added to a project. Therefore the plugin must be added to the project each time a project is opened. The project **Purkinje-Network** directory is saved between project sessions.
+2) If the Purkinje Network tool is added to a project before a mesh is loaded the tool does not know there is a mesh and will not work. 
+3) The Purkinje Network tool does not know when the mesh changes. If the mesh is changed then the project must be saved and then reopened.
+4) There is no error reporting from the Python script. Users must check the console window for errors.
+```
 
 ## Building the Purkinje Plugin Shared Libraries
 The shared libraries defining a SimVascular custom plugin are built from the Purkinje Plugin project source using CMake. The Purkinje Plugin CMake code uses CMake macros from the SimVascular project and the CMake.config file from a local SimVascular build so a SimVascular local build must be present. The Purkinje Plugin is built from source using the following steps
