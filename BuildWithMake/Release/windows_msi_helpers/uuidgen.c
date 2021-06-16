@@ -29,34 +29,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SV4GUI_PURKINJENETWORKFOLDER_H
-#define SV4GUI_PURKINJENETWORKFOLDER_H
+#define _OLEAUT32_
 
-#include "SimVascular.h"
+#include <stdio.h>
+#include <unknwn.h>
 
-#include "sv4guiModulePurkinjeNetworkExports.h"
+GUID guid;
+WORD* wstrGUID[100];
+char strGUID[100];
+int count, i;
 
-#include "sv4gui_DataFolder.h"
-
-#include "mitkBaseData.h"
-
-class SV4GUIMODULEPURKINJENETWORK_EXPORT sv4guiPurkinjeNetworkFolder : public sv4guiDataFolder
-{
-public:
-
-    mitkClassMacro(sv4guiPurkinjeNetworkFolder, sv4guiDataFolder);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-protected:
-
-    mitkCloneMacro(Self);
-
-    sv4guiPurkinjeNetworkFolder();
-    sv4guiPurkinjeNetworkFolder(const sv4guiPurkinjeNetworkFolder &other);
-    virtual ~sv4guiPurkinjeNetworkFolder();
-
-};
-
-
-#endif // SV4GUI_PURKINJENETWORKFOLDER_H
+int main (int argc, char* argv[]) {
+  if (argc != 2) {
+    fprintf (stderr, "SYNTAX: UUIDGEN <number-of-GUIDs-to-generate>\n");
+    return 1;
+    }
+  count = atoi (argv[1]);
+  for (i = 0; i < count; i++) {
+    CoCreateGuid (&guid);
+    StringFromCLSID (&guid, wstrGUID);
+    WideCharToMultiByte (CP_ACP, 0, *wstrGUID, -1, strGUID, MAX_PATH, NULL, NULL);
+    printf ("%s\n", strGUID);
+    }
+  return 0;
+}

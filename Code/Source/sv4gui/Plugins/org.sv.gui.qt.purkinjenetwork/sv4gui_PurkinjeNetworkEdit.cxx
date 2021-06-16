@@ -395,7 +395,7 @@ bool sv4guiPurkinjeNetworkEdit::Initialize()
     mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(PurkinjeNetwork_NODE_NAME);
     if (!node) {
       QString folderName = QString(PurkinjeNetwork_NODE_NAME.c_str());
-      node = svProj.CreateDataFolder<PurkinjeNetworkFolder>(m_DataStorage, folderName, projFolderNode);
+      node = svProj.CreateDataFolder<sv4guiPurkinjeNetworkFolder>(m_DataStorage, folderName, projFolderNode);
     }
     m_PurkinjeNetworkNode = node;
   }

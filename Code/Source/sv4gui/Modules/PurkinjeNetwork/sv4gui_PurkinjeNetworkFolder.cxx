@@ -29,34 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SV4GUI_PURKINJENETWORKFOLDER_H
-#define SV4GUI_PURKINJENETWORKFOLDER_H
+#include "sv4gui_PurkinjeNetworkFolder.h"
 
-#include "SimVascular.h"
+sv4guiPurkinjeNetworkFolder::sv4guiPurkinjeNetworkFolder() {
+}
 
-#include "sv4guiModulePurkinjeNetworkExports.h"
+sv4guiPurkinjeNetworkFolder::sv4guiPurkinjeNetworkFolder(const sv4guiPurkinjeNetworkFolder &other) : sv4guiDataFolder(other) {
+}
 
-#include "sv4gui_DataFolder.h"
-
-#include "mitkBaseData.h"
-
-class SV4GUIMODULEPURKINJENETWORK_EXPORT sv4guiPurkinjeNetworkFolder : public sv4guiDataFolder
-{
-public:
-
-    mitkClassMacro(sv4guiPurkinjeNetworkFolder, sv4guiDataFolder);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-protected:
-
-    mitkCloneMacro(Self);
-
-    sv4guiPurkinjeNetworkFolder();
-    sv4guiPurkinjeNetworkFolder(const sv4guiPurkinjeNetworkFolder &other);
-    virtual ~sv4guiPurkinjeNetworkFolder();
-
-};
-
-
-#endif // SV4GUI_PURKINJENETWORKFOLDER_H
+sv4guiPurkinjeNetworkFolder::~sv4guiPurkinjeNetworkFolder() {
+}
