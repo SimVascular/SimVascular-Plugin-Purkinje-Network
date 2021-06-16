@@ -733,6 +733,7 @@ sv4guiMesh* sv4guiPurkinjeNetworkEdit::LoadNetwork(std::string fileName)
   } else {
     showNetwork(false);
   }
+  return  m_SurfaceNetworkMesh;
 }
 
 void sv4guiPurkinjeNetworkEdit::SelectMesh()

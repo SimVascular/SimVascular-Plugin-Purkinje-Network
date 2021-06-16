@@ -178,6 +178,9 @@ std::vector<mitk::BaseData::Pointer> sv4guiPurkinjeNetworkIO::ReadFile(std::stri
     result.push_back(path.GetPointer());
     return result;
 */
+  // this is returning an empty result, maybe bad to do this???
+    std::vector<mitk::BaseData::Pointer> result;
+    return result;
 }
 
 mitk::IFileIO::ConfidenceLevel sv4guiPurkinjeNetworkIO::GetReaderConfidenceLevel() const

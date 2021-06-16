@@ -172,6 +172,7 @@ bool sv4guiPurkinjeNetworkModel::WriteMesh(const std::string fileName)
   writer->SetFileName(fileName.c_str());
   writer->SetInputData(this->meshPolyData);
   writer->Write();
+  return true;
 }
 
 //-----------------
@@ -182,5 +183,5 @@ bool sv4guiPurkinjeNetworkModel::WriteMesh(const std::string fileName)
 bool sv4guiPurkinjeNetworkModel::WriteParameters(const std::string fileName, 
     std::map<std::string, std::string>& params)
 {
-
+   return true;
 }
