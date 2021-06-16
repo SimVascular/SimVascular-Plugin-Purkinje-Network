@@ -18,7 +18,7 @@ export LD_LIBRARY_PATH=$PWD/build/lib/
 #
 #   2) Add: 
 #
-#        export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/:
+#        export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/SimCardio/Code/Source/sv4gui/Modules/PurkinjeNetwork/python/fractal-tree/:
 #
 #      after: 
 #
