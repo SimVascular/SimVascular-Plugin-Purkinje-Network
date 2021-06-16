@@ -54,13 +54,13 @@ message(STATUS "[CMakeLists] SimVascular_USE_EXTERNALS_FILE '${SimVascular_USE_E
 include(${SimVascular_USE_EXTERNALS_FILE})
 
 include_directories(
-  "${CMAKE_SOURCE_DIR}/Modules/PurkinjeNetwork"
-  "${CMAKE_BINARY_DIR}/Modules/PurkinjeNetwork"
-  "${CMAKE_SOURCE_DIR}/Plugins/${PLUGIN_NAME}"
-  "${CMAKE_BINARY_DIR}/Plugins/${PLUGIN_NAME}"
+  "${CMAKE_SOURCE_DIR}/Code/Source/sv4gui/Modules/PurkinjeNetwork"
+  "${CMAKE_BINARY_DIR}/Code/Source/sv4gui/Modules/PurkinjeNetwork"
+  "${CMAKE_SOURCE_DIR}/Code/Source/sv4gui/Plugins/${PLUGIN_NAME}"
+  "${CMAKE_BINARY_DIR}/Code/Source/sv4gui/Plugins/${PLUGIN_NAME}"
   )
 
-add_subdirectory("${CMAKE_SOURCE_DIR}/Modules/PurkinjeNetwork")
-add_subdirectory("${CMAKE_SOURCE_DIR}/Plugins/${PLUGIN_NAME}")
+add_subdirectory("${CMAKE_SOURCE_DIR}/Code/Source/sv4gui/Modules/PurkinjeNetwork")
+add_subdirectory("${CMAKE_SOURCE_DIR}/Code/Source/sv4gui/Plugins/${PLUGIN_NAME}")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Distribution")
 

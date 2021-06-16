@@ -85,7 +85,7 @@ In the $PROJECT_DIR/SimVascular/build/SimVascular-build/sv script
 
    2) Add: 
 
-        export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/SimCardio/Modules/PurkinjeNetwork/python/fractal-tree/:
+        export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/SimCardio/Code/Source/sv4gui/Modules/PurkinjeNetwork/python/fractal-tree/:
 
       after: 
 
