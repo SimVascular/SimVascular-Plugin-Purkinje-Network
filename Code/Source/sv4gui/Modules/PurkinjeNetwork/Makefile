@@ -30,9 +30,12 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-TOP=../../../../../BuildWithMake
+TOP=$(SV_TOP)
+PURKINJENETWORK_PLUGIN_TOP=../../../../../BuildWithMake
+TARGETLIB_TOP=$(PURKINJENETWORK_PLUGIN_TOP)
 
 include $(TOP)/include.mk
+include $(PURKINJENETWORK_PLUGIN_TOP)/include.purkinjenetwork.mk
 
 CXXFLAGS = $(GLOBAL_CXXFLAGS) \
 	   $(LOCAL_INCDIR) \
@@ -41,31 +44,42 @@ CXXFLAGS = $(GLOBAL_CXXFLAGS) \
            $(PYTHON_INCDIR) \
            $(QT_INCDIRS) $(QT_DEFS) \
 	   $(ITK_INCDIRS) \
-           $(MITK_INCDIRS) $(MITK_DEFS)
+           $(MITK_INCDIRS) $(MITK_DEFS) \
+           $(VMTK_INCDIR) \
+	   $(SV_MMG_INCDIR) \
+           $(PURKINJENETWORK_INCDIR)
 
-MODULE_NAME = sv4guiModuleImageProcessing
-MODULE_NAME_ALL_CAPS = SV4GUIMODULEIMAGEPROCESSING
+MODULE_NAME = sv4guiModulePurkinjeNetwork
+MODULE_NAME_ALL_CAPS = SV4GUIMODULEPURKINJENETWORK
 CXXFLAGS += -D$(MODULE_NAME)_EXPORTS
-
 CXXFLAGS += -DUS_MODULE_NAME="$(MODULE_NAME)"
 
-HDRS	= sv4gui_ImageProcessingUtils.h
+HDRS	= \
+    sv4gui_PurkinjeNetworkIO.h \
+    sv4gui_PurkinjeNetworkUtils.h \
+    sv4gui_PurkinjeNetwork.h \
+    sv4gui_PurkinjeNetworkFolder.h
 
-CXXSRCS	= sv4gui_ImageProcessingUtils.cxx
+CXXSRCS	= \
+    sv4gui_PurkinjeNetworkIO.cxx \
+    sv4gui_PurkinjeNetworkUtils.cxx \
+    sv4gui_PurkinjeNetwork.cxx \
+    sv4gui_PurkinjeNetworkFolder.cxx
 
 CXXSRCS += us_init.cxx
 
 UIFILES =
 
-SV_APPEND_CPPMICROSERVICES_TO_DLL = 1
-
+#SV_APPEND_CPPMICROSERVICES_TO_DLL = 1
 RCFILES = \
-    resource/Interactions/seedConfig.xml \
-    resource/Interactions/seedInteraction.xml
+   resource/Interactions/meshConfig.xml \
+   resource/Interactions/meshInteraction.xml
 
 QRCFILES =
 
 CXXSRCS += $(addprefix moc_,$(HDRS:.h=.cxx))
+
+CXXSRCS += $(addprefix ui_,$(UIFILES:.ui=.cxx))
 
 CXXSRCS += $(addprefix rcc_,$(notdir $(QRCFILES:.qrc=.cxx)))
 
@@ -73,18 +87,37 @@ DLLHDRS =
 
 DLLSRCS =
 
+# these DLLLIBS came from Segmentation and can probably be cleaned up
+# significantly!
+
 DLLLIBS += $(PYTHON_LIB) $(VTK_LIBS) $(ITK_LIBS) $(QT_LIBS) $(MITK_LIBS)
 
 DLLLIBS += \
           $(SVLIBFLAG)$(SV_LIB_MODULE_COMMON_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_PATH_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_SEGMENTATION_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_MODEL_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_VTKSVCOMMON_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_VTKSVNURBS_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_POLYDATA_SOLID_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_SOLID_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_ITK_LSET_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_REPOSITORY_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_GEOM_NAME)$(LIBLINKEXT) \
-          $(SVLIBFLAG)$(SV_LIB_PATH_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_UTILS_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_GLOBALS_NAME)$(LIBLINKEXT) \
-          $(SVLIBFLAG)$(SV_LIB_VTKSVBOOLEAN_NAME)$(LIBLINKEXT)
+          $(SVLIBFLAG)$(SV_LIB_SEGMENTATION_NAME)$(LIBLINKEXT)
 
-TARGET_LIB_NAME = $(SV_LIB_MODULE_IMAGEPROCESSING_NAME)
+ifeq ($(SV_USE_VMTK),1)
+	DLLLIBS += $(SVLIBFLAG)$(SV_LIB_VMTK_UTILS_NAME)$(LIBLINKEXT)
+	DLLLIBS += $(SVLIBFLAG)$(SV_LIB_THIRDPARTY_VMTK_NAME)$(LIBLINKEXT)
+	DLLLIBS += $(SV_MMG_LIBS)
+endif
+
+ifeq ($(SV_USE_MMG),1)
+	DLLLIBS += $(SVLIBFLAG)$(SV_LIB_MMG_MESH_NAME)$(LIBLINKEXT)
+endif
+
+TARGET_LIB_NAME = $(SV_LIB_MODULE_PURKINJENETWORK_NAME)
 
 include $(TOP)/targetlib.mk

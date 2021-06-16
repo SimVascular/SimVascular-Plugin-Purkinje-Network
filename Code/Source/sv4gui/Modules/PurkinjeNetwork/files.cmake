@@ -38,6 +38,7 @@ set(H_FILES
 set(CPP_FILES
     sv4gui_PurkinjeNetworkIO.cxx
     sv4gui_PurkinjeNetworkUtils.cxx
+    sv4gui_PurkinjeNetworkFolder.cxx
     sv4gui_PurkinjeNetwork.cxx
 )
 

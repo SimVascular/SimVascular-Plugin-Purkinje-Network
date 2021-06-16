@@ -30,62 +30,80 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-TOP=../../../../../BuildWithMake
+# need to set to build!
+# SV_TOP: set environment variable "SV_TOP" to point to core SV build "BuildWithMake" directory!
 
+# need to set before running executable at command line
+# SV_PLUGIN_PATH: location for modules and shared objects (: separated linux, ; separated windows)
+# SV_CUSTOM_PLUGINS: location for qt plugins (: separated linux, ; separated windows)
+
+TOP=$(SV_TOP)
+PURKINJENETWORK_PLUGIN_TOP=../../../../../BuildWithMake
+TARGETLIB_TOP=$(PURKINJENETWORK_PLUGIN_TOP)
 include $(TOP)/include.mk
+include $(PURKINJENETWORK_PLUGIN_TOP)/include.purkinjenetwork.mk
 
 CXXFLAGS = $(GLOBAL_CXXFLAGS) \
 	   $(LOCAL_INCDIR) \
 	   $(VTK_INCDIRS) \
 	   $(TCLTK_INCDIR) \
            $(PYTHON_INCDIR) \
-           $(ZLIB_INCDIR) \
-           $(TETGEN_INCDIR) \
            $(QT_INCDIRS) $(QT_DEFS) \
 	   $(ITK_INCDIRS) \
            $(MITK_INCDIRS) $(MITK_DEFS) \
-           $(MESHSIM_INCDIR) \
-           $(PARASOLID_INCDIR) \
-           -Dorg_sv_gui_qt_meshing_EXPORTS \
-           -DUS_MODULE_NAME=sv4guiModuleMeshing
+           -Dorg_sv_gui_qt_purkinjenetwork_EXPORTS \
+          -DUS_MODULE_NAME=sv4guiModulePurkinjenetwork
 
-ifeq ($(SV_USE_OPENCASCADE_QT_GUI),1)
-    CXXFLAGS += $(OPENCASCADE_INCDIR)
-endif
+CXXFLAGS += -I../../Modules/PurkinjeNetwork
 
 HDRS	= \
-    sv4gui_MeshCreate.h \
-    sv4gui_MeshCreateAction.h \
-    sv4gui_MeshEdit.h \
+    sv4gui_PurkinjeNetworkCreate.h \
+    sv4gui_PurkinjeNetworkCreateAction.h \
+    sv4gui_PurkinjeNetworkEdit.h \
     sv4gui_LocalTableDelegate.h \
-    sv4gui_MeshLegacySaveAction.h \
-    sv4gui_MeshLoadSurfaceAction.h \
-    sv4gui_MeshLoadVolumeAction.h \
-    sv4gui_MeshingPluginActivator.h
+    sv4gui_PurkinjeNetworkLegacySaveAction.h \
+    sv4gui_PurkinjeNetworkLoadSurfaceAction.h \
+    sv4gui_PurkinjeNetworkLoadVolumeAction.h \
+    sv4gui_PurkinjeNetworkPluginActivator.h \
+    sv4gui_PurkinjeNetworkMeshContainer.h \
+    sv4gui_PurkinjeNetworkMeshMapper.h \
+    sv4gui_PurkinjeNetworkInteractor.h \
+    sv4gui_PurkinjeNetwork1DMapper.h \
+    sv4gui_PurkinjeNetwork1DContainer.h \
+    sv4gui_PurkinjeNetworkModel.h
 
-CXXSRCS	= \
-    sv4gui_MeshCreate.cxx \
-    sv4gui_MeshCreateAction.cxx \
-    sv4gui_MeshEdit.cxx \
-    sv4gui_VtkMeshSphereWidget.cxx \
+CXXSRCS	=  \
+    sv4gui_PurkinjeNetworkCreate.cxx \
+    sv4gui_PurkinjeNetworkCreateAction.cxx \
+    sv4gui_PurkinjeNetworkEdit.cxx \
+    sv4gui_VtkPurkinjeNetworkSphereWidget.cxx \
     sv4gui_LocalTableDelegate.cxx \
-    sv4gui_MeshLegacySaveAction.cxx \
-    sv4gui_MeshLoadSurfaceAction.cxx \
-    sv4gui_MeshLoadVolumeAction.cxx \
-    sv4gui_MeshingPluginActivator.cxx
+    sv4gui_PurkinjeNetworkLegacySaveAction.cxx \
+    sv4gui_PurkinjeNetworkLoadSurfaceAction.cxx \
+    sv4gui_PurkinjeNetworkLoadVolumeAction.cxx \
+    sv4gui_PurkinjeNetworkPluginActivator.cxx \
+    sv4gui_PurkinjeNetworkMeshContainer.cxx \
+    sv4gui_PurkinjeNetworkMeshMapper.cxx \
+    sv4gui_PurkinjeNetworkInteractor.cxx \
+    sv4gui_PurkinjeNetwork1DMapper.cxx \
+    sv4gui_PurkinjeNetwork1DContainer.cxx \
+    sv4gui_PurkinjeNetworkModel.cxx
 
 UIFILES = \
-    sv4gui_MeshCreate.ui \
-    sv4gui_MeshEdit.ui
+    sv4gui_PurkinjeNetworkCreate.ui \
+    sv4gui_PurkinjeNetworkEdit.ui
 
-QRCFILES = org_sv_gui_qt_meshing_manifest.qrc \
-           org_sv_gui_qt_meshing_cached.qrc
+QRCFILES =
+
+QRCFILES += org_sv_gui_qt_purkinjenetwork_manifest.qrc \
+            org_sv_gui_qt_purkinjenetwork_cached.qrc
 
 RCFILES = \
-  plugin.xml \
-  resources/mesh.png
+    plugin.xml \
+    resources/purkinje_network.png
 
-CXXSRCS += $(addprefix moc_,$(notdir $(HDRS:.h=.cxx)))
+CXXSRCS += $(addprefix moc_,$(HDRS:.h=.cxx))
+
 CXXSRCS += $(addprefix qrc_,$(notdir $(QRCFILES:.qrc=.cxx)))
 
 DLLHDRS =
@@ -98,44 +116,58 @@ DLLLIBS +=  \
           $(SVLIBFLAG)$(SV_PLUGIN_DATAMANAGER_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_COMMON_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_SEGMENTATION_NAME)$(LIBLINKEXT) \
-          $(SVLIBFLAG)$(SV_LIB_MODULE_MESH_NAME)$(LIBLINKEXT) \
-          $(SVLIBFLAG)$(SV_LIB_MODULE_MODEL_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_PATH_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_PROJECTMANAGEMENT_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_MESH_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_MODEL_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_MODULE_QTWIDGETS_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_ITK_LSET_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_REPOSITORY_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_GEOM_NAME)$(LIBLINKEXT) \
           $(SVLIBFLAG)$(SV_LIB_UTILS_NAME)$(LIBLINKEXT) \
-          $(SVLIBFLAG)$(SV_LIB_GLOBALS_NAME)$(LIBLINKEXT)
+          $(SVLIBFLAG)$(SV_LIB_GLOBALS_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_PURKINJENETWORK_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_MODULE_PROJECTMANAGEMENT_NAME)$(LIBLINKEXT) \
+          $(SVLIBFLAG)$(SV_LIB_POLYDATA_SOLID_NAME)$(LIBLINKEXT)
+# $(SVLIBFLAG)$(SV_LIB_MODULE_PATH_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_COMMON_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_SEGMENTATION_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_PURKINJENETWORK_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_MODEL_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_QTWIDGETS_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_PATH_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_COMMON_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_MODEL_NAME)$(LIBLINKEXT) \
+# $(SVLIBFLAG)$(SV_LIB_MODULE_QTWIDGETS_NAME)$(LIBLINKEXT) \
+#
 
-ifeq ($(SV_USE_MESHSIM_DISCRETE_MODEL_QT_GUI),1)
-    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_MESHSIM_DISCRETE_SOLID_NAME)$(LIBLINKEXT)
-endif
-ifeq ($(SV_USE_MESHSIM_SOLID_MODEL_QT_GUI),1)
-    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_MESHSIM_SOLID_NAME)$(LIBLINKEXT)
-endif
-ifeq ($(SV_USE_PARASOLID_QT_GUI),1)
-    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_PARASOLID_SOLID_NAME)$(LIBLINKEXT)
-endif
-ifeq ($(SV_USE_OPENCASCADE_QT_GUI),1)
-    DLLLIBS += $(SVLIBFLAG)$(SV_LIB_OpenCASCADE_SOLID_NAME)$(LIBLINKEXT)
-endif
 
-DLLLIBS += $(PARASOLID_LIBS) $(MESHSIM_LIBS)
+#EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I../../../org.sv.gui.qt.datamanager
 
-ifeq ($(SV_USE_OPENCASCADE_QT_GUI),1)
-    DLLLIBS += $(OPENCASCADE_LIBS)
-endif
+EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I../../../org.sv.gui.qt.datamanager \
+           -I$(MITK_BINDIR)/include/ctk/PluginFramework \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.core.services \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.common \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.application \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.common \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.common.legacy \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.datamanager \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.stdmultiwidgeteditor \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.ext \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.ui.qt \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.ui.qt/application \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.ui.qt/intro \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.core.runtime \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.core.runtime/application \
+           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.core.runtime/registry \
+           -IC:/cygwin64/home/nwilson/gitwork/simvascular/branches/2021-06-12-RC2/Code/Source/sv4gui/Plugins/org.sv.gui.qt.datamanager
 
-EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I../org.sv.gui.qt.datamanager
+TARGET_LIB_NAME = $(SV_PLUGIN_PURKINJENETWORK_NAME)
 
-TARGET_LIB_NAME = $(SV_PLUGIN_MESHING_NAME)
-
-PLUGIN_SYMBOLIC_NAME = org_sv_gui_qt_meshing
-PLUGIN_EXPORTS_NAME = org_sv_gui_qt_meshing
+PLUGIN_SYMBOLIC_NAME = org_sv_gui_qt_purkinjenetwork
+PLUGIN_EXPORTS_NAME = org_sv_gui_qt_purkinjenetwork
 PLUGIN_EXPORTS_PREFIX = SV_QT_
-PLUGIN_NAME = MESHING
+PLUGIN_NAME = PURKINJENETWORK
 
 SV_COPY_DLL_TO_BIN_PLUGINS = 1
 
