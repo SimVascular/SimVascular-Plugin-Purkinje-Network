@@ -142,25 +142,7 @@ DLLLIBS +=  \
 #
 
 
-#EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I../../../org.sv.gui.qt.datamanager
-
-EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I../../../org.sv.gui.qt.datamanager \
-           -I$(MITK_BINDIR)/include/ctk/PluginFramework \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.core.services \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.common \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.application \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.common \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.common.legacy \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.datamanager \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.stdmultiwidgeteditor \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.mitk.gui.qt.ext \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.ui.qt \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.ui.qt/application \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.ui.qt/intro \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.core.runtime \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.core.runtime/application \
-           -I$(MITK_BINDIR)/include/mitk/plugins/org.blueberry.core.runtime/registry \
-           -IC:/cygwin64/home/nwilson/gitwork/simvascular/branches/2021-06-12-RC2/Code/Source/sv4gui/Plugins/org.sv.gui.qt.datamanager
+EXTRA_MOC_INCDIRS = $(MITK_PLUGIN_INCDIRS) -I$(SV_TOP)/../Code/Source/Include  -I../../../org.sv.gui.qt.datamanager
 
 TARGET_LIB_NAME = $(SV_PLUGIN_PURKINJENETWORK_NAME)
 
