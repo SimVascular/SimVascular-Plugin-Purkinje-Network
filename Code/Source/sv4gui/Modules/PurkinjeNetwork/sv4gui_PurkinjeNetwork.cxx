@@ -111,6 +111,7 @@ void sv4guiPurkinjeNetwork::Expand( unsigned int timeSteps )
 unsigned int sv4guiPurkinjeNetwork::GetTimeSize() const
 {
     //return m_PathElementSet.size();
+    return 0; 
 }
 
 int sv4guiPurkinjeNetwork::GetSize( unsigned int t ) const
@@ -121,6 +122,7 @@ int sv4guiPurkinjeNetwork::GetSize( unsigned int t ) const
     else
         return 0;
 */
+   return 0;
 }
 
 /*
@@ -517,4 +519,5 @@ bool Equal( const sv4guiPurkinjeNetwork& leftHandSide, const sv4guiPurkinjeNetwo
     }
     return result;
 */
+    return false;
 }
