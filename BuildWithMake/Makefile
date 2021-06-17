@@ -30,11 +30,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-TOP=$(SV_TOP)
 PURKINJENETWORK_PLUGIN_TOP=.
 
-include $(TOP)/include.mk
-#include $(PURKINJENETWORK_PLUGIN_TOP)/include.purkinjenetwork.mk
+TOP=$(SV_TOP)
+include $(SV_TOP)/include.mk
+include $(PURKINJENETWORK_PLUGIN_TOP)/include.purkinjenetwork.mk
 
 PLUGIN_TOP_DIRS = ../Code/Source/sv4gui/Plugins
 
@@ -54,16 +54,22 @@ common-pre-build:
 	mkdir -p ../Code/Source/Include/Make
 
 shared-pre-build: common-pre-build
-	cd ../Code/Source/sv4gui;$(MAKE) create_exports_h
-	for i in ${PLUGIN_TOP_DIRS}; do ( \
-	  cd $$i; \
-	  $(MAKE) pre-shared-build ) ; done
+ifeq ($(SV_USE_MITK),1)
+	cd ../Code/Source/sv4gui/Modules;$(MAKE) moc qrc ui
+	cd ../Code/Source/sv4gui/Modules;$(MAKE) create_exports_h us-init-module create_cppmicroservices_file
+ifeq ($(SV_USE_SV4_GUI),1)
+	cd ../Code/Source/sv4gui/Plugins;$(MAKE) create_plugin_export_h create_manifest_qrc create_cached_qrc
+	cd ../Code/Source/sv4gui/Plugins;$(MAKE) moc qrc ui
+endif
+endif
 
 shared:
-	cd ../Code/Source/sv4gui/Modules/PurkinjeNetwork;$(MAKE) shared
-	for i in ${PLUGIN_TOP_DIRS}; do ( \
-	  cd $$i; \
-	  $(MAKE) shared ) ; done
+ifeq ($(SV_USE_MITK),1)
+	cd ../Code/Source/sv4gui/Modules;$(MAKE) shared
+ifeq ($(SV_USE_SV4_GUI),1)
+	cd ../Code/Source/sv4gui/Plugins;$(MAKE) shared
+endif
+endif
 
 post-build:
 	-echo "#!/bin/bash -f" > sv-with-purkinjenetwork.sh
@@ -97,16 +103,19 @@ endif
 	-chmod a+rx ./sv-with-purkinjenetwork.sh
 
 clean:
-	for i in ${PLUGIN_TOP_DIRS}; do ( \
-	  cd $$i; \
-	  $(MAKE) clean ) ; done
+ifeq ($(SV_USE_MITK),1)
+ifeq ($(SV_USE_SV4_GUI),1)
+	cd ../Code/Source/sv4gui/Plugins;$(MAKE) clean
+endif
+	cd ../Code/Source/sv4gui/Modules;$(MAKE) clean
+endif
+	for fn in $(PURKINJENETWORK_PLUGIN_TOP)/*~; do /bin/rm -f $$fn;done
+	for fn in $(PURKINJENETWORK_PLUGIN_TOP)/Lib/*; do /bin/rm -f -r $$fn; done
+	for fn in $(PURKINJENETWORK_PLUGIN_TOP)/Bin/*; do /bin/rm -f -r $$fn; done
 	if [ -e sv-with-purkinjenetwork.sh ];then /bin/rm -f sv-with-purkinjenetwork.sh;fi
+	/bin/rm -fR ../Code/Source/Include/Make
 
 veryclean: clean
-	for i in ${PLUGIN_TOP_DIRS}; do ( \
-	  cd $$i; \
-	  $(MAKE) veryclean ) ; done
 	-rm -Rf int
 	-rm -Rf ext
-	-rm -Rf ../Code/Source/Include/Make
 
