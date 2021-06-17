@@ -33,8 +33,8 @@
 #export SV_EXTERNALS_VERSION_NUMBER=2019.02
 export SV_EXTERNALS_VERSION_NUMBER=2019.06
 
-export SV_BUILD_AGAINST_RELEASE_DATE=2021-06-12
-export SV_BUILD_AGAINST_RELEASE_DATE_DOTS=2021.06.12
+export SV_BUILD_AGAINST_RELEASE_DATE=2021-06-16
+export SV_BUILD_AGAINST_RELEASE_DATE_DOTS=2021.06.16
 
 if [ $SV_EXTERNALS_VERSION_NUMBER == '2019.02' ]; then
 
@@ -69,10 +69,10 @@ if [[ -z "${SV_TOP}" ]]; then
 
   pushd $INTERNALS_TOP
     echo "untar simvascular-make-libs-headers-windows..."
-    tar xzf tarfiles/simvascular-make-libs-headers-windows-x64.$SV_BUILD_AGAINST_RELEASE_DATE.tar.gz
+    tar --strip-components=1 -xzf tarfiles/simvascular-make-libs-headers-windows-x64.$SV_BUILD_AGAINST_RELEASE_DATE.tar.gz
   popd
 
-  export SV_TOP=$INTERNALS_TOP/SimVascularLibsAndHeaders/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake
+  export SV_TOP=$INTERNALS_TOP/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake
   export SV_TOP=`cygpath --windows -t mixed $SV_TOP`
   echo "SV_TOP: $SV_TOP"
 
@@ -80,10 +80,10 @@ if [[ -z "${SV_TOP}" ]]; then
   # externals
   #
 
-  source $INTERNALS_TOP/SimVascularLibsAndHeaders/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake/MakeHelpers/2019.06/wget-externals.x64_cygwin.sh
+  source $INTERNALS_TOP/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake/MakeHelpers/2019.06/wget-externals.x64_cygwin.sh
   echo "SV_TIMESTAMP=$SV_BUILD_AGAINST_RELEASE_DATE" >> global_overrides.mk
-  mv cluster_overrides.mk $INTERNALS_TOP/SimVascularLibsAndHeaders/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake
-  mv global_overrides.mk $INTERNALS_TOP/SimVascularLibsAndHeaders/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake
+  mv cluster_overrides.mk $INTERNALS_TOP/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake
+  mv global_overrides.mk $INTERNALS_TOP/$SV_BUILD_AGAINST_RELEASE_DATE/BuildWithMake
 
 fi
 

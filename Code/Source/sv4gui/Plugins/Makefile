@@ -32,8 +32,6 @@
 
 .PHONY: setup
 
-shared-complete: setup pre-shared-build shared
-
 setup:
   # we require a top level SV build directory
   # be set in an env variable and exist
@@ -41,14 +39,18 @@ setup:
     $(error SV_TOP not defined)
   endif
   TOP=$(SV_TOP)
-  PURKINJENETWORK_PLUGIN_TOP=../../../../../BuildWithMake
-  TARGETLIB_TOP=$(PURKINJENETWORK_PLUGIN_TOP)
+  PURKINJENETWORK_PLUGIN_TOP=../../../../BuildWithMake
+  ##TARGETLIB_TOP=$(PURKINJENETWORK_PLUGIN_TOP)
   include $(TOP)/include.mk
-  #include $(PURKINJENETWORK_PLUGIN_TOP)/include.purkinjenetwork.mk
+  include $(PURKINJENETWORK_PLUGIN_TOP)/include.purkinjenetwork.mk
 
 SVQTGUIEXT_DIRS = org.sv.gui.qt.purkinjenetwork
 
-pre-shared-build: create_plugin_export_h create_manifest_qrc create_cached_qrc moc ui qrc
+lib-complete: moc ui qrc lib
+
+static-complete:  create_plugin_export_h create_manifest_qrc create_cached_qrc moc ui qrc static
+
+shared-complete:  create_plugin_export_h create_manifest_qrc create_cached_qrc moc ui qrc shared
 
 lib:
 	@for i in ${SVQTGUIEXT_DIRS}; do ( \
