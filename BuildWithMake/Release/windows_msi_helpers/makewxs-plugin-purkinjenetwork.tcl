@@ -37,6 +37,11 @@ set SV_MAJOR_VER_NO [lindex $argv 5]
 set SV_PLUGIN_MAJOR_VER_NO [lindex $argv 6]
 set SV_PLUGIN_MINOR_VER_NO [lindex $argv 7]
 set SV_PLUGIN_PATCH_VER_NO [lindex $argv 8]
+set TCL_LIBRARY_TAIL [file tail [lindex $argv 9]]
+set TK_LIBRARY_TAIL [file tail [lindex $argv 10]]
+set PYTHON_MAJOR_VERSION [lindex $argv 11]
+set PYTHON_MINOR_VERSION [lindex $argv 12]
+set SV_CMAKE_BUILD_TYPE [lindex $argv 13]
 
 global pwd
 if {$tcl_platform(platform) == "windows"} {
@@ -55,6 +60,11 @@ proc file_find {dir wildcard args} {
   global pwd
   global SV_TIMESTAMP
   global SV_PLUGIN_TIMESTAMP
+  global TCL_LIBRARY_TAIL
+  global TK_LIBRARY_TAIL
+  global PYTHON_MAJOR_VERSION
+  global PYTHON_MINOR_VERSION
+  global SV_CMAKE_BUILD_TYPE
   
   if {[llength $args] == 0} {
      set rtnme {}
@@ -87,9 +97,12 @@ proc file_find {dir wildcard args} {
 	puts $outfp "<RegistryKey Root='HKLM' Key='Software\\WOW6432Node\\SimVascular\\Plugins\\$SV_TIMESTAMP\\Purkinjenetwork\\$SV_PLUGIN_TIMESTAMP\\ENVIRONMENT_VARIABLES'>"
         puts $outfp "  <RegistryValue Type=\"string\" Name='PATH' Value='\[INSTALLDIR\]'  />"
         puts $outfp "  <RegistryValue Type=\"string\" Name='SV_PLUGIN_PATH' Value='\[INSTALLDIR\]' />"
-        puts $outfp "  <RegistryValue Type=\"string\" Name='SV_CUSTOM_PLUGINS' Value='org_sv_gui_qt_purkinjenetwork' />"	
+        puts $outfp "  <RegistryValue Type=\"string\" Name='SV_CUSTOM_PLUGINS' Value='org_sv_gui_qt_purkinjenetwork' />"
+        puts $outfp "  <RegistryValue Type=\"string\" Name='QT_PLUGIN_PATH' Value='\[INSTALLDIR\]qt-plugins' />"
+	puts $outfp "  <RegistryValue Type=\"string\" Name='TCLLIBPATH' Value='\[INSTALLDIR\]Tcl\\$TCL_LIBRARY_TAIL'  />"
+        # must be python 3
+        puts $outfp "  <RegistryValue Type=\"string\" Name='PYTHONPATH' Value='\[INSTALLDIR\]Python\\$PYTHON_MAJOR_VERSION.$PYTHON_MINOR_VERSION\\site-packages' />"
 	puts $outfp "</RegistryKey>"
-
     }
     foreach i $files {
       global outfp
