@@ -52,6 +52,7 @@ class sv4guiPurkinjeNetworkModelParamNames
     sv4guiPurkinjeNetworkModelParamNames() {
       allNames.insert(AvgBranchLength);
       allNames.insert(BranchAngle);
+      allNames.insert(InitialLength);
       allNames.insert(BranchSegLength);
       allNames.insert(FirstPoint);
       allNames.insert(NumBranchGenerations);
@@ -60,6 +61,7 @@ class sv4guiPurkinjeNetworkModelParamNames
     }
     const std::string AvgBranchLength = "avgBranchLength";
     const std::string BranchAngle = "branchAngle";
+    const std::string InitialLength = "initialLength";
     const std::string BranchSegLength = "branchSegLength";
     const std::string FirstPoint = "firstPoint";
     const std::string NumBranchGenerations = "numBranchGenerations";
@@ -89,6 +91,7 @@ class sv4guiPurkinjeNetworkModel
     int numBranchGenerations;
     float avgBranchLength;
     float branchAngle;
+    float initialLength;
     float repulsiveParameter;
     float branchSegLength;
     */

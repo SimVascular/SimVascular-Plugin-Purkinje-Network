@@ -133,6 +133,7 @@ std::string sv4guiPurkinjeNetworkModel::CreateCommand(const std::string infile, 
   //
   auto avg_branch_length = parameterValues[parameterNames.AvgBranchLength];
   auto branch_angle = parameterValues[parameterNames.BranchAngle];
+  auto initial_length = parameterValues[parameterNames.InitialLength];
   auto branch_seg_length = parameterValues[parameterNames.BranchSegLength];
   auto init_node = parameterValues[parameterNames.FirstPoint];
   auto num_branch_gen = parameterValues[parameterNames.NumBranchGenerations];
@@ -152,6 +153,7 @@ std::string sv4guiPurkinjeNetworkModel::CreateCommand(const std::string infile, 
   // Optional parameters.
   cmd += "avg_branch_length='" + avg_branch_length +  "',";
   cmd += "branch_angle='" + branch_angle + "',";
+  cmd += "initial_length='" + initial_length + "',";
   cmd += "branch_seg_length='" + branch_seg_length + "',";
   cmd += "num_branch_gen='" + num_branch_gen + "',";
   cmd += "repulsive_parameter='" + repulsive_parameter + "'";

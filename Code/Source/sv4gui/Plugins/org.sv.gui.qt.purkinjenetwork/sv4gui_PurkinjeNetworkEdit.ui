@@ -105,7 +105,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget1">
    <property name="geometry">
     <rect>
      <x>1</x>
@@ -137,7 +137,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget2">
    <property name="geometry">
     <rect>
      <x>1</x>
@@ -166,7 +166,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget3">
    <property name="geometry">
     <rect>
      <x>1</x>
@@ -240,7 +240,7 @@
     <string>The Z-coordinate of the network start point.</string>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget4">
    <property name="geometry">
     <rect>
      <x>1</x>
@@ -276,7 +276,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget5">
    <property name="geometry">
     <rect>
      <x>1</x>
@@ -305,7 +305,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget6">
    <property name="geometry">
     <rect>
      <x>1</x>
@@ -334,6 +334,35 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="layoutWidget7">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>480</y>
+     <width>166</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_100">
+    <item>
+     <widget class="QLabel" name="label_100">
+      <property name="text">
+       <string>Initial length</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="initialLengthSpinBox">
+      <property name="toolTip">
+       <string>The length of the first branch.</string>
+      </property>
+      <property name="value">
+       <double>5.0000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+   </widget>
   <widget class="QLineEdit" name="secondPointYLineEdit">
    <property name="geometry">
     <rect>
