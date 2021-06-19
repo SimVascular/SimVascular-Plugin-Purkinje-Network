@@ -695,6 +695,9 @@ std::map<std::string, std::string> sv4guiPurkinjeNetworkEdit::GetParametersFromG
   auto branchAngle = std::to_string(ui->branchAngleSpinBox->value());
   params.insert(pair<std::string,std::string>(paramNames.BranchAngle, branchAngle));
 
+  auto initialLength = std::to_string(ui->initialLengthSpinBox->value());
+  params.insert(pair<std::string,std::string>(paramNames.InitialLength, initialLength));
+
   auto branchSegLength = std::to_string(ui->branchSegLengthSpinBox->value());
   params.insert(pair<std::string,std::string>(paramNames.BranchSegLength, branchSegLength));
 
@@ -866,7 +869,9 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
         std::stringstream ss(line);
         ss >> name;
         std::cout << " name " << name << std::endl;
+
         if (name == paramNames.FirstPoint) {
+
           ss >> v1 >> v2 >> v3;
           std::cout << " 1st v1 " << v1 << std::endl;
           std::cout << " 1st v2 " << v2 << std::endl;
@@ -878,7 +883,9 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
           ui->startPointXLineEdit->setText(QString::fromStdString(v1));
           ui->startPointYLineEdit->setText(QString::fromStdString(v2));
           ui->startPointZLineEdit->setText(QString::fromStdString(v3));
+
         } else if (name == paramNames.SecondPoint) {
+
           ss >> v1 >> v2 >> v3;
           std::cout << " 2nd v1 " << v1 << std::endl;
           std::cout << " 2nd v2 " << v2 << std::endl;
@@ -890,15 +897,31 @@ void sv4guiPurkinjeNetworkEdit::LoadParameters()
           ui->secondPointXLineEdit->setText(QString::fromStdString(v1));
           ui->secondPointYLineEdit->setText(QString::fromStdString(v2));
           ui->secondPointZLineEdit->setText(QString::fromStdString(v3));
+
         } else if (name == paramNames.NumBranchGenerations) {
           ss >> v1;
           ui->numBranchGenSpinBox->setValue(std::stoi(v1));
+	  
         } else if (name == paramNames.AvgBranchLength) {
           ss >> v1;
           ui->avgBranchLengthSpinBox->setValue(std::stod(v1));
+	  
+        } else if (name == paramNames.BranchAngle) {
+          ss >> v1;
+          ui->branchAngleSpinBox->setValue(std::stod(v1));
+
+	} else if (name == paramNames.RepulsiveParameter) {
+          ss >> v1;
+          ui->repulsiveParameterSpinBox->setValue(std::stod(v1));
+ 
         } else if (name == paramNames.BranchSegLength) {
           ss >> v1;
           ui->branchSegLengthSpinBox->setValue(std::stod(v1));
+	  
+        } else if (name == paramNames.InitialLength) {
+          ss >> v1;
+          ui->initialLengthSpinBox->setValue(std::stod(v1));
+
         }
       }
       inFile.close();
