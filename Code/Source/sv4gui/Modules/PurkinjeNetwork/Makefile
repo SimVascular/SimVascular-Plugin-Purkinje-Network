@@ -70,7 +70,7 @@ CXXSRCS += us_init.cxx
 
 UIFILES =
 
-#SV_APPEND_CPPMICROSERVICES_TO_DLL = 1
+SV_APPEND_CPPMICROSERVICES_TO_DLL = 1
 RCFILES = \
    resource/Interactions/meshConfig.xml \
    resource/Interactions/meshInteraction.xml

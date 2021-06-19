@@ -89,8 +89,13 @@ endif
 	-echo "puts \"[file tail $(DIST_DIR)]\"" | tclsh > tmp/timestamp
 	-cp -f tmp/timestamp $(DIST_DIR_PLUGIN_TOP)/
 	-cp -f $(PURKINJENETWORK_PLUGIN_TOP)/Lib/$(LIB_BUILD_DIR)/*purkinjenetwork*.$(SOEXT)* $(DIST_DIR_PLUGIN_TOP)
+
+ifeq ($(SV_USE_PYTHON),1)
+	-mkdir -p $ $(DIST_DIR_PLUGIN_TOP)/Python/$(PYTHON_MAJOR_VERSION).$(PYTHON_MINOR_VERSION)/site-packages
+	-cp -fR ../../Python/site-packages/* $(DIST_DIR_PLUGIN_TOP)/Python/$(PYTHON_MAJOR_VERSION).$(PYTHON_MINOR_VERSION)/site-packages
+endif
 	-echo "Create WXS file..."
-	-tclsh windows_msi_helpers/makewxs-plugin-purkinjenetwork.tcl $(SV_VERSION) $(SV_PLATFORM) $(SV_TIMESTAMP) $(SV_PLUGIN_TIMESTAMP) $(DIST_DIR_PLUGIN_TOP) $(SV_MAJOR_VER_NO) $(SV_PLUGIN_MAJOR_VER_NO) $(SV_PLUGIN_MINOR_VER_NO) $(SV_PLUGIN_PATCH_VER_NO)
+	-tclsh windows_msi_helpers/makewxs-plugin-purkinjenetwork.tcl $(SV_VERSION) $(SV_PLATFORM) $(SV_TIMESTAMP) $(SV_PLUGIN_TIMESTAMP) $(DIST_DIR_PLUGIN_TOP) $(SV_MAJOR_VER_NO) $(SV_PLUGIN_MAJOR_VER_NO) $(SV_PLUGIN_MINOR_VER_NO) $(SV_PLUGIN_PATCH_VER_NO) $(TCL_LIBRARY) $(TK_LIBRARY) $(PYTHON_MAJOR_VERSION) $(PYTHON_MINOR_VERSION) $(SV_CMAKE_BUILD_TYPE)
 	-echo "Run candle..."
 	-$(WIXUI_PATH)/candle.exe -ext WixBalExtension -ext WixUIExtension -ext WixUtilExtension -out tmp/simvascular-plugin-purkinjenetwork.wixobj tmp/simvascular-plugin-purkinjenetwork.wxs
 	-echo "Run light..."
