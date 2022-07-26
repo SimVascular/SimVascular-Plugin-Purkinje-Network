@@ -31,6 +31,7 @@
 
 #include "sv4gui_PurkinjeNetworkFolder.h"
 
+/*
 sv4guiPurkinjeNetworkFolder::sv4guiPurkinjeNetworkFolder() {
 }
 
@@ -39,3 +40,4 @@ sv4guiPurkinjeNetworkFolder::sv4guiPurkinjeNetworkFolder(const sv4guiPurkinjeNet
 
 sv4guiPurkinjeNetworkFolder::~sv4guiPurkinjeNetworkFolder() {
 }
+*/
