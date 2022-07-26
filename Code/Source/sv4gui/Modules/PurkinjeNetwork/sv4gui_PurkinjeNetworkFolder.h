@@ -52,9 +52,9 @@ protected:
 
     mitkCloneMacro(Self);
 
-    sv4guiPurkinjeNetworkFolder();
-    sv4guiPurkinjeNetworkFolder(const sv4guiPurkinjeNetworkFolder &other);
-    virtual ~sv4guiPurkinjeNetworkFolder();
+    sv4guiPurkinjeNetworkFolder(){};
+    sv4guiPurkinjeNetworkFolder(const sv4guiPurkinjeNetworkFolder &other){};
+    virtual ~sv4guiPurkinjeNetworkFolder(){};
 
 };
 
